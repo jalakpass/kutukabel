@@ -1,66 +1,370 @@
 <!DOCTYPE html>
 <html lang="id">
-<img src="portfolio/instalasi-access-control.jpg" alt="Instalasi Access Control">
+<head>
 
-<img src="portfolio/instalasi-breakglass.jpg" alt="Instalasi Break Glass">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<img src="portfolio/instalasi-dropbolt.jpg" alt="Instalasi Drop Bolt">
+<title>KutuKabel | Instalasi Access Control, Fingerprint, CCTV & Jaringan</title>
 
-<img src="portfolio/instalasi-emlock.jpg" alt="Instalasi Magnetic Lock Emlock">
+<meta name="description" content="Instalasi dan maintenance Access Control, Fingerprint, Face Recognition, CCTV dan Jaringan Komputer. Hubungi 08568080882.">
 
-<img src="portfolio/instalasi-exit-button.jpg" alt="Instalasi Exit Button">
+<meta name="keywords" content="access control, fingerprint, face recognition, cctv, jaringan komputer, magnetic lock, absensi fingerprint, door access, instalasi cctv, instalasi jaringan">
 
-<img src="portfolio/instalasi-face-recognition.jpg" alt="Instalasi Face Recognition">
+<meta name="robots" content="index,follow">
 
-<img src="portfolio/instalasi-fingerprint.jpg" alt="Instalasi Fingerprint">
+<meta name="theme-color" content="#1E40AF">
 
-<img src="portfolio/instalasi-wiegand.jpg" alt="Instalasi Wiegand Reader">
+<link rel="icon" type="image/png" href="favicon.png">
+
+<meta property="og:title" content="KutuKabel | Instalasi & Maintenance Access Control, Fingerprint, CCTV & Jaringan">
+<meta property="og:description" content="Instalasi dan maintenance Access Control, Fingerprint, Face Recognition, CCTV dan Jaringan Komputer.">
+<meta property="og:image" content="https://jalakpass.github.io/kutukabel/og-image.jpg">
+<meta property="og:url" content="https://jalakpass.github.io/kutukabel/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="KutuKabel">
+
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+--primary:#1E40AF;
+--dark:#020617;
+--dark2:#0F172A;
+--light:#F8FAFC;
+--wa:#25D366;
+--text:#334155;
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Inter',sans-serif;
+scroll-behavior:smooth;
+}
+
+body{
+background:#fff;
+color:var(--text);
+line-height:1.7;
+}
+
+.container{
+width:92%;
+max-width:1200px;
+margin:auto;
+}
+
+nav{
+position:sticky;
+top:0;
+background:rgba(255,255,255,.95);
+backdrop-filter:blur(12px);
+border-bottom:1px solid #e5e7eb;
+z-index:999;
+}
+
+.nav-wrap{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:14px 0;
+}
+
+.brand{
+font-weight:800;
+font-size:1.2rem;
+color:var(--dark);
+text-decoration:none;
+}
+
+.hero{
+background:
+radial-gradient(circle at top right,#2563eb55,transparent 35%),
+linear-gradient(135deg,#020617,#0F172A);
+color:white;
+padding:80px 0 120px;
+text-align:center;
+}
+
+.logo{
+width:140px;
+margin:auto;
+display:block;
+margin-bottom:20px;
+}
+
+.hero h1{
+font-size:2.3rem;
+line-height:1.1;
+margin-bottom:15px;
+font-weight:800;
+}
+
+.hero p{
+max-width:700px;
+margin:auto;
+opacity:.95;
+}
+
+.btn{
+display:inline-block;
+background:var(--wa);
+color:white;
+text-decoration:none;
+padding:15px 28px;
+border-radius:12px;
+font-weight:700;
+margin-top:25px;
+}
+
+.badges{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+margin-top:30px;
+}
+
+.badge{
+background:rgba(255,255,255,.1);
+padding:12px;
+border-radius:12px;
+font-size:.9rem;
+}
+
+.section{
+padding:80px 0;
+}
+
+.section-title{
+text-align:center;
+font-size:2rem;
+font-weight:800;
+color:var(--dark);
+margin-bottom:35px;
+}
+
+.cards{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:18px;
+}
+
+.card{
+background:white;
+padding:22px;
+border-radius:18px;
+border:1px solid #e5e7eb;
+box-shadow:0 10px 25px rgba(0,0,0,.05);
+}
+
+.card h3{
+color:var(--dark);
+margin-bottom:8px;
+}
+
+.brands{
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+gap:12px;
+}
+
+.brand-item{
+padding:10px 18px;
+background:#eef2ff;
+border-radius:999px;
+font-weight:600;
+}
+
+.gallery{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+}
+
+.gallery img{
+width:100%;
+aspect-ratio:1/1;
+object-fit:cover;
+border-radius:16px;
+cursor:pointer;
+}
+
+.faq{
+display:grid;
+gap:15px;
+}
+
+.faq-item{
+background:#F8FAFC;
+padding:18px;
+border-radius:12px;
+}
+
+.cta{
+background:#0F172A;
+color:white;
+text-align:center;
+padding:80px 20px;
+}
+
+.footer{
+background:#020617;
+color:#94A3B8;
+text-align:center;
+padding:25px;
+}
+
+.float-wa{
+position:fixed;
+right:20px;
+bottom:20px;
+background:#25D366;
+color:white;
+padding:14px 20px;
+border-radius:50px;
+text-decoration:none;
+font-weight:700;
+box-shadow:0 8px 25px rgba(0,0,0,.25);
+}
+
+@media(min-width:768px){
+
+.hero h1{
+font-size:4rem;
+}
+
+.gallery{
+grid-template-columns:repeat(4,1fr);
+}
+
+}
+
+</style>
+
+</head>
 <body>
-<nav><div class="container"><div class="logo-text">KUTUKABEL</div><a href="https://wa.me/628568080882">Kontak Kami</a></div></nav>
+
+<nav>
+<div class="container nav-wrap">
+<a href="#" class="brand">KUTUKABEL</a>
+</div>
+</nav>
 
 <section class="hero">
+
 <div class="container">
-<img src="logo.png" style="width:140px">
-<h1>Solusi Sistem Keamanan & Jaringan</h1>
-<p>Instalasi, perbaikan dan maintenance Access Control, Fingerprint, Face Recognition, CCTV dan Jaringan Komputer untuk rumah, kantor, ruko dan area komersial.</p>
-<a class="btn" href="https://wa.me/628568080882">Konsultasi WhatsApp</a>
+
+<img src="logo.png" class="logo" alt="Logo KutuKabel">
+
+<h1>
+Instalasi & Maintenance<br>
+Access Control, Fingerprint,<br>
+CCTV & Jaringan
+</h1>
+
+<p>
+Melayani instalasi, perbaikan dan maintenance Access Control, Face Recognition, Fingerprint, CCTV serta Jaringan Komputer untuk kantor, ruko, gudang dan area komersial.
+</p>
+
+<a href="https://wa.me/628568080882" class="btn">
+Konsultasi WhatsApp
+</a>
+
+<div class="badges">
+<div class="badge">Dokumentasi Pekerjaan</div>
+<div class="badge">Instalasi & Maintenance</div>
+<div class="badge">Survey & Konsultasi</div>
+<div class="badge">Berbagai Merek</div>
 </div>
+
+</div>
+
 </section>
 
 <section class="section">
+
 <div class="container">
-<h2>Merek yang Sering Ditangani</h2>
+
+<h2 class="section-title">Merek yang Sering Ditangani</h2>
+
 <div class="brands">
-<div class="brand">Hikvision</div><div class="brand">Dahua</div><div class="brand">ZKTeco</div><div class="brand">MikroTik</div><div class="brand">Ruijie</div>
+<div class="brand-item">Hikvision</div>
+<div class="brand-item">Dahua</div>
+<div class="brand-item">ZKTeco</div>
+<div class="brand-item">MikroTik</div>
+<div class="brand-item">Ruijie</div>
 </div>
+
 </div>
+
 </section>
 
 <section class="section">
+
 <div class="container">
-<h2>Layanan</h2>
+
+<h2 class="section-title">Layanan</h2>
+
 <div class="cards">
-<div class="card"><h3>Access Control</h3><p>Door access dan controller.</p></div>
-<div class="card"><h3>Fingerprint</h3><p>Absensi dan kontrol akses.</p></div>
-<div class="card"><h3>Face Recognition</h3><p>Verifikasi wajah.</p></div>
-<div class="card"><h3>CCTV</h3><p>Instalasi dan maintenance.</p></div>
-<div class="card"><h3>Jaringan LAN</h3><p>Kabel, switch dan rack.</p></div>
-<div class="card"><h3>Magnetic Lock</h3><p>Pemasangan dan perbaikan.</p></div>
+
+<div class="card">
+<h3>Access Control</h3>
+<p>Door access, controller dan integrasi keamanan.</p>
 </div>
+
+<div class="card">
+<h3>Fingerprint</h3>
+<p>Absensi dan kontrol akses berbasis sidik jari.</p>
 </div>
+
+<div class="card">
+<h3>Face Recognition</h3>
+<p>Sistem verifikasi wajah untuk keamanan.</p>
+</div>
+
+<div class="card">
+<h3>CCTV</h3>
+<p>Instalasi dan maintenance CCTV.</p>
+</div>
+
+<div class="card">
+<h3>Magnetic Lock</h3>
+<p>Pemasangan dan troubleshooting magnetic lock.</p>
+</div>
+
+<div class="card">
+<h3>Jaringan LAN</h3>
+<p>Kabel, switch, rack dan patch panel.</p>
+</div>
+
+</div>
+
+</div>
+
 </section>
 
 <section class="section">
+
 <div class="container">
-<h2>Portofolio</h2>
+
+<h2 class="section-title">Portofolio</h2>
+
 <div class="gallery">
+
 <img src="portfolio/instalasi-access-control.jpg" alt="Instalasi Access Control">
 
 <img src="portfolio/instalasi-breakglass.jpg" alt="Instalasi Break Glass">
 
 <img src="portfolio/instalasi-dropbolt.jpg" alt="Instalasi Drop Bolt">
 
-<img src="portfolio/instalasi-emlock.jpg" alt="Instalasi Magnetic Lock Emlock">
+<img src="portfolio/instalasi-emlock.jpg" alt="Instalasi Magnetic Lock">
 
 <img src="portfolio/instalasi-exit-button.jpg" alt="Instalasi Exit Button">
 
@@ -69,39 +373,98 @@
 <img src="portfolio/instalasi-fingerprint.jpg" alt="Instalasi Fingerprint">
 
 <img src="portfolio/instalasi-wiegand.jpg" alt="Instalasi Wiegand Reader">
+
 </div>
+
 </div>
+
 </section>
 
 <section class="section">
+
 <div class="container">
-<h2>Mengapa KutuKabel?</h2>
+
+<h2 class="section-title">Mengapa KutuKabel?</h2>
+
 <div class="cards">
-<div class="card"><h3>Pengerjaan Rapi</h3><p>Fokus kualitas instalasi.</p></div>
-<div class="card"><h3>Dokumentasi</h3><p>Dokumentasi proyek tersedia.</p></div>
-<div class="card"><h3>Maintenance</h3><p>Instalasi baru dan sistem lama.</p></div>
-<div class="card"><h3>Berbagai Merek</h3><p>Berpengalaman menangani berbagai perangkat.</p></div>
+
+<div class="card">
+<h3>Pengerjaan Rapi</h3>
+<p>Fokus pada kualitas instalasi dan manajemen kabel.</p>
 </div>
+
+<div class="card">
+<h3>Dokumentasi Proyek</h3>
+<p>Dokumentasi memudahkan maintenance dan pengembangan sistem.</p>
 </div>
+
+<div class="card">
+<h3>Maintenance</h3>
+<p>Melayani instalasi baru maupun sistem yang sudah berjalan.</p>
+</div>
+
+<div class="card">
+<h3>Berbagai Merek</h3>
+<p>Berpengalaman menangani berbagai perangkat keamanan dan jaringan.</p>
+</div>
+
+</div>
+
+</div>
+
 </section>
 
 <section class="section">
+
 <div class="container">
-<h2>FAQ</h2>
-<div class="cards">
-<div class="card"><h3>Survey lokasi?</h3><p>Ya.</p></div>
-<div class="card"><h3>Perbaikan sistem lama?</h3><p>Ya.</p></div>
-<div class="card"><h3>Perangkat milik customer?</h3><p>Ya.</p></div>
+
+<h2 class="section-title">FAQ</h2>
+
+<div class="faq">
+
+<div class="faq-item">
+<h4>Apakah bisa survey lokasi?</h4>
+<p>Ya, sesuai kebutuhan proyek.</p>
 </div>
+
+<div class="faq-item">
+<h4>Apakah menerima perbaikan sistem lama?</h4>
+<p>Ya, termasuk troubleshooting dan maintenance.</p>
 </div>
+
+<div class="faq-item">
+<h4>Apakah bisa instalasi perangkat milik customer?</h4>
+<p>Ya, selama perangkat kompatibel dengan sistem.</p>
+</div>
+
+</div>
+
+</div>
+
 </section>
 
 <section class="cta">
+
 <h2>Butuh Bantuan Instalasi atau Perbaikan?</h2>
-<p>Hubungi 08568080882</p>
-<a class="btn" href="https://wa.me/628568080882">Chat WhatsApp</a>
+
+<p>Hubungi kami melalui WhatsApp</p>
+
+<a href="https://wa.me/628568080882" class="btn">
+0856-8080-882
+</a>
+
 </section>
 
-<div class="footer">© 2026 KUTUKABEL</div>
-<a class="float" href="https://wa.me/628568080882">WhatsApp</a>
-</body></html>
+<footer class="footer">
+
+© 2026 KUTUKABEL<br>
+Access Control • Fingerprint • CCTV • Jaringan
+
+</footer>
+
+<a class="float-wa" href="https://wa.me/628568080882">
+WhatsApp
+</a>
+
+</body>
+</html>
