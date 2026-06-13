@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KutuBot - Diagnosa Gratis | KutuKabel</title>
+
+<style>
+  /* Style sama seperti sebelumnya (saya ringkas) */
+  :root{--bg:#FAFAF8;--bg2:#F0EDE6;--card:#fff;--text:#1A1A18;--muted:#5A5955;--border:#D8D4CC;--orange:#C94E18;}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;line-height:1.6}
+
+  header{position:sticky;top:0;z-index:100;background:rgba(250,250,248,0.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:0 6vw;}
+  .header-in{max-width:1000px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:70px;}
+  .logo{font-size:18px;font-weight:800;color:var(--text);text-decoration:none}
+  .logo b{color:var(--orange)}
+
+  .chat-container{max-width:800px;margin:40px auto;height:calc(100vh - 120px);display:flex;flex-direction:column;border:1px solid var(--border);border-radius:20px;overflow:hidden;background:var(--card);}
+  .chat-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
+  .messages{flex:1;padding:24px;overflow-y:auto;background:var(--bg2);display:flex;flex-direction:column;gap:16px;}
+  .message{max-width:80%;padding:14px 18px;border-radius:18px;line-height:1.5;}
+  .user{align-self:flex-end;background:var(--orange);color:white;border-bottom-right-radius:4px;}
+  .bot{align-self:flex-start;background:var(--card);border:1px solid var(--border);border-bottom-left-radius:4px;}
+  .warning{background:#FEF3C7;color:#92400E;border:1px solid #FCD34D;}
+
+  .input-area{padding:20px 24px;background:var(--card);border-top:1px solid var(--border);}
+  .input-wrapper{display:flex;gap:12px;align-items:center;background:var(--bg2);border-radius:9999px;padding:8px 12px;border:1px solid var(--border);}
+  input{flex:1;border:none;background:transparent;font-size:16px;outline:none;padding:12px 8px;}
+  button{background:var(--orange);color:white;border:none;width:48px;height:48px;border-radius:50%;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-in">
+    <a href="/" class="logo">Kutu<b>Kabel</b></a>
+    <div style="font-weight:600;color:var(--orange)">KutuBot • Diagnosa AI</div>
+  </div>
+</header>
+
+<div class="chat-container">
+  <div class="chat-header">
+    <div style="width:42px;height:42px;background:var(--orange);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:20px">🤖</div>
+    <div>
+      <h1>KutuBot</h1>
+      <p style="font-size:13px;color:var(--muted)">Teknisi AI CCTV • Access Control • Jaringan</p>
+    </div>
+  </div>
+
+  <div class="messages" id="messages">
+    <div class="message bot">
+      Halo! Saya <strong>KutuBot</strong>.<br><br>
+      Tolong jelaskan masalah Anda dengan jelas dan lengkap agar saya bisa membantu dengan baik.<br>
+      Contoh: "Kamera CCTV no. 3 tidak muncul di NVR setelah hujan deras"
+    </div>
+  </div>
+
+  <div class="input-area">
+    <div class="input-wrapper">
+      <input type="text" id="userInput" placeholder="Jelaskan masalah Anda secara detail..." onkeypress="if(event.key==='Enter') sendMessage()">
+      <button onclick="sendMessage()">↑</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Filter & Logic KutuBot
+let shortMessageCount = 0;
+
+function isShortOrInvalid(text) {
+  const trimmed = text.trim();
+  if (trimmed.length < 8) return true;
+  
+  // Kata yang terlalu umum / test
+  const lowQualityWords = ["tes", "test", "coba", "halo", "hai", "hi", "bot", "?", "!!", "oke", "ok"];
+  const lower = trimmed.toLowerCase();
+  
+  if (lowQualityWords.some(word => lower.includes(word) && trimmed.length < 15)) {
+    return true;
+  }
+  
+  // Hanya angka atau simbol
+  if (/^[\d\s\W]+$/.test(trimmed)) return true;
+  
+  return false;
+}
+
+function addMessage(text, isUser, isWarning = false) {
+  const messages = document.getElementById('messages');
+  const msg = document.createElement('div');
+  msg.className = `message ${isUser ? 'user' : 'bot'} ${isWarning ? 'warning' : ''}`;
+  msg.innerHTML = text;
+  messages.appendChild(msg);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function sendMessage() {
+  const input = document.getElementById('userInput');
+  let text = input.value.trim();
+  
+  if (!text) return;
+
+  addMessage(text, true);
+  input.value = '';
+
+  // === FILTER LOGIC ===
+  if (isShortOrInvalid(text)) {
+    shortMessageCount++;
+    
+    if (shortMessageCount >= 3) {
+      addMessage("Maaf, sepertinya Anda hanya mencoba-coba.<br><br>Untuk mendapatkan bantuan yang baik, tolong jelaskan masalah Anda dengan lebih lengkap ya.", false, true);
+    } else {
+      addMessage("Mohon maaf, pesan Anda terlalu singkat.<br><br>Contoh yang baik:<br>• Kamera CCTV mati total setelah listrik padam<br>• Door access tidak bisa dibuka padahal sudah scan RFID", false, true);
+    }
+    return;
+  }
+
+  // Reset counter kalau pesan sudah cukup panjang
+  shortMessageCount = 0;
+
+  // Simulasi jawaban AI (nanti diganti Groq)
+  setTimeout(() => {
+    addMessage("Terima kasih atas penjelasannya. Saya sedang menganalisa...<br><br>Apakah Anda bisa tambahkan informasi berikut?<br>1. Merk & tipe perangkat<br>2. Gejala yang muncul persis<br>3. Sudah dicoba apa saja?", false);
+  }, 700);
+}
+</script>
+
+</body>
+</html>
