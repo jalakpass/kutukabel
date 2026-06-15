@@ -439,7 +439,23 @@ async function sendMessage(){
         temperature:0.7
       })
     });
-    const data=await response.json();
+    const text=await response.text();
+    let data;
+    try{data=JSON.parse(text);}catch(e){
+      removeTyping();
+      addMessage('bot','Response tidak terbaca. Coba lagi ya. (err: parse)');
+      return;
+    }
+    if(data.error){
+      removeTyping();
+      addMessage('bot','Groq error: '+data.error.message+'. Coba lagi sebentar.');
+      return;
+    }
+    if(!data.choices||!data.choices[0]){
+      removeTyping();
+      addMessage('bot','Response tidak lengkap. Coba lagi ya.');
+      return;
+    }
     const reply=data.choices[0].message.content;
     removeTyping();
     addMessage('bot',reply);
@@ -449,7 +465,7 @@ async function sendMessage(){
     if(conversationHistory.filter(m=>m.role==='user').length>=3)showEskalasi();
   }catch(e){
     removeTyping();
-    addMessage('bot','Waduh, koneksi ke server lagi gangguan nih. Coba lagi sebentar ya.');
+    addMessage('bot','Error: '+e.message);
   }
 }
 
