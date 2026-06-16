@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<button onclick="kirim()">
+Tambah Kasus Test
+</button>
+
+<script>
+async function kirim(){
+
+  const res = await fetch(
+    "https://kutukabel-api.jalakpass.workers.dev",
+    {
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({
+        device:"CCTV Hikvision",
+        symptom:"Camera Offline",
+        solution:"Ganti konektor RJ45"
+      })
+    }
+  );
+
+  const data = await res.json();
+
+  alert(JSON.stringify(data));
+
+}
+</script>
+
+</body>
+</html>
