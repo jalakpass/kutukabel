@@ -3,27 +3,58 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login - KutuKabel</title>
+<title>Login Teknisi | KutuKabel</title>
+
+<style>
+body{
+font-family:Arial,sans-serif;
+background:#f5f5f5;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+.card{
+background:white;
+padding:30px;
+border-radius:12px;
+width:320px;
+box-shadow:0 10px 30px rgba(0,0,0,.1);
+}
+
+input{
+width:100%;
+padding:12px;
+margin-bottom:12px;
+border:1px solid #ddd;
+border-radius:8px;
+}
+
+button{
+width:100%;
+padding:12px;
+background:#d46316;
+color:white;
+border:none;
+border-radius:8px;
+}
+</style>
 </head>
+
 <body>
+
+<div class="card">
 
 <h1>Login Teknisi</h1>
 
-<form>
-  <input type="text" placeholder="Username">
-  <br><br>
+<input type="text" placeholder="Username">
 
-  <input type="password" placeholder="Password">
-  <br><br>
+<input type="password" placeholder="Password">
 
-  <button type="submit">
-    Login
-  </button>
-</form>
+<button>Login</button>
 
-<p>
-  Lupa Password?
-</p>
+</div>
 
 </body>
 </html>
