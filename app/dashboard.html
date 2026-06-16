@@ -1,21 +1,92 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-<title>Dashboard</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Teknisi | KutuKabel</title>
+
+<style>
+body{
+    font-family:Arial,sans-serif;
+    background:#f5f5f5;
+    margin:0;
+}
+
+.header{
+    background:#d46316;
+    color:white;
+    padding:15px 25px;
+}
+
+.container{
+    max-width:1000px;
+    margin:auto;
+    padding:20px;
+}
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:15px;
+}
+
+.card{
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 3px 10px rgba(0,0,0,.05);
+}
+
+.menu{
+    margin-top:20px;
+}
+
+.menu a{
+    display:inline-block;
+    padding:12px 18px;
+    background:#d46316;
+    color:white;
+    text-decoration:none;
+    border-radius:8px;
+    margin-right:10px;
+}
+</style>
 </head>
+
 <body>
 
-<h1>Dashboard Teknisi</h1>
+<div class="header">
+<h2>KutuKabel Dashboard</h2>
+</div>
 
-<ul>
-  <li>Total Kasus : 0</li>
-  <li>Draft : 0</li>
-  <li>Published : 0</li>
-</ul>
+<div class="container">
 
-<a href="kasus-baru.html">
-Tambah Kasus
-</a>
+<div class="cards">
+
+<div class="card">
+<h3>0</h3>
+<p>Total Kasus</p>
+</div>
+
+<div class="card">
+<h3>0</h3>
+<p>Draft</p>
+</div>
+
+<div class="card">
+<h3>0</h3>
+<p>Published</p>
+</div>
+
+</div>
+
+<div class="menu">
+<a href="kasus-baru.html">+ Kasus Baru</a>
+<a href="#">Pengumuman</a>
+<a href="#">Pengguna</a>
+</div>
+
+</div>
 
 </body>
 </html>
