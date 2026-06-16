@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test API KutuKabel</title>
+</head>
+<body>
+
+<h1>Test API KutuKabel</h1>
+
+<button onclick="kirim()">
+Tambah Kasus Test
+</button>
+
+<hr>
+
+<div id="hasil">
+Belum ada respon...
+</div>
+
+<script>
+async function kirim() {
+
+  try {
+
+    const res = await fetch(
+      "https://kutukabel-api.jalakpass.workers.dev",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          device: "CCTV Hikvision",
+          symptom: "Camera Offline",
+          solution: "Ganti konektor RJ45"
+        })
+      }
+    );
+
+    const data = await res.json();
+
+    document.getElementById("hasil").innerText =
+      JSON.stringify(data);
+
+  } catch (err) {
+
+    document.getElementById("hasil").innerText =
+      "ERROR: " + err.message;
+
+  }
+}
+</script>
+
+</body>
+</html>
