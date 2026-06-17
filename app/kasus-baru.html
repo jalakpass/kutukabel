@@ -3,38 +3,88 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kasus Baru</title>
+
+<title>Kasus Baru | KutuKabel</title>
 
 <style>
+
 body{
-font-family:Arial;
+font-family:Arial,sans-serif;
 background:#f5f5f5;
 padding:20px;
+margin:0;
 }
 
 .card{
-background:white;
-padding:20px;
-border-radius:12px;
-max-width:700px;
+max-width:900px;
 margin:auto;
+background:white;
+padding:25px;
+border-radius:12px;
+box-shadow:0 2px 10px rgba(0,0,0,.08);
 }
 
-input, textarea{
+h1{
+margin-top:0;
+}
+
+label{
+display:block;
+margin-top:15px;
+margin-bottom:5px;
+font-weight:bold;
+}
+
+input,
+select,
+textarea{
 width:100%;
-padding:10px;
-margin-bottom:10px;
+padding:12px;
+border:1px solid #ddd;
+border-radius:8px;
+box-sizing:border-box;
 }
 
-button{
+textarea{
+min-height:120px;
+resize:vertical;
+}
+
+.row{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:15px;
+}
+
+.btn{
 padding:12px 20px;
-background:#d46316;
-color:white;
 border:none;
 border-radius:8px;
+cursor:pointer;
+font-weight:bold;
 }
-</style>
 
+.btn-ai{
+background:#d46316;
+color:white;
+}
+
+.btn-save{
+background:#222;
+color:white;
+}
+
+.actions{
+display:flex;
+gap:10px;
+margin-top:20px;
+}
+
+#promptOutput{
+min-height:250px;
+}
+
+</style>
 </head>
 
 <body>
@@ -43,25 +93,132 @@ border-radius:8px;
 
 <h1>Kasus Baru</h1>
 
-<input type="text" placeholder="Perangkat">
+<div class="row">
 
-<input type="text" placeholder="Model">
+<div>
+<label>Kategori</label>
+<select id="category">
+<option>CCTV</option>
+<option>Access Control</option>
+<option>Network</option>
+<option>PABX</option>
+<option>Alarm</option>
+</select>
+</div>
 
-<textarea placeholder="Gejala"></textarea>
+<div>
+<label>Merk</label>
+<input id="brand" type="text">
+</div>
 
-<textarea placeholder="Solusi"></textarea>
+</div>
 
-<input type="text" placeholder="Nama Klien">
+<div class="row">
 
+<div>
+<label>Model</label>
+<input id="model" type="text">
+</div>
+
+<div>
+<label>Perangkat</label>
+<input id="device" type="text">
+</div>
+
+</div>
+
+<label>Gejala</label>
+<textarea id="symptom"></textarea>
+
+<label>Penyebab</label>
+<textarea id="cause"></textarea>
+
+<label>Solusi</label>
+<textarea id="solution"></textarea>
+
+<label>Tools Digunakan</label>
+<textarea id="tools"></textarea>
+
+<label>Catatan Teknisi</label>
+<textarea id="notes"></textarea>
+
+<label>Nama Klien (Opsional)</label>
+<input id="client" type="text">
+
+<label>Upload Foto</label>
 <input type="file">
 
-<br><br>
+<div class="actions">
 
-<button>
-Generate AI
+<button class="btn btn-ai"
+onclick="generatePrompt()">
+Generate Prompt AI
+</button>
+
+<button class="btn btn-save">
+Simpan Kasus
 </button>
 
 </div>
+
+<hr>
+
+<h2>Prompt AI</h2>
+
+<textarea id="promptOutput"></textarea>
+
+</div>
+
+<script>
+
+function generatePrompt(){
+
+const prompt = `
+
+Anda adalah teknisi lapangan berpengalaman yang sedang menulis dokumentasi troubleshooting untuk database pengetahuan KutuKabel.
+
+Tujuan tulisan ini adalah membagikan pengalaman nyata kepada teknisi lain yang mungkin menghadapi masalah serupa.
+
+Tulis seperti catatan pengalaman lapangan, bukan artikel marketing, bukan manual produk, dan bukan jawaban AI.
+
+Kategori: ${document.getElementById('category').value}
+
+Merk: ${document.getElementById('brand').value}
+
+Model: ${document.getElementById('model').value}
+
+Perangkat: ${document.getElementById('device').value}
+
+Gejala: ${document.getElementById('symptom').value}
+
+Penyebab: ${document.getElementById('cause').value}
+
+Solusi: ${document.getElementById('solution').value}
+
+Tools: ${document.getElementById('tools').value}
+
+Catatan Teknisi:
+${document.getElementById('notes').value}
+
+Buat:
+
+1. Judul Kasus
+
+2. Ringkasan
+
+3. Narasi Troubleshooting
+
+4. Pembelajaran Teknis
+
+5. Kata Kunci
+
+`;
+
+document.getElementById('promptOutput').value = prompt;
+
+}
+
+</script>
 
 </body>
 </html>
