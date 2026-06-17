@@ -1,85 +1,61 @@
-export default {
-  async fetch(request, env) {
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test API KutuKabel</title>
+</head>
 
-    const headers = {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type"
-    };
+<body>
 
-    if (request.method === "OPTIONS") {
-      return new Response(null, {
-        headers
-      });
-    }
+<h1>Test API KutuKabel</h1>
 
-    if (request.method === "GET") {
+<button onclick="kirim()">
+Tambah Kasus Test
+</button>
 
-      const result = await env.DB
-        .prepare("SELECT COUNT(*) as total FROM cases")
-        .first();
+<hr>
 
-      return new Response(
-        JSON.stringify(result),
-        { headers }
-      );
-    }
+<div id="hasil">
+Belum ada respon...
+</div>
 
-    if (request.method === "POST") {
+<script>
 
-      try {
+async function kirim() {
 
-        const data = await request.json();
+  try {
 
-        await env.DB.prepare(`
-          INSERT INTO cases (
-            id,
-            device,
-            symptom,
-            solution
-          )
-          VALUES (?, ?, ?, ?)
-        `)
-        .bind(
-          crypto.randomUUID(),
-          data.device,
-          data.symptom,
-          data.solution
-        )
-        .run();
-
-        return new Response(
-          JSON.stringify({
-            success: true,
-            message: "Kasus tersimpan"
-          }),
-          { headers }
-        );
-
-      } catch (err) {
-
-        return new Response(
-          JSON.stringify({
-            success: false,
-            error: err.message
-          }),
-          { headers }
-        );
-
-      }
-
-    }
-
-    return new Response(
-      JSON.stringify({
-        error: "Method not allowed"
-      }),
+    const res = await fetch(
+      "https://kutukabel-api.jalakpass.workers.dev",
       {
-        status: 405,
-        headers
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          device: "CCTV Hikvision",
+          symptom: "Camera Offline",
+          solution: "Ganti konektor RJ45"
+        })
       }
     );
 
+    const data = await res.json();
+
+    document.getElementById("hasil").innerHTML =
+      JSON.stringify(data, null, 2);
+
+  } catch (err) {
+
+    document.getElementById("hasil").innerHTML =
+      "ERROR: " + err.message;
+
   }
+
 }
+
+</script>
+
+</body>
+</html>
