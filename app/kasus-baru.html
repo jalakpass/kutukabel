@@ -137,9 +137,48 @@ document.getElementById("category").value;
 const device =
 document.getElementById("device").value.trim();
 
+const category =
+document.getElementById("category").value;
+
+const device =
+document.getElementById("device").value.trim();
+
 if(!device){
 
 alert("Perangkat wajib diisi");
+
+return;
+
+}
+
+const symptom =
+document.getElementById("symptom").value.trim();
+
+if(!symptom){
+
+alert("Gejala wajib diisi");
+
+return;
+
+}
+
+const solution =
+document.getElementById("solution").value.trim();
+
+if(!solution){
+
+alert("Solusi wajib diisi");
+
+return;
+
+}
+
+const content =
+document.getElementById("content").value.trim();
+
+if(!content){
+
+alert("Narasi AI wajib diisi");
 
 return;
 
