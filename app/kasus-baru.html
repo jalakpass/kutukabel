@@ -130,6 +130,21 @@ alert("Prompt berhasil disalin");
 }
 
 async function simpanKasus(){
+
+const category =
+document.getElementById("category").value;
+
+const device =
+document.getElementById("device").value.trim();
+
+if(!device){
+
+alert("Perangkat wajib diisi");
+
+return;
+
+}
+
 try{
 const res = await fetch(
 "https://kutukabel-api.jalakpass.workers.dev/cases",
