@@ -178,6 +178,19 @@ return;
 
 }
 
+if(
+!confirm(
+"Yakin ingin menyimpan kasus ini?"
+)
+){
+return;
+}
+
+let title = content
+.split("\n")[0]
+.replace(/^#+/,"")
+.trim();
+
 try{
 const res = await fetch(
 "https://kutukabel-api.jalakpass.workers.dev/cases",
@@ -185,6 +198,9 @@ const res = await fetch(
 method:"POST",
 headers:{"Content-Type":"application/json"},
 body:JSON.stringify({
+
+title:title,
+
 device: document.getElementById("device").value,
 symptom: document.getElementById("symptom").value,
 solution: document.getElementById("solution").value,
@@ -195,7 +211,21 @@ content: document.getElementById("content").value
 }
 );
 const data = await res.json();
-alert(data.message || data.error);
+
+if(data.success){
+
+alert("✅ Kasus berhasil disimpan");
+
+window.location.href =
+"daftar-kasus.html";
+
+}else{
+
+alert(
+data.error || "Gagal menyimpan"
+);
+
+}
 }catch(err){
 alert("Gagal: " + err.message);
 }
