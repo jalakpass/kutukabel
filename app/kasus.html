@@ -1,33 +1,136 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Daftar Kasus</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Detail Kasus | KutuKabel</title>
+
+<style>
+
+body{
+font-family:Arial,sans-serif;
+background:#f5f5f5;
+padding:20px;
+margin:0;
+}
+
+.container{
+max-width:900px;
+margin:auto;
+background:white;
+padding:30px;
+border-radius:12px;
+box-shadow:0 2px 10px rgba(0,0,0,.08);
+}
+
+h1{
+margin-top:0;
+margin-bottom:10px;
+}
+
+.meta{
+color:#666;
+margin-bottom:20px;
+padding-bottom:20px;
+border-bottom:1px solid #eee;
+}
+
+.content{
+white-space:pre-wrap;
+line-height:1.8;
+font-size:15px;
+}
+
+.back{
+display:inline-block;
+margin-bottom:20px;
+text-decoration:none;
+color:#d46316;
+font-weight:bold;
+}
+
+</style>
 </head>
+
 <body>
 
-<h1>Daftar Kasus</h1>
+<div class="container">
 
-<table border="1" cellpadding="10">
-<tr>
-<th>ID</th>
-<th>Perangkat</th>
-<th>Status</th>
-</tr>
-
-<tr>
-<td>001</td>
-<td>CCTV Hikvision</td>
-<td>Draft</td>
-</tr>
-
-</table>
-
-<br>
-
-<a href="kasus-baru.html">
-+ Tambah Kasus
+<a href="daftar-kasus.html" class="back">
+← Kembali ke Daftar Kasus
 </a>
+
+<h1 id="title">
+Loading...
+</h1>
+
+<div class="meta">
+
+<div>
+<b>Perangkat:</b>
+<span id="device"></span>
+</div>
+
+<div>
+<b>Klien:</b>
+<span id="client"></span>
+</div>
+
+</div>
+
+<div
+id="content"
+class="content">
+Memuat data...
+</div>
+
+</div>
+
+<script>
+
+const params =
+new URLSearchParams(
+window.location.search
+);
+
+const id =
+params.get("id");
+
+async function loadCase(){
+
+try{
+
+const res = await fetch(
+"https://kutukabel-api.jalakpass.workers.dev/case?id=" + id
+);
+
+const data = await res.json();
+
+document.getElementById("title").innerText =
+data.title || "Tanpa Judul";
+
+document.getElementById("device").innerText =
+data.device || "-";
+
+document.getElementById("client").innerText =
+data.client_name || "-";
+
+document.getElementById("content").innerText =
+data.content || "Belum ada narasi AI";
+
+}catch(err){
+
+document.getElementById("content").innerText =
+"Gagal memuat data";
+
+}
+
+}
+
+loadCase();
+
+</script>
 
 </body>
 </html>
