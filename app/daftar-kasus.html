@@ -110,7 +110,19 @@ ${item.title || item.device}
 </div>
 
 <div class="meta">
-${item.created_at}
+
+Perangkat:
+${item.device || "-"}
+
+<br>
+
+Klien:
+${item.client_name || "-"}
+
+<br>
+
+${item.created_at || ""}
+
 </div>
 
 </div>
