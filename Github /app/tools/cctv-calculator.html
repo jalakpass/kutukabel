@@ -142,7 +142,15 @@ parseInt(document.getElementById("hours").value);
 const days =
 parseInt(document.getElementById("days").value);
   
-let bitrate = resolution;
+let bitrateMap = {
+2: 2,
+4: 4,
+5: 5,
+8: 8,
+12: 12
+};
+
+let bitrate = bitrateMap[resolution];
 
 if(codec === "h265"){
 bitrate = bitrate * 0.5;
