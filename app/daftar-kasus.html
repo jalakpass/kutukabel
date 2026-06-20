@@ -100,6 +100,12 @@ document.getElementById("cases");
 
 container.innerHTML = "";
 
+document.getElementById(
+"resultCount"
+).innerHTML =
+data.length +
+" kasus ditemukan";
+
 data.forEach(item=>{
 
 container.innerHTML += `
