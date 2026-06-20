@@ -101,7 +101,32 @@ footer{border-top:1px solid var(--border);padding:16px 24px;display:flex;align-i
 .foot-wa{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--orange);text-decoration:none;font-weight:500;transition:opacity .15s}
 .foot-wa:hover{opacity:.8}
 .foot-wa svg{width:15px;height:15px;fill:#25d366}
-@media(max-width:600px){.portal-links{grid-template-columns:1fr 1fr}.hero-logo{font-size:38px}.nav-right a:not(:last-child){display:none}}
+@media(max-width:600px){
+
+.portal-links{
+grid-template-columns:1fr 1fr;
+}
+
+.hero-logo{
+font-size:38px;
+}
+
+.nav-right{
+gap:12px;
+}
+
+.nav-right a{
+display:block;
+font-size:12px;
+}
+
+.nav-right a:last-child{
+display:none;
+}
+
+}
+
+}
 </style>
 </head>
 <body>
@@ -141,13 +166,13 @@ footer{border-top:1px solid var(--border);padding:16px 24px;display:flex;align-i
   <div class="portal-links">
     <a href="/app/daftar-kasus.html" class="portal-card">
       
-      <div class="portal-card-title">Kasus Lapangan</div>
-      <div class="portal-card-desc">Artikel troubleshoot dari pengalaman nyata kami</div>
+      <div class="portal-card-title">Database Kasus</div>
+		<div class="portal-card-desc">Cari solusi dari pengalaman teknisi lapangan</div>
     </a>
     <a href="/tools/cctv-calculator" class="portal-card">
       
-      <div class="portal-card-title">CCTV Calculator</div>
-      <div class="portal-card-desc">Hitung kebutuhan HDD untuk sistem CCTV kamu</div>
+      <div class="portal-card-title">Tools Teknisi</div>
+		<div class="portal-card-desc">Kalkulator HDD CCTV dan alat bantu teknis lainnya</div>
     </a>
     <a href="https://www.tiktok.com/@carebusy" target="_blank" rel="noopener" class="portal-card">
       
