@@ -146,6 +146,18 @@ allCases.filter(item =>
 .toLowerCase()
 .includes(keyword)
 
+||
+
+(item.device || "")
+.toLowerCase()
+.includes(keyword)
+
+||
+
+(item.client_name || "")
+.toLowerCase()
+.includes(keyword)
+
 );
 
 renderCases(filtered);
