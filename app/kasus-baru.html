@@ -132,6 +132,36 @@ Buat:
 document.getElementById('promptOutput').value = prompt;
 }
 
+async function uploadPhoto(file){
+
+if(!file) return "";
+
+const formData = new FormData();
+
+formData.append("file", file);
+
+const res = await fetch(
+"https://kutukabel-api.jalakpass.workers.dev/upload",
+{
+method:"POST",
+body:formData
+}
+);
+
+const data = await res.json();
+
+if(data.success){
+
+return data.file;
+
+}
+
+throw new Error(
+data.error || "Upload gagal"
+);
+
+}
+  
 function copyPrompt(){
 navigator.clipboard.writeText(document.getElementById("promptOutput").value);
 alert("Prompt berhasil disalin");
@@ -199,7 +229,33 @@ let title = content
 .replace(/^#+/,"")
 .trim();
 
+const beforeFile =
+document.getElementById("photoBefore")
+.files[0];
+
+const afterFile =
+document.getElementById("photoAfter")
+.files[0];
+
 try{
+
+let photoBefore = "";
+let photoAfter = "";
+
+if(beforeFile){
+
+photoBefore =
+await uploadPhoto(beforeFile);
+
+}
+
+if(afterFile){
+
+photoAfter =
+await uploadPhoto(afterFile);
+
+}
+
 const res = await fetch(
 "https://kutukabel-api.jalakpass.workers.dev/cases",
 {
@@ -245,8 +301,8 @@ document.getElementById("promptOutput").value,
 content:
 document.getElementById("content").value,
 
-photo_before:"",
-photo_after:""
+photo_before:photoBefore,
+photo_after:photoAfter
 
 })
 }
