@@ -103,6 +103,13 @@ margin-bottom:15px;
 <option value="30">30 FPS</option>
 </select>
 
+<label>Kualitas Video</label>
+<select id="quality">
+<option value="low">Low</option>
+<option value="medium" selected>Medium</option>
+<option value="high">High</option>
+</select>
+  
 <label>Jam Rekam per Hari</label>
 <input type="number" id="hours" value="24">
 
@@ -142,18 +149,48 @@ parseInt(document.getElementById("hours").value);
 const days =
 parseInt(document.getElementById("days").value);
   
-let bitrateMap = {
-2: 2,
-4: 4,
-5: 5,
-8: 8,
-12: 12
+const quality =
+document.getElementById("quality").value;
+
+const bitrateTable = {
+
+2:{
+low:1.8,
+medium:2.5,
+high:4.0
+},
+
+4:{
+low:3.0,
+medium:4.5,
+high:6.5
+},
+
+5:{
+low:4.0,
+medium:5.5,
+high:8.0
+},
+
+8:{
+low:6.0,
+medium:8.0,
+high:12.0
+},
+
+12:{
+low:8.0,
+medium:12.0,
+high:16.0
+}
+
 };
 
-let bitrate = bitrateMap[resolution];
+let bitrate =
+bitrateTable[resolution][quality];
 
-if(codec === "h265"){
-bitrate = bitrate * 0.5;
+if(codec === "h264"){
+bitrate = bitrate * 1.4;
 }
 
 bitrate =
@@ -162,11 +199,24 @@ bitrate * (fps / 25);
 const totalBitrate =
 bitrate * camera;
 
-const gbPerDay =
-(totalBitrate * 3600 * hours) / 8 / 1024;
-
 const totalTB =
-(gbPerDay * days) / 1024;
+(
+totalBitrate *
+1000000 *
+3600 *
+hours *
+days
+)
+/
+8
+/
+1000
+/
+1000
+/
+1000
+/
+1000;
 
 const hddSizes =
 [1,2,4,6,8,10,12,16,20,24];
@@ -188,30 +238,34 @@ break;
 document.getElementById("result").style.display="block";
 
 document.getElementById("result").innerHTML = `
-<div>
-Bitrate per Kamera
-<div class="value">${bitrate.toFixed(1)} Mbps</div>
-</div>
-
-<div>
-Bitrate Total
-<div class="value">${totalBitrate.toFixed(1)} Mbps</div>
-</div>
-
-<div>
-Data per Hari
-<div class="value">${gbPerDay.toFixed(1)} GB</div>
-</div>
 
 <div>
 Kebutuhan Storage
-<div class="value">${totalTB.toFixed(2)} TB</div>
+<div class="value">
+${totalTB.toFixed(2)} TB
+</div>
 </div>
 
 <div>
 Rekomendasi HDD
-<div class="value">${recommend}</div>
+<div class="value">
+${recommend}
 </div>
+</div>
+
+<div>
+Alternatif
+<div class="value">
+
+2 × ${Math.ceil(parseInt(recommend)/2)} TB
+
+<br><br>
+
+3 × ${Math.ceil(parseInt(recommend)/3)} TB
+
+</div>
+</div>
+
 `;
 
 }
