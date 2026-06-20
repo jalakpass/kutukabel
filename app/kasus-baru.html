@@ -73,8 +73,11 @@ textarea{min-height:120px;resize:vertical;}
 <label>Nama Klien (Opsional)</label>
 <input id="client" type="text">
 
-<label>Upload Foto</label>
-<input id="photo" type="file">
+<label>Foto Before</label>
+<input id="photoBefore" type="file" accept="image/*">
+
+<label>Foto After</label>
+<input id="photoAfter" type="file" accept="image/*">
 
 <div class="actions">
 <button class="btn btn-ai" onclick="generatePrompt()">Generate Prompt AI</button>
@@ -206,7 +209,11 @@ symptom: document.getElementById("symptom").value,
 solution: document.getElementById("solution").value,
 client_name: document.getElementById("client").value,
 excerpt: document.getElementById("promptOutput").value,
-content: document.getElementById("content").value
+content: document.getElementById("content").value,
+
+photo_before:"",
+photo_after:""
+
 })
 }
 );
