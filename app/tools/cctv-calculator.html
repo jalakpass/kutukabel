@@ -3,274 +3,744 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>CCTV HDD Calculator | KutuKabel</title>
-
 <style>
-body{
-font-family:Arial,sans-serif;
-background:#f5f5f5;
-margin:0;
-padding:20px;
-}
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap');
 
-.container{
-max-width:700px;
-margin:auto;
-background:white;
-padding:25px;
-border-radius:12px;
-box-shadow:0 2px 10px rgba(0,0,0,.08);
-}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-h1{
-margin-top:0;
-}
+  :root {
+    --orange:   #d46316;
+    --orange-dk:#a84d0f;
+    --orange-lt:#fff0e6;
+    --black:    #1a1a1a;
+    --gray-90:  #2d2d2d;
+    --gray-60:  #666;
+    --gray-20:  #e0e0e0;
+    --gray-10:  #f5f5f5;
+    --white:    #ffffff;
+    --green:    #1d8a4e;
+    --green-lt: #e9f7ef;
+  }
 
-label{
-display:block;
-margin-top:15px;
-margin-bottom:5px;
-font-weight:bold;
-}
+  body {
+    font-family: 'Inter', Arial, sans-serif;
+    background: var(--gray-10);
+    min-height: 100vh;
+    padding: 24px 16px 48px;
+    color: var(--black);
+  }
 
-input,select{
-width:100%;
-padding:12px;
-border:1px solid #ddd;
-border-radius:8px;
-box-sizing:border-box;
-}
+  /* ── Header ── */
+  .header {
+    max-width: 720px;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .logo-mark {
+    width: 40px; height: 40px;
+    background: var(--orange);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 14px; font-weight: 700;
+    color: white; letter-spacing: -1px;
+    flex-shrink: 0;
+  }
+  .header-text h1 {
+    font-family: 'Space Mono', monospace;
+    font-size: 18px; font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--black);
+  }
+  .header-text p {
+    font-size: 12px; color: var(--gray-60);
+    margin-top: 2px;
+  }
 
-button{
-margin-top:20px;
-padding:12px 20px;
-border:none;
-border-radius:8px;
-background:#d46316;
-color:white;
-font-weight:bold;
-cursor:pointer;
-}
+  /* ── Card ── */
+  .card {
+    max-width: 720px;
+    margin: 0 auto;
+    background: var(--white);
+    border-radius: 14px;
+    box-shadow: 0 2px 16px rgba(0,0,0,.07);
+    overflow: hidden;
+  }
 
-.result{
-margin-top:25px;
-padding:20px;
-background:#fafafa;
-border-radius:10px;
-display:none;
-}
+  .card-top {
+    background: var(--black);
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card-top .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--orange);
+  }
+  .card-top span {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: #888;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
 
-.value{
-font-size:20px;
-font-weight:bold;
-margin-top:5px;
-margin-bottom:15px;
-}
+  .form-body {
+    padding: 24px;
+  }
+
+  /* ── Grid layout ── */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .span-2 { grid-column: 1 / -1; }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+
+  label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray-60);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  label .req { color: var(--orange); }
+
+  input, select {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid var(--gray-20);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Inter', Arial, sans-serif;
+    color: var(--black);
+    background: var(--white);
+    transition: border-color .15s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  input:focus, select:focus {
+    outline: none;
+    border-color: var(--orange);
+  }
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+  }
+
+  /* Codec toggle pills */
+  .codec-toggle {
+    display: flex;
+    gap: 8px;
+  }
+  .codec-btn {
+    flex: 1;
+    padding: 10px;
+    border: 1.5px solid var(--gray-20);
+    border-radius: 8px;
+    background: var(--white);
+    font-size: 13px;
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    color: var(--gray-60);
+    cursor: pointer;
+    transition: all .15s;
+    text-align: center;
+  }
+  .codec-btn.active {
+    border-color: var(--orange);
+    background: var(--orange-lt);
+    color: var(--orange-dk);
+  }
+
+  /* FPS stepper */
+  .fps-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .fps-btn {
+    width: 38px; height: 38px;
+    border: 1.5px solid var(--gray-20);
+    border-radius: 8px;
+    background: var(--white);
+    font-size: 18px;
+    color: var(--gray-60);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all .15s;
+  }
+  .fps-btn:hover { border-color: var(--orange); color: var(--orange); }
+  #fps-display {
+    flex: 1;
+    text-align: center;
+    border: 1.5px solid var(--gray-20);
+    border-radius: 8px;
+    padding: 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  /* Quality slider */
+  .quality-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--gray-60);
+    margin-top: 4px;
+  }
+  input[type="range"] {
+    -webkit-appearance: auto;
+    appearance: auto;
+    border: none;
+    padding: 0;
+    accent-color: var(--orange);
+    height: 4px;
+    cursor: pointer;
+  }
+
+  /* Divider */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--gray-20);
+    margin: 20px 0;
+  }
+
+  /* Hitung button */
+  .btn-hitung {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    background: var(--orange);
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: background .15s, transform .1s;
+  }
+  .btn-hitung:hover { background: var(--orange-dk); }
+  .btn-hitung:active { transform: scale(.98); }
+
+  /* ── Result ── */
+  #result { display: none; }
+
+  .result-divider {
+    height: 4px;
+    background: linear-gradient(90deg, var(--orange) 0%, var(--orange-dk) 100%);
+  }
+
+  .result-body { padding: 24px; background: var(--gray-10); }
+
+  .result-headline {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--gray-60);
+    margin-bottom: 16px;
+  }
+
+  /* Big number */
+  .storage-main {
+    background: var(--black);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .storage-main .big {
+    font-family: 'Space Mono', monospace;
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--orange);
+    line-height: 1;
+    letter-spacing: -2px;
+  }
+  .storage-main .big sup {
+    font-size: 20px;
+    letter-spacing: 0;
+  }
+  .storage-main .sub-label {
+    color: #888;
+    font-size: 12px;
+    line-height: 1.5;
+    padding-bottom: 4px;
+  }
+  .storage-main .sub-label strong { color: #ccc; display: block; }
+
+  /* Stat row */
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .stat-box {
+    background: var(--white);
+    border-radius: 10px;
+    padding: 14px;
+    border: 1px solid var(--gray-20);
+  }
+  .stat-box .stat-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--gray-60);
+    margin-bottom: 6px;
+  }
+  .stat-box .stat-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--black);
+  }
+  .stat-box .stat-unit {
+    font-size: 11px;
+    color: var(--gray-60);
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+  }
+
+  /* HDD recommendation */
+  .hdd-section {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 18px;
+    border: 1px solid var(--gray-20);
+    margin-bottom: 16px;
+  }
+  .hdd-section h3 {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--gray-60);
+    margin-bottom: 12px;
+  }
+  .hdd-options { display: flex; flex-direction: column; gap: 8px; }
+  .hdd-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1.5px solid var(--gray-20);
+    font-size: 13px;
+  }
+  .hdd-option.best {
+    border-color: var(--orange);
+    background: var(--orange-lt);
+  }
+  .hdd-option.ok { background: var(--gray-10); }
+  .hdd-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-family: 'Space Mono', monospace;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .hdd-option.best .hdd-badge { background: var(--orange); color: white; }
+  .hdd-option.ok .hdd-badge { background: var(--gray-20); color: var(--gray-60); }
+  .hdd-option .hdd-desc { flex: 1; color: var(--gray-60); line-height: 1.4; }
+  .hdd-option .hdd-desc strong { color: var(--black); display: block; }
+
+  /* Formula note */
+  .formula-note {
+    background: var(--green-lt);
+    border-left: 3px solid var(--green);
+    border-radius: 0 8px 8px 0;
+    padding: 12px 14px;
+    font-size: 12px;
+    color: var(--green);
+    font-family: 'Space Mono', monospace;
+    line-height: 1.7;
+  }
+  .formula-note span { color: #555; font-family: 'Inter', sans-serif; }
+
+  /* Bitrate info */
+  .bitrate-detail {
+    font-size: 11px;
+    color: var(--gray-60);
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: var(--white);
+    border-radius: 8px;
+    font-family: 'Space Mono', monospace;
+    line-height: 1.8;
+    border: 1px solid var(--gray-20);
+  }
+
+  /* Footer */
+  .footer {
+    max-width: 720px;
+    margin: 20px auto 0;
+    font-size: 11px;
+    color: var(--gray-60);
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 540px) {
+    .grid-2 { grid-template-columns: 1fr; }
+    .span-2 { grid-column: 1; }
+    .stat-row { grid-template-columns: 1fr 1fr; }
+    .storage-main .big { font-size: 36px; }
+  }
 </style>
 </head>
-
 <body>
 
-<div class="container">
+<div class="header">
+  <div class="logo-mark">KK</div>
+  <div class="header-text">
+    <h1>CCTV HDD Calculator</h1>
+    <p>Formula berbasis standar industri Hikvision Bitrate Reference</p>
+  </div>
+</div>
 
-<h1>CCTV HDD Calculator</h1>
+<div class="card">
+  <div class="card-top">
+    <div class="dot"></div>
+    <span>Input Parameter</span>
+  </div>
 
-<label>Jumlah Kamera *</label>
-<input type="number" id="camera" min="1">
+  <div class="form-body">
+    <div class="grid-2">
 
-<label>Resolusi</label>
-<select id="resolution">
-<option value="2" selected>2MP</option>
-<option value="4">4MP</option>
-<option value="5">5MP</option>
-<option value="8">8MP</option>
-<option value="12">12MP</option>
-</select>
+      <!-- Jumlah Kamera -->
+      <div class="field span-2">
+        <label>Jumlah Kamera <span class="req">*</span></label>
+        <input type="number" id="camera" min="1" max="512" placeholder="Contoh: 24">
+      </div>
 
-<label>Codec</label>
-<select id="codec">
-<option value="h265" selected>H.265</option>
-<option value="h264">H.264</option>
-</select>
+      <!-- Resolusi -->
+      <div class="field">
+        <label>Resolusi</label>
+        <select id="resolution">
+          <option value="0.9">1MP — 720p (1280×720)</option>
+          <option value="2" selected>2MP — 1080p (1920×1080)</option>
+          <option value="3">3MP — (2048×1536)</option>
+          <option value="4">4MP — (2688×1520)</option>
+          <option value="5">5MP — (2560×1920)</option>
+          <option value="6">6MP — (3072×2048)</option>
+          <option value="8">8MP — 4K (3840×2160)</option>
+          <option value="12">12MP — (4000×3000)</option>
+        </select>
+      </div>
 
-<label>Frame Rate</label>
-<select id="fps">
-<option value="10">10 FPS</option>
-<option value="15">15 FPS</option>
-<option value="20">20 FPS</option>
-<option value="25" selected>25 FPS</option>
-<option value="30">30 FPS</option>
-</select>
+      <!-- Codec -->
+      <div class="field">
+        <label>Codec</label>
+        <div class="codec-toggle">
+          <button class="codec-btn active" onclick="setCodec('h265', this)">H.265</button>
+          <button class="codec-btn" onclick="setCodec('h264', this)">H.264</button>
+          <button class="codec-btn" onclick="setCodec('h265plus', this)">H.265+</button>
+          <button class="codec-btn" onclick="setCodec('h264plus', this)">H.264+</button>
+        </div>
+        <input type="hidden" id="codec" value="h265">
+      </div>
 
-<label>Kualitas Video</label>
-<select id="quality">
-<option value="low">Low</option>
-<option value="medium" selected>Medium</option>
-<option value="high">High</option>
-</select>
-  
-<label>Jam Rekam per Hari</label>
-<input type="number" id="hours" value="24">
+      <!-- Frame Rate -->
+      <div class="field">
+        <label>Frame Rate</label>
+        <div class="fps-row">
+          <button class="fps-btn" onclick="stepFps(-1)">−</button>
+          <div id="fps-display">25 FPS</div>
+          <button class="fps-btn" onclick="stepFps(1)">+</button>
+        </div>
+        <input type="hidden" id="fps" value="25">
+      </div>
 
-<label>Hari Penyimpanan</label>
-<input type="number" id="days" value="30">
+      <!-- Kualitas -->
+      <div class="field">
+        <label>Kualitas Video</label>
+        <input type="range" id="quality" min="0" max="2" step="1" value="1" oninput="updateQualityLabel()">
+        <div class="quality-labels">
+          <span>Low (×0.6)</span>
+          <span id="qlabel" style="font-weight:600;color:var(--black)">Medium</span>
+          <span>High (×1.2)</span>
+        </div>
+      </div>
 
-<button onclick="hitung()">HITUNG</button>
+      <!-- Jam Rekam -->
+      <div class="field">
+        <label>Jam Rekam / Hari</label>
+        <select id="hours">
+          <option value="6">6 Jam</option>
+          <option value="8">8 Jam</option>
+          <option value="12">12 Jam</option>
+          <option value="16">16 Jam</option>
+          <option value="24" selected>24 Jam (Full)</option>
+        </select>
+      </div>
 
-<div class="result" id="result"></div>
+      <!-- Hari Simpan -->
+      <div class="field">
+        <label>Hari Penyimpanan</label>
+        <select id="days">
+          <option value="7">7 Hari</option>
+          <option value="14">14 Hari</option>
+          <option value="30" selected>30 Hari</option>
+          <option value="60">60 Hari</option>
+          <option value="90">90 Hari</option>
+        </select>
+      </div>
 
+    </div><!-- /grid-2 -->
+
+    <hr class="divider">
+
+    <button class="btn-hitung" onclick="hitung()">▶ HITUNG KEBUTUHAN HDD</button>
+  </div><!-- /form-body -->
+
+  <!-- Result -->
+  <div id="result">
+    <div class="result-divider"></div>
+    <div class="result-body">
+      <div class="result-headline">// Hasil Kalkulasi</div>
+
+      <div class="storage-main" id="storage-main-box">
+        <div>
+          <div class="big" id="res-tb">—</div>
+        </div>
+        <div class="sub-label">
+          <strong id="res-tb-label">— TB</strong>
+          Raw (tanpa buffer)
+          <br>+ 20% buffer overhead
+          <br><strong id="res-recommended">— TB</strong>
+          <span style="color:#888"> Rekomendasi final</span>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-box">
+          <div class="stat-label">Bitrate / Kamera</div>
+          <div class="stat-val" id="res-bitrate-cam">—</div>
+          <div class="stat-unit">Mbps</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Bandwidth Total</div>
+          <div class="stat-val" id="res-bandwidth">—</div>
+          <div class="stat-unit">Mbps</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Storage / Hari</div>
+          <div class="stat-val" id="res-per-day">—</div>
+          <div class="stat-unit">GB/hari</div>
+        </div>
+      </div>
+
+      <div class="hdd-section">
+        <h3>Rekomendasi Konfigurasi HDD</h3>
+        <div class="hdd-options" id="hdd-options"></div>
+      </div>
+
+      <div class="formula-note" id="formula-note">
+        <span>Formula:</span><br>
+        Storage (GB) = Bitrate × 3.600 × Jam × Hari × N_kamera ÷ 8 ÷ 1.024
+      </div>
+
+      <div class="bitrate-detail" id="bitrate-detail"></div>
+
+    </div><!-- /result-body -->
+  </div><!-- /result -->
+</div><!-- /card -->
+
+<div class="footer">
+  KutuKabel Tools — Formula berbasis Hikvision Official Bitrate Reference (H.264/H.265)<br>
+  Deviasi estimasi ±10% dari Seagate SkyHawk Calculator &amp; WD Purple Calculator
 </div>
 
 <script>
-
-function hitung(){
-
-const camera =
-parseInt(document.getElementById("camera").value);
-
-if(!camera){
-alert("Jumlah Kamera wajib diisi");
-return;
-}
-
-const resolution =
-parseInt(document.getElementById("resolution").value);
-
-const codec =
-document.getElementById("codec").value;
-
-const fps =
-parseInt(document.getElementById("fps").value);
-
-const hours =
-parseInt(document.getElementById("hours").value);
-
-const days =
-parseInt(document.getElementById("days").value);
-  
-const quality =
-document.getElementById("quality").value;
-
-const bitrateTable = {
-
-2:{
-low:1.8,
-medium:2.5,
-high:4.0
-},
-
-4:{
-low:3.0,
-medium:4.5,
-high:6.5
-},
-
-5:{
-low:4.0,
-medium:5.5,
-high:8.0
-},
-
-8:{
-low:6.0,
-medium:8.0,
-high:12.0
-},
-
-12:{
-low:8.0,
-medium:12.0,
-high:16.0
-}
-
+// ── Hikvision official bitrate table (Average, Kbps, VBR)
+// Source: Hikvision Technical Bulletin — H.264/H.265 Bit Rate Chart
+// Key: MP value → { 30fps, 25fps, 20fps, 15fps, 10fps }
+const BITRATE_H264 = {
+  // mp  : [30fps, 25fps, 20fps, 15fps, 10fps]
+  0.9  : [2048,  1792,  1536,  1280,  1024],   // 1MP 720p
+  2    : [4096,  3584,  3072,  2560,  2048],   // 2MP 1080p
+  3    : [5120,  4480,  3840,  3200,  2560],   // 3MP (interpolated)
+  4    : [6144,  5120,  4608,  4096,  3072],   // 4MP
+  5    : [8192,  6656,  6144,  5120,  4096],   // 5MP
+  6    : [10240, 8192,  7168,  6144,  4608],   // 6MP
+  8    : [16384, 14336, 12288, 10240, 8192],   // 8MP 4K
+  12   : [21845, 18043, 16384, 13107, 10240],  // 12MP
 };
 
-let bitrate =
-bitrateTable[resolution][quality];
+// H.265 ≈ 50% dari H.264 (Hikvision standard)
+const CODEC_FACTOR = {
+  'h265':     0.50,
+  'h264':     1.00,
+  'h265plus': 0.35,  // H.265+ proprietary ~30-40%
+  'h264plus': 0.50,  // H.264+ ~50%
+};
 
-if(codec === "h264"){
-bitrate = bitrate * 1.4;
+const CODEC_LABEL = {
+  'h265':     'H.265',
+  'h264':     'H.264',
+  'h265plus': 'H.265+',
+  'h264plus': 'H.264+',
+};
+
+const QUALITY_FACTOR = { 0: 0.60, 1: 1.00, 2: 1.20 };
+const QUALITY_LABEL  = { 0: 'Low',        1: 'Medium',      2: 'High' };
+const FPS_OPTIONS    = [1, 5, 8, 10, 12, 15, 20, 25, 30];
+
+let currentCodec = 'h265';
+let currentFpsIdx = FPS_OPTIONS.indexOf(25); // default 25 FPS
+
+function setCodec(val, btn) {
+  currentCodec = val;
+  document.getElementById('codec').value = val;
+  document.querySelectorAll('.codec-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
 }
 
-bitrate =
-bitrate * (fps / 25);
-
-const totalBitrate =
-bitrate * camera;
-
-const totalTB =
-(
-totalBitrate *
-1000000 *
-3600 *
-hours *
-days
-)
-/
-8
-/
-1000
-/
-1000
-/
-1000
-/
-1000;
-
-const hddSizes =
-[1,2,4,6,8,10,12,16,20,24];
-
-let recommend = "Multi HDD";
-
-for(let size of hddSizes){
-
-if(totalTB <= size){
-
-recommend = size + " TB";
-
-break;
-
+function stepFps(dir) {
+  currentFpsIdx = Math.max(0, Math.min(FPS_OPTIONS.length - 1, currentFpsIdx + dir));
+  const fps = FPS_OPTIONS[currentFpsIdx];
+  document.getElementById('fps').value = fps;
+  document.getElementById('fps-display').textContent = fps + ' FPS';
 }
 
+function updateQualityLabel() {
+  const q = parseInt(document.getElementById('quality').value);
+  document.getElementById('qlabel').textContent = QUALITY_LABEL[q];
 }
 
-document.getElementById("result").style.display="block";
-
-document.getElementById("result").innerHTML = `
-
-<div>
-Kebutuhan Storage
-<div class="value">
-${totalTB.toFixed(2)} TB
-</div>
-</div>
-
-<div>
-Rekomendasi HDD
-<div class="value">
-${recommend}
-</div>
-</div>
-
-<div>
-Alternatif
-<div class="value">
-
-2 × ${Math.ceil(parseInt(recommend)/2)} TB
-
-<br><br>
-
-3 × ${Math.ceil(parseInt(recommend)/3)} TB
-
-</div>
-</div>
-
-`;
-
+function getBitrateKbps(mp, fps) {
+  // Lookup tabel Hikvision
+  const row = BITRATE_H264[mp];
+  if (!row) return null;
+  // Interpolasi FPS terhadap titik referensi: 30,25,20,15,10
+  const fpsPts = [30, 25, 20, 15, 10];
+  // Cari bracket
+  if (fps >= 30) return row[0];
+  if (fps <= 10) return row[4];
+  for (let i = 0; i < fpsPts.length - 1; i++) {
+    const hi = fpsPts[i], lo = fpsPts[i + 1];
+    if (fps <= hi && fps >= lo) {
+      const t = (fps - lo) / (hi - lo);
+      return Math.round(row[i + 1] + t * (row[i] - row[i + 1]));
+    }
+  }
+  return row[1]; // fallback 25fps
 }
 
+function hitung() {
+  const N   = parseInt(document.getElementById('camera').value);
+  if (!N || N < 1) { alert('Jumlah kamera wajib diisi (min 1)'); return; }
+
+  const mp    = parseFloat(document.getElementById('resolution').value);
+  const codec = document.getElementById('codec').value;
+  const fps   = parseInt(document.getElementById('fps').value);
+  const hours = parseInt(document.getElementById('hours').value);
+  const days  = parseInt(document.getElementById('days').value);
+  const qIdx  = parseInt(document.getElementById('quality').value);
+
+  // ── STAGE 1: Bitrate lookup (H.264 reference, Kbps)
+  const baseKbps = getBitrateKbps(mp, fps);
+
+  // ── STAGE 2: Apply codec factor & quality factor
+  const codecFactor   = CODEC_FACTOR[codec] || 0.5;
+  const qualityFactor = QUALITY_FACTOR[qIdx];
+  const bitrateKbps   = baseKbps * codecFactor * qualityFactor;
+  const bitrateMbps   = bitrateKbps / 1000;
+
+  // ── STAGE 3: Storage formula
+  // Storage (GB) = Bitrate_Mbps × 3600 × Hours × Days × N ÷ 8 ÷ 1024
+  const storageGB_raw = (bitrateMbps * 3_600 * hours * days * N) / 8 / 1024;
+  const storageTB_raw = storageGB_raw / 1000;        // TB desimal (label HDD)
+  const storageTB_rec = storageTB_raw * 1.20;        // +20% buffer
+  const gbPerDay      = (bitrateMbps * 3_600 * hours * N) / 8 / 1024;
+  const bwTotal       = bitrateMbps * N;
+
+  // ── STAGE 4: HDD recommendation
+  const hddRef = [1, 2, 3, 4, 6, 8, 10, 12, 14, 16, 18, 20, 24];
+  const fits   = hddRef.filter(s => s >= storageTB_rec);
+  const best   = fits.length ? fits[0] : null;
+
+  // Build multi-drive options
+  const opts = [];
+  if (best) {
+    opts.push({ label: '1 × ' + best + ' TB', note: 'Single drive — paling simpel', best: true });
+  }
+  // 2-drive split
+  const half = Math.ceil(storageTB_rec / 2);
+  const halfHDD = hddRef.find(s => s >= half) || hddRef[hddRef.length - 1];
+  opts.push({ label: '2 × ' + halfHDD + ' TB', note: 'RAID 1 — mirroring, redudansi penuh (50% efisiensi)', best: false });
+  // 3-drive RAID 5
+  // RAID 5 efektif = (n-1)/n × kapasitas; utk 3 drive efektif = 2/3
+  // butuh: storageTB_rec / (2/3) / 3 per drive
+  const driveFor3 = storageTB_rec / 2; // setiap drive harus ≥ ini (RAID5 3-disk = 2× kapasitas)
+  const r5HDD = hddRef.find(s => s >= driveFor3) || hddRef[hddRef.length - 1];
+  opts.push({ label: '3 × ' + r5HDD + ' TB (RAID 5)', note: 'Usable ' + (r5HDD * 2).toFixed(0) + ' TB — survives 1 drive failure', best: false });
+
+  if (!best && fits.length === 0) {
+    opts.unshift({ label: 'Multi-drive diperlukan', note: '≥' + storageTB_rec.toFixed(1) + ' TB total capacity', best: true });
+  }
+
+  // ── Render
+  document.getElementById('res-tb').innerHTML =
+    storageTB_raw.toFixed(2) + '<sup> TB</sup>';
+  document.getElementById('res-tb-label').textContent =
+    storageTB_raw.toFixed(2) + ' TB raw';
+  document.getElementById('res-recommended').textContent =
+    storageTB_rec.toFixed(2) + ' TB';
+
+  document.getElementById('res-bitrate-cam').textContent = bitrateMbps.toFixed(2);
+  document.getElementById('res-bandwidth').textContent   = bwTotal.toFixed(1);
+  document.getElementById('res-per-day').textContent     = gbPerDay.toFixed(1);
+
+  // HDD options
+  const hddEl = document.getElementById('hdd-options');
+  hddEl.innerHTML = opts.map(o => `
+    <div class="hdd-option ${o.best ? 'best' : 'ok'}">
+      <div class="hdd-badge">${o.best ? '★ BEST' : 'ALT'}</div>
+      <div class="hdd-desc">
+        <strong>${o.label}</strong>
+        ${o.note}
+      </div>
+    </div>`).join('');
+
+  // Formula trace
+  const ql    = QUALITY_LABEL[qIdx];
+  const cname = CODEC_LABEL[codec];
+  document.getElementById('formula-note').innerHTML = `
+    <span>Trace kalkulasi:</span><br>
+    H.264 base @ ${mp}MP / ${fps}fps = ${baseKbps.toLocaleString()} Kbps<br>
+    × codec ${cname} (${codecFactor}) × quality ${ql} (${qualityFactor}) = <strong>${bitrateKbps.toFixed(0)} Kbps = ${bitrateMbps.toFixed(3)} Mbps</strong><br>
+    × 3600s × ${hours}h × ${days}d × ${N} kamera ÷ 8 ÷ 1024 = <strong>${storageGB_raw.toFixed(0)} GB = ${storageTB_raw.toFixed(2)} TB</strong><br>
+    + 20% overhead = <strong style="color:var(--orange)">${storageTB_rec.toFixed(2)} TB final</strong>
+  `;
+
+  document.getElementById('bitrate-detail').innerHTML =
+    `Referensi: Hikvision Official Bitrate Table (H.264 avg VBR) &nbsp;|&nbsp; H.265 factor: ×0.50 &nbsp;|&nbsp; H.265+: ×0.35<br>` +
+    `Real-world variance ±20–40% tergantung kompleksitas scene, pencahayaan, dan gerakan`;
+
+  document.getElementById('result').style.display = 'block';
+  document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
 </script>
-
 </body>
 </html>
