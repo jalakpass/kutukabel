@@ -134,7 +134,7 @@ display:none;
   <a href="/" class="logo">Kutu<span>Kabel</span></a>
   <div class="nav-right">
     <a href="/app/daftar-kasus.html">Kasus</a>
-    <a href="/tools">Tools</a>
+    <a href="/app/tools">Tools</a>
     <a href="https://www.tiktok.com/@carebusy" target="_blank" rel="noopener">TikTok</a>
   </div>
 </nav>
@@ -169,10 +169,10 @@ display:none;
       <div class="portal-card-title">Database Kasus</div>
 		<div class="portal-card-desc">Cari solusi dari pengalaman teknisi lapangan</div>
     </a>
-    <a href="/tools/cctv-calculator" class="portal-card">
+    <a href="/app/tools/index" class="portal-card">
       
       <div class="portal-card-title">Tools Teknisi</div>
-		<div class="portal-card-desc">Kalkulator HDD CCTV dan alat bantu teknis lainnya</div>
+		<div class="portal-card-desc">Alat bantu teknis</div>
     </a>
     <a href="https://www.tiktok.com/@carebusy" target="_blank" rel="noopener" class="portal-card">
       
@@ -226,16 +226,16 @@ const SYSTEM_PROMPT=`Kamu adalah KutuBot, asisten teknis AI dari KutuKabel — t
 
 Tim KutuKabel:
 - Jaalk: spesialis Access Control & Smart Home (RFID, face recognition, magnetic lock, door controller)
-- Habib: spesialis Mikrotik, IP PBX, dan perangkat Huawei
+- Habib: spesialis Jaringan, Mikrotik, IP PBX, dan perangkat Huawei
 - Kholil: spesialis CCTV, splicing Fiber Optik, dan cable piping plan
 
-Merek: Hikvision, Dahua, CP Plus, ZKTeco, Suprema, Mikrotik, Ruijie, Huawei, Fingerspot, Akuvox
+Merek: Hikvision, Dahua,  ZKTeco,  Mikrotik, Ruijie, Huawei
 
 Tugasmu:
 1. Tanya gejala kerusakan secara spesifik (merek, tipe/model, indikator LED, pesan error, durasi masalah)
 2. Berikan solusi troubleshoot step-by-step yang bisa dicoba sendiri
-3. Kalau bisa diselesaikan tanpa teknisi — jawab tuntas, gratis
-4. Kalau butuh cek fisik atau konfigurasi mendalam — sarankan konsultasi teknisi KutuKabel
+3. Kalau bisa diselesaikan tanpa teknisi — jawab tuntas, 
+4. Kalau butuh cek fisik atau konfigurasi mendalam — sarankan konsultasi teknisi senior KutuKabel
 
 Tone: santai, langsung ke poin, bahasa Indonesia sehari-hari.
 Jangan mengarang solusi. Kalau tidak tahu, akui dan arahkan ke teknisi.
