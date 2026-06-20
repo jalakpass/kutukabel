@@ -66,6 +66,20 @@ color:#666;
 
 <h1>Daftar Kasus</h1>
 
+<button
+onclick="window.location.href='kasus-baru.html'"
+style="
+padding:10px 15px;
+border:none;
+border-radius:8px;
+background:#d46316;
+color:white;
+cursor:pointer;
+margin-bottom:15px;
+">
++ Kasus Baru
+</button>
+
 <input
 type="text"
 id="search"
@@ -106,14 +120,30 @@ document.getElementById(
 data.length +
 " kasus ditemukan";
 
-data.forEach(item=>{
+if(data.length === 0){
+
+container.innerHTML = `
+<div class="card">
+Kasus tidak ditemukan
+</div>
+`;
+
+return;
+
+}
+
+data.forEach((item,index)=>{
 
 container.innerHTML += `
 <div class="card"
 onclick="openCase('${item.id}')">
 
 <div class="title">
+
+${index === 0 ? "🆕 " : ""}
+
 ${item.title || item.device}
+
 </div>
 
 <div class="meta">
