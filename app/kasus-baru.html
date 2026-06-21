@@ -132,13 +132,14 @@ Buat:
 document.getElementById('promptOutput').value = prompt;
 }
 
-async function uploadPhoto(file){
+async function uploadPhoto(file,name){
 
 if(!file) return "";
 
 const formData = new FormData();
 
 formData.append("file", file);
+formData.append("filename", name);
 
 const res = await fetch(
 "https://kutukabel-api.jalakpass.workers.dev/upload",
@@ -244,15 +245,19 @@ let photoAfter = "";
 
 if(beforeFile){
 
+const caseId = crypto.randomUUID();
+
 photoBefore =
-await uploadPhoto(beforeFile);
-
-}
-
-if(afterFile){
+await uploadPhoto(
+beforeFile,
+caseId + "-before.jpg"
+);
 
 photoAfter =
-await uploadPhoto(afterFile);
+await uploadPhoto(
+afterFile,
+caseId + "-after.jpg"
+);
 
 }
 
