@@ -128,14 +128,22 @@ style="display:none;">
 <div class="photo-title">
 Before
 </div>
+
+<a id="photoBeforeLink" target="_blank">
 <img id="photoBefore">
+</a>
+
 </div>
 
 <div class="photo-box">
 <div class="photo-title">
 After
 </div>
+
+<a id="photoAfterLink" target="_blank">
 <img id="photoAfter">
+</a>
+
 </div>
 
 </div>
@@ -198,6 +206,15 @@ data.photo_before
 
 }
 
+document.getElementById(
+"photoBeforeLink"
+).href =
+"https://kutukabel-api.jalakpass.workers.dev/image?file="
++
+encodeURIComponent(
+data.photo_before
+);
+  
 if(data.photo_after){
 
 document.getElementById(
@@ -211,6 +228,15 @@ data.photo_after
 
 }
 
+document.getElementById(
+"photoAfterLink"
+).href =
+"https://kutukabel-api.jalakpass.workers.dev/image?file="
++
+encodeURIComponent(
+data.photo_after
+);
+  
 }
   
 }catch(err){
