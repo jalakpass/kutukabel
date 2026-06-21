@@ -225,7 +225,7 @@ async function loadCase(){
 try{
 
 const res = await fetch(
-"https://kutukabel-api.jalakpass.workers.dev/case?id=" + id
+"https://kutukabel-api.jalakpass.workers.dev/case?slug=" + slug
 );
 
 const data = await res.json();
