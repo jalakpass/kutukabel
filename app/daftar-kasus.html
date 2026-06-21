@@ -130,7 +130,7 @@ data.forEach((item,index)=>{
 
 container.innerHTML += `
 <div class="card"
-onclick="openCase('${item.id}')">
+onclick="openCase('${item.slug || item.id}')">
 
 <div class="title">
 
@@ -195,10 +195,10 @@ renderCases(filtered);
 
 }
 
-function openCase(id){
+function openCase(slug){
 
 window.location.href =
-"kasus.html?id=" + id;
+"kasus.html?slug=" + slug;
 
 }
 
