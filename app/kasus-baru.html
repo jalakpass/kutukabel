@@ -230,6 +230,13 @@ let title = content
 .replace(/^#+/,"")
 .trim();
 
+if(
+title.length < 10
+){
+title =
+device + " " + symptom;
+}
+
 const beforeFile =
 document.getElementById("photoBefore")
 .files[0];
