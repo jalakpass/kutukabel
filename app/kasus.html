@@ -41,6 +41,27 @@ white-space:pre-wrap;
 line-height:1.8;
 font-size:15px;
 }
+
+.quick-nav{
+display:flex;
+justify-content:center;
+gap:15px;
+margin:30px 0;
+flex-wrap:wrap;
+}
+
+.quick-nav a{
+background:#f3f3f3;
+padding:10px 15px;
+border-radius:8px;
+text-decoration:none;
+font-weight:bold;
+color:#222;
+}
+
+.quick-nav a:hover{
+background:#e8e8e8;
+}
   
 .photos{
 margin-top:30px;
@@ -157,12 +178,26 @@ After
 
 <hr style="margin:40px 0;">
 
+<div class="quick-nav">
+
+<a href="/app/">
+🏠 Home
+</a>
+
+<a href="daftar-kasus.html">
+📚 Database Kasus
+</a>
+
+<a href="/app/tools/">
+🧮 Tools
+</a>
+
+</div>
+
 <h2>Kasus Serupa</h2>
 
 <div id="relatedCases">
-
 Loading...
-
 </div>
   
 <script>
