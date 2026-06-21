@@ -155,6 +155,16 @@ After
 
 </div>
 
+<hr style="margin:40px 0;">
+
+<h2>Kasus Serupa</h2>
+
+<div id="relatedCases">
+
+Loading...
+
+</div>
+  
 <script>
 
 const params =
@@ -186,6 +196,11 @@ data.client_name || "-";
 
 document.getElementById("content").innerText =
 data.content || "Belum ada narasi AI";
+
+loadRelated(
+data.device,
+data.id
+);
 
 if(
 data.photo_before ||
@@ -253,6 +268,75 @@ document.getElementById("content").innerText =
 
 loadCase();
 
+async function loadRelated(device,currentId){
+
+const res = await fetch(
+"https://kutukabel-api.jalakpass.workers.dev/cases"
+);
+
+const cases = await res.json();
+
+const related =
+cases.filter(item =>
+
+item.id !== currentId &&
+
+(item.device || "")
+.toLowerCase() ===
+(device || "")
+.toLowerCase()
+
+);
+
+const container =
+document.getElementById(
+"relatedCases"
+);
+
+if(related.length === 0){
+
+container.innerHTML =
+"Tidak ada kasus serupa";
+
+return;
+
+}
+
+container.innerHTML = "";
+
+related
+.slice(0,5)
+.forEach(item => {
+
+container.innerHTML += `
+<div
+style="
+padding:15px;
+border:1px solid #eee;
+margin-bottom:10px;
+border-radius:8px;
+cursor:pointer;
+"
+onclick="
+window.location.href=
+'kasus.html?id=${item.id}'
+">
+
+<b>${item.title}</b>
+
+<br>
+
+<small>
+${item.created_at}
+</small>
+
+</div>
+`;
+
+});
+
+}
+  
 </script>
 
 </body>
