@@ -41,7 +41,37 @@ white-space:pre-wrap;
 line-height:1.8;
 font-size:15px;
 }
+  
+.photos{
+margin-top:30px;
+padding-top:20px;
+border-top:1px solid #eee;
+}
 
+.photo-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:20px;
+}
+
+.photo-box img{
+width:100%;
+border-radius:10px;
+border:1px solid #ddd;
+}
+
+.photo-title{
+font-weight:bold;
+margin-bottom:10px;
+}
+
+@media(max-width:768px){
+
+.photo-grid{
+grid-template-columns:1fr;
+}
+
+}
 .back{
 display:inline-block;
 margin-bottom:20px;
@@ -85,6 +115,33 @@ class="content">
 Memuat data...
 </div>
 
+<div
+id="photos"
+class="photos"
+style="display:none;">
+
+<h2>Dokumentasi Lapangan</h2>
+
+<div class="photo-grid">
+
+<div class="photo-box">
+<div class="photo-title">
+Before
+</div>
+<img id="photoBefore">
+</div>
+
+<div class="photo-box">
+<div class="photo-title">
+After
+</div>
+<img id="photoAfter">
+</div>
+
+</div>
+
+</div>
+
 </div>
 
 <script>
@@ -119,6 +176,43 @@ data.client_name || "-";
 document.getElementById("content").innerText =
 data.content || "Belum ada narasi AI";
 
+if(
+data.photo_before ||
+data.photo_after
+){
+
+document.getElementById(
+"photos"
+).style.display = "block";
+
+if(data.photo_before){
+
+document.getElementById(
+"photoBefore"
+).src =
+"https://kutukabel-api.jalakpass.workers.dev/image?file="
++
+encodeURIComponent(
+data.photo_before
+);
+
+}
+
+if(data.photo_after){
+
+document.getElementById(
+"photoAfter"
+).src =
+"https://kutukabel-api.jalakpass.workers.dev/image?file="
++
+encodeURIComponent(
+data.photo_after
+);
+
+}
+
+}
+  
 }catch(err){
 
 document.getElementById("content").innerText =
