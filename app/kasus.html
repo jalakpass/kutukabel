@@ -356,9 +356,7 @@ document.getElementById(
 ).textContent =
 JSON.stringify(schema);
 
-document.title =
-(data.title || "Kasus") +
-" | KutuKabel";
+
 
 document
 .getElementById("ogTitle")
@@ -367,14 +365,7 @@ document
 data.title || "KutuKabel"
 );
 
-document
-.getElementById("ogDescription")
-.setAttribute(
-"content",
-data.symptom ||
-data.title ||
-"Database troubleshooting teknisi"
-);
+
 
 document.getElementById("device").innerText =
 data.device || "-";
@@ -382,19 +373,7 @@ data.device || "-";
 document.getElementById("client").innerText =
 data.client_name || "-";
 
-document
-.querySelector(
-'meta[name="description"]'
-)
-.setAttribute(
-"content",
-(
-data.symptom ||
-data.title ||
-"Database troubleshooting KutuKabel"
-)
-.substring(0,160)
-);
+
 
 document.getElementById("content").innerText =
 data.content || "Belum ada narasi AI";
