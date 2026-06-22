@@ -241,12 +241,20 @@ window.location.search
 const slug =
 params.get("slug");
 
+const id =
+params.get("id");
+
 async function loadCase(){
 
 try{
 
 const res = await fetch(
-"https://kutukabel-api.jalakpass.workers.dev/case?slug=" + slug
+"https://kutukabel-api.jalakpass.workers.dev/case?" +
+(
+slug
+? "slug=" + slug
+: "id=" + id
+)
 );
 
 const data = await res.json();
