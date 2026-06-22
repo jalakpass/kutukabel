@@ -182,6 +182,31 @@ font-weight:bold;
 
 <div class="container">
 
+<div
+id="breadcrumb"
+style="
+font-size:14px;
+margin-bottom:15px;
+color:#666;
+"
+>
+<a href="../index.html">
+Home
+</a>
+
+&nbsp;>&nbsp;
+
+<a href="daftar-kasus.html">
+Database Kasus
+</a>
+
+&nbsp;>&nbsp;
+
+<span id="breadcrumbCategory">
+Kasus
+</span>
+</div>
+
 <a href="daftar-kasus.html" class="back">
 ← Kembali ke Daftar Kasus
 </a>
@@ -407,6 +432,12 @@ data.device || "-";
 document.getElementById("client").innerText =
 data.client_name || "-";
 
+document.getElementById(
+"breadcrumbCategory"
+).innerText =
+data.category ||
+data.device ||
+"Kasus";
 
 
 document.getElementById("content").innerText =
