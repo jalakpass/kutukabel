@@ -35,7 +35,7 @@ content="KutuKabel"
   
 <meta
 property="og:description"
-id="ogDescription"
+id=
 content="Database troubleshooting teknisi Indonesia"
 />
 
@@ -325,6 +325,24 @@ document.getElementById(
 ).content =
 (data.excerpt || "")
 .substring(0,160);
+
+document.getElementById(
+"ogUrl"
+).content =
+window.location.href;
+
+if(data.photo_before){
+
+document.getElementById(
+"ogImage"
+).content =
+"https://kutukabel-api.jalakpass.workers.dev/image?file="
++
+encodeURIComponent(
+data.photo_before
+);
+
+}
 
 const schema = {
 "@context":"https://schema.org",
