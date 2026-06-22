@@ -314,33 +314,47 @@ document.title =
 (data.title || "KutuKabel") +
 " | KutuKabel";
 
-document.getElementById(
-"metaDescription"
-).content =
+const metaDescription =
+document.getElementById("metaDescription");
+
+if(metaDescription){
+metaDescription.content =
 (data.excerpt || "")
 .substring(0,160);
+}
 
-document.getElementById(
-"ogDescription"
-).content =
+const ogDescription =
+document.getElementById("ogDescription");
+
+if(ogDescription){
+ogDescription.content =
 (data.excerpt || "")
 .substring(0,160);
+}
 
-document.getElementById(
-"ogUrl"
-).content =
+const ogUrl =
+document.getElementById("ogUrl");
+
+if(ogUrl){
+ogUrl.content =
 window.location.href;
+}
 
 if(data.photo_before){
 
-document.getElementById(
-"ogImage"
-).content =
+const ogImage =
+document.getElementById("ogImage");
+
+if(ogImage){
+
+ogImage.content =
 "https://kutukabel-api.jalakpass.workers.dev/image?file="
 +
 encodeURIComponent(
 data.photo_before
 );
+
+}
 
 }
 
