@@ -4,7 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Detail Kasus | KutuKabel</title>
+<title id="pageTitle">
+Loading... | KutuKabel
+</title>
+
+<meta
+name="description"
+id="metaDescription"
+content="Database troubleshooting teknisi Indonesia"
+/>
 
 <style>
 
@@ -233,11 +241,29 @@ const data = await res.json();
 document.getElementById("title").innerText =
 data.title || "Tanpa Judul";
 
+document.title =
+(data.title || "Kasus") +
+" | KutuKabel";
+
 document.getElementById("device").innerText =
 data.device || "-";
 
 document.getElementById("client").innerText =
 data.client_name || "-";
+
+document
+.querySelector(
+'meta[name="description"]'
+)
+.setAttribute(
+"content",
+(
+data.symptom ||
+data.title ||
+"Database troubleshooting KutuKabel"
+)
+.substring(0,160)
+);
 
 document.getElementById("content").innerText =
 data.content || "Belum ada narasi AI";
