@@ -43,6 +43,15 @@ property="og:image"
 id="ogImage"
 content="https://kutukabel.id/og-image.png"
 />
+
+<meta
+property="og:url"
+id="ogUrl"
+content="https://kutukabel.id"
+/>
+
+
+
 <style>
 
 body{
@@ -302,11 +311,6 @@ data.title || "Tanpa Judul";
 document.title =
 (data.title || "KutuKabel") +
 " | KutuKabel";
-
-document.getElementById(
-"ogTitle"
-).content =
-data.title || "KutuKabel";
 
 document.getElementById(
 "metaDescription"
