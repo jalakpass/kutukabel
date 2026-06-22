@@ -145,6 +145,27 @@ font-weight:bold;
 }
 
 </style>
+<script id="articleSchema" type="application/ld+json">
+{
+"@context":"https://schema.org",
+"@type":"Article",
+"headline":"KutuKabel",
+"description":"Database troubleshooting teknisi Indonesia",
+"author":{
+"@type":"Organization",
+"name":"KutuKabel"
+},
+"publisher":{
+"@type":"Organization",
+"name":"KutuKabel",
+"logo":{
+"@type":"ImageObject",
+"url":"https://kutukabel.id/logo.png"
+}
+}
+}
+</script>
+
 </head>
 
 <body>
@@ -298,6 +319,38 @@ document.getElementById(
 ).content =
 (data.excerpt || "")
 .substring(0,160);
+
+const schema = {
+"@context":"https://schema.org",
+"@type":"Article",
+"headline": data.title || "",
+"description":
+(data.excerpt || "")
+.substring(0,160),
+"datePublished":
+data.created_at || "",
+"author":{
+"@type":"Organization",
+"name":"KutuKabel"
+},
+"publisher":{
+"@type":"Organization",
+"name":"KutuKabel",
+"logo":{
+"@type":"ImageObject",
+"url":"https://kutukabel.id/logo.png"
+}
+},
+"mainEntityOfPage":{
+"@type":"WebPage",
+"@id":window.location.href
+}
+};
+
+document.getElementById(
+"articleSchema"
+).textContent =
+JSON.stringify(schema);
 
 document.title =
 (data.title || "Kasus") +
