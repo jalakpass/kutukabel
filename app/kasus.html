@@ -27,6 +27,33 @@ id="metaDescription"
 content="Database troubleshooting teknisi Indonesia"
 />
 
+<meta
+property="og:type"
+content="article"
+/>
+
+<meta
+property="og:site_name"
+content="KutuKabel"
+/>
+
+<meta
+property="og:title"
+id="ogTitle"
+content="KutuKabel"
+/>
+
+<meta
+property="og:description"
+id="ogDescription"
+content="Database troubleshooting teknisi Indonesia"
+/>
+
+<meta
+property="og:image"
+id="ogImage"
+content="https://kutukabel.id/og-image.png"
+/>
 <style>
 
 body{
@@ -261,6 +288,27 @@ const data = await res.json();
 
 document.getElementById("title").innerText =
 data.title || "Tanpa Judul";
+
+document.title =
+(data.title || "KutuKabel") +
+" | KutuKabel";
+
+document.getElementById(
+"ogTitle"
+).content =
+data.title || "KutuKabel";
+
+document.getElementById(
+"metaDescription"
+).content =
+(data.excerpt || "")
+.substring(0,160);
+
+document.getElementById(
+"ogDescription"
+).content =
+(data.excerpt || "")
+.substring(0,160);
 
 document.title =
 (data.title || "Kasus") +
