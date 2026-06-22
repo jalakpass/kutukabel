@@ -458,10 +458,14 @@ data.photo_after
   
 }
   
-}catch(err){
+}
+
+catch(err){
+
+console.error(err);
 
 document.getElementById("content").innerText =
-"Gagal memuat data";
+"Gagal memuat data : " + err.message;
 
 }
 
