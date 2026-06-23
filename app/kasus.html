@@ -612,11 +612,14 @@ window.location.href=
 
 <b>${item.title}</b>
 
-<br>
-
-<small>
-${item.created_at}
-</small>
+<div
+style="
+margin-top:5px;
+font-size:13px;
+color:#666;
+">
+${item.device || "-"}
+</div>
 
 </div>
 `;
