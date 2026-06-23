@@ -254,15 +254,19 @@ try{
 let photoBefore = "";
 let photoAfter = "";
 
-if(beforeFile){
-
 const caseId = crypto.randomUUID();
+
+if(beforeFile){
 
 photoBefore =
 await uploadPhoto(
 beforeFile,
 caseId + "-before.jpg"
 );
+
+}
+
+if(afterFile){
 
 photoAfter =
 await uploadPhoto(
