@@ -70,6 +70,11 @@ font-weight:bold;
 background:#e8e8e8;
 }
 
+#categoryFilter button.active{
+background:#d46316;
+color:white;
+}
+
 .quick-nav{
 width:100%;
 display:flex;
@@ -276,6 +281,36 @@ function filterCategory(category){
 
 activeCategory = category;
 
+document
+.querySelectorAll(
+"#categoryFilter button"
+)
+.forEach(btn =>
+btn.classList.remove(
+"active"
+)
+);
+
+const target =
+Array.from(
+document.querySelectorAll(
+"#categoryFilter button"
+)
+).find(btn =>
+btn.innerText
+.toLowerCase() ===
+(
+category || "Semua"
+)
+.toLowerCase()
+);
+
+if(target){
+target.classList.add(
+"active"
+);
+}
+
 filterCases();
 
 }
@@ -288,6 +323,10 @@ window.location.href =
 }
 
 loadCases();
+
+setTimeout(() => {
+filterCategory("");
+},100);
 
 </script>
 
