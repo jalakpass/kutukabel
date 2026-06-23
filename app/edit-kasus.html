@@ -113,6 +113,25 @@ cursor:pointer;
 <input id="client_name">
 
 <label>Prompt AI</label>
+
+<div style="margin-bottom:10px;">
+
+<button
+type="button"
+class="btn"
+onclick="generatePrompt()">
+Generate Prompt AI
+</button>
+
+<button
+type="button"
+class="btn"
+onclick="copyPrompt()">
+Copy Prompt
+</button>
+
+</div>
+
 <textarea id="excerpt"></textarea>
 
 <label>Narasi</label>
@@ -191,6 +210,55 @@ data.excerpt || "";
 
 document.getElementById("content").value =
 data.content || "";
+
+}
+
+function generatePrompt(){
+
+const prompt = `Anda adalah teknisi lapangan berpengalaman yang sedang menulis dokumentasi troubleshooting untuk database pengetahuan KutuKabel.
+
+Kategori: ${document.getElementById("category").value}
+Merk: ${document.getElementById("brand").value}
+Model: ${document.getElementById("model").value}
+Perangkat: ${document.getElementById("device").value}
+Gejala: ${document.getElementById("symptom").value}
+Penyebab: ${document.getElementById("cause").value}
+Solusi: ${document.getElementById("solution").value}
+Tools: ${document.getElementById("tools").value}
+
+Catatan Teknisi:
+${document.getElementById("notes").value}
+
+Buat:
+
+1. Judul Kasus
+2. Ringkasan
+3. Narasi Troubleshooting
+4. Pembelajaran Teknis
+5. Kata Kunci`;
+
+document.getElementById(
+"excerpt"
+).value = prompt;
+
+}
+
+function copyPrompt(){
+
+const prompt =
+document.getElementById(
+"excerpt"
+);
+
+prompt.select();
+
+navigator.clipboard.writeText(
+prompt.value
+);
+
+alert(
+"Prompt berhasil disalin"
+);
 
 }
 
