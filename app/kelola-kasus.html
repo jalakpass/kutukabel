@@ -51,7 +51,88 @@ color:white;
 </head>
 
 <body>
+<script>
 
+async function loadCases(){
+
+const res = await fetch(
+"https://kutukabel-api.jalakpass.workers.dev/cases"
+);
+
+const data =
+await res.json();
+
+renderCases(data);
+
+}
+
+function renderCases(data){
+
+const container =
+document.getElementById("cases");
+
+container.innerHTML = "";
+
+if(data.length === 0){
+
+container.innerHTML =
+"Belum ada kasus";
+
+return;
+
+}
+
+data.forEach(item => {
+
+container.innerHTML += `
+<div class="card">
+
+<h3>
+${item.title || "-"}
+</h3>
+
+<p>
+${item.device || "-"}
+</p>
+
+<a
+class="btn edit"
+href="edit-kasus.html?id=${item.id}">
+Edit
+</a>
+
+<a
+class="btn delete"
+href="#"
+onclick="
+hapusKasus(
+'${item.id}'
+);
+return false;
+">
+Hapus
+</a>
+
+</div>
+`;
+
+});
+
+}
+
+async function hapusKasus(id){
+
+alert(
+"Fitur hapus akan dibuat setelah endpoint delete selesai."
+);
+
+}
+
+loadCases();
+
+</script>
+
+</body>
 <div class="container">
 
 <h1>Kelola Kasus</h1>
