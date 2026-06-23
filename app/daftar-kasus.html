@@ -150,6 +150,7 @@ margin-bottom:15px;
 <script>
 
 let allCases = [];
+let activeCategory = "";
 
 async function loadCases(){
 
@@ -204,6 +205,11 @@ ${item.title || item.device}
 
 <div class="meta">
 
+Kategori:
+${item.category || "-"}
+
+<br>
+
 Perangkat:
 ${item.device || "-"}
 
@@ -230,7 +236,9 @@ document.getElementById("search")
 .toLowerCase();
 
 const filtered =
-allCases.filter(item =>
+allCases.filter(item => {
+
+const matchKeyword =
 
 (item.title || "")
 .toLowerCase()
@@ -246,11 +254,29 @@ allCases.filter(item =>
 
 (item.client_name || "")
 .toLowerCase()
-.includes(keyword)
+.includes(keyword);
 
-);
+const matchCategory =
+
+!activeCategory ||
+
+(item.category || "")
+.toLowerCase() ===
+activeCategory.toLowerCase();
+
+return matchKeyword && matchCategory;
+
+});
 
 renderCases(filtered);
+
+}
+
+function filterCategory(category){
+
+activeCategory = category;
+
+filterCases();
 
 }
 
