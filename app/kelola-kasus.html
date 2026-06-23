@@ -122,12 +122,48 @@ Hapus
 
 async function hapusKasus(id){
 
+if(
+!confirm(
+"Yakin ingin menghapus kasus ini?"
+)
+){
+return;
+}
+
+const res =
+await fetch(
+"https://kutukabel-api.jalakpass.workers.dev/delete-case",
+{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+id:id
+})
+}
+);
+
+const data =
+await res.json();
+
+if(data.success){
+
 alert(
-"Fitur hapus akan dibuat setelah endpoint delete selesai."
+"Kasus berhasil dihapus"
+);
+
+loadCases();
+
+}else{
+
+alert(
+"Gagal menghapus kasus"
 );
 
 }
 
+}
 loadCases();
 
 </script>
