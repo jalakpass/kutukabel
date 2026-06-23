@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Edit Kasus | KutuKabel</title>
+
+<style>
+body{
+font-family:Arial,sans-serif;
+background:#f5f5f5;
+padding:20px;
+margin:0;
+}
+
+.card{
+max-width:900px;
+margin:auto;
+background:white;
+padding:25px;
+border-radius:12px;
+box-shadow:0 2px 10px rgba(0,0,0,.08);
+}
+
+label{
+display:block;
+margin-top:15px;
+margin-bottom:5px;
+font-weight:bold;
+}
+
+input,select,textarea{
+width:100%;
+padding:12px;
+border:1px solid #ddd;
+border-radius:8px;
+box-sizing:border-box;
+}
+
+textarea{
+min-height:80px;
+}
+
+.btn{
+margin-top:20px;
+padding:12px 20px;
+border:none;
+border-radius:8px;
+background:#d46316;
+color:white;
+font-weight:bold;
+cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<h1>Edit Kasus</h1>
+
+<input id="caseId" type="hidden">
+
+<label>Judul</label>
+<input id="title">
+
+<label>Kategori</label>
+<input id="category">
+
+<label>Merk</label>
+<input id="brand">
+
+<label>Model</label>
+<input id="model">
+
+<label>Perangkat</label>
+<input id="device">
+
+<label>Gejala</label>
+<textarea id="symptom"></textarea>
+
+<label>Penyebab</label>
+<textarea id="cause"></textarea>
+
+<label>Solusi</label>
+<textarea id="solution"></textarea>
+
+<label>Tools</label>
+<textarea id="tools"></textarea>
+
+<label>Catatan</label>
+<textarea id="notes"></textarea>
+
+<label>Klien</label>
+<input id="client_name">
+
+<label>Narasi</label>
+<textarea id="content"></textarea>
+
+<button
+class="btn"
+onclick="updateCase()">
+Simpan Perubahan
+</button>
+
+</div>
