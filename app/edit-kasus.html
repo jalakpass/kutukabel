@@ -105,3 +105,73 @@ Simpan Perubahan
 </button>
 
 </div>
+
+<script>
+
+const params =
+new URLSearchParams(
+window.location.search
+);
+
+const id =
+params.get("id");
+
+async function loadCase(){
+
+if(!id){
+return;
+}
+
+const res =
+await fetch(
+"https://kutukabel-api.jalakpass.workers.dev/case?slug="
++ id
+);
+
+const data =
+await res.json();
+
+document.getElementById("caseId").value =
+data.id || "";
+
+document.getElementById("title").value =
+data.title || "";
+
+document.getElementById("category").value =
+data.category || "";
+
+document.getElementById("brand").value =
+data.brand || "";
+
+document.getElementById("model").value =
+data.model || "";
+
+document.getElementById("device").value =
+data.device || "";
+
+document.getElementById("symptom").value =
+data.symptom || "";
+
+document.getElementById("cause").value =
+data.cause || "";
+
+document.getElementById("solution").value =
+data.solution || "";
+
+document.getElementById("tools").value =
+data.tools || "";
+
+document.getElementById("notes").value =
+data.notes || "";
+
+document.getElementById("client_name").value =
+data.client_name || "";
+
+document.getElementById("content").value =
+data.content || "";
+
+}
+
+loadCase();
+
+</script>
