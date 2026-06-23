@@ -99,7 +99,7 @@ background:#e8e8e8;
 <input
 id="search"
 type="text"
-placeholder="🔍 Cari kasus..."
+placeholder="Cari kasus..."
 oninput="filterCases()"
 >
 </div>
@@ -174,9 +174,6 @@ ${item.device || "-"}
 Klien:
 ${item.client_name || "-"}
 
-<br>
-
-${item.created_at || ""}
 
 </div>
 
@@ -222,7 +219,7 @@ renderCases(filtered);
 function openCase(slug){
 
 window.location.href =
-"/kasus/" + slug;
+"kasus.html?slug=" + slug;
 
 }
 
