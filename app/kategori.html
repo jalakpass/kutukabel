@@ -77,7 +77,120 @@ background:#e8e8e8;
 </head>
 
 <body>
+<script>
 
+const params =
+new URLSearchParams(
+window.location.search
+);
+
+const category =
+params.get("category") || "";
+
+document.getElementById(
+"pageTitle"
+).innerText =
+category || "Kategori";
+
+document.title =
+(category || "Kategori")
++ " | KutuKabel";
+
+async function loadCases(){
+
+const res = await fetch(
+"https://kutukabel-api.jalakpass.workers.dev/cases"
+);
+
+const data =
+await res.json();
+
+const filtered =
+data.filter(item =>
+
+(item.category || "")
+.toLowerCase() ===
+category.toLowerCase()
+
+);
+
+renderCases(filtered);
+
+}
+
+function renderCases(data){
+
+const container =
+document.getElementById("cases");
+
+container.innerHTML = "";
+
+document.getElementById(
+"resultCount"
+).innerHTML =
+data.length +
+" kasus ditemukan";
+
+if(data.length === 0){
+
+container.innerHTML =
+`
+<div class="card">
+Belum ada kasus pada kategori ini
+</div>
+`;
+
+return;
+
+}
+
+data.forEach(item => {
+
+container.innerHTML += `
+<div
+class="card"
+onclick="
+window.location.href=
+'kasus.html?slug=${item.slug}'
+">
+
+<div class="title">
+${item.title}
+</div>
+
+<div class="meta">
+Perangkat:
+${item.device || "-"}
+</div>
+
+</div>
+`;
+
+});
+
+}
+
+loadCases();
+
+</script>
+
+<div class="quick-nav">
+
+<a href="/">
+Home
+</a>
+
+<a href="daftar-kasus.html">
+Database
+</a>
+
+<a href="/app/tools/">
+Tools
+</a>
+
+</div>
+
+</body>
 <div class="container">
 
 <h1 id="pageTitle">
