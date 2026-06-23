@@ -57,6 +57,30 @@ font-size:13px;
 color:#666;
 }
 
+.quick-nav{
+width:100%;
+display:flex;
+justify-content:center;
+align-items:center;
+gap:15px;
+margin:30px auto;
+flex-wrap:wrap;
+text-align:center;
+}
+
+.quick-nav a{
+background:#f3f3f3;
+padding:10px 15px;
+border-radius:8px;
+text-decoration:none;
+font-weight:bold;
+color:#222;
+}
+
+.quick-nav a:hover{
+background:#e8e8e8;
+}
+
 </style>
 </head>
 
@@ -205,6 +229,22 @@ window.location.href =
 loadCases();
 
 </script>
+
+<div class="quick-nav">
+
+<a href="/app/">
+Home
+</a>
+
+<a href="daftar-kasus.html">
+Database
+</a>
+
+<a href="/app/tools/">
+Tools
+</a>
+
+</div>
 
 </body>
 </html>
