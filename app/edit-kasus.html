@@ -95,9 +95,11 @@ cursor:pointer;
 <label>Klien</label>
 <input id="client_name">
 
+<label>Prompt AI</label>
+<textarea id="excerpt"></textarea>
+
 <label>Narasi</label>
 <textarea id="content"></textarea>
-
 <button
 class="btn"
 onclick="updateCase()">
@@ -166,6 +168,9 @@ data.notes || "";
 
 document.getElementById("client_name").value =
 data.client_name || "";
+
+document.getElementById("excerpt").value =
+data.excerpt || "";
 
 document.getElementById("content").value =
 data.content || "";
