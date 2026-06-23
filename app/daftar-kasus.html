@@ -57,6 +57,19 @@ font-size:13px;
 color:#666;
 }
 
+#categoryFilter button{
+padding:8px 14px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+background:#f3f3f3;
+font-weight:bold;
+}
+
+#categoryFilter button:hover{
+background:#e8e8e8;
+}
+
 .quick-nav{
 width:100%;
 display:flex;
@@ -102,6 +115,31 @@ type="text"
 placeholder="Cari kasus..."
 oninput="filterCases()"
 >
+</div>
+
+<div
+id="categoryFilter"
+style="
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+margin-bottom:15px;
+">
+
+<button onclick="filterCategory('')">Semua</button>
+
+<button onclick="filterCategory('CCTV')">CCTV</button>
+
+<button onclick="filterCategory('Access Control')">Access Control</button>
+
+<button onclick="filterCategory('Jaringan')">Jaringan</button>
+
+<button onclick="filterCategory('PABX')">PABX</button>
+
+<button onclick="filterCategory('Alarm')">Alarm</button>
+
+<button onclick="filterCategory('Smart Home')">Smart Home</button>
+
 </div>
 
 <div id="resultCount"></div>
