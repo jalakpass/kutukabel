@@ -72,6 +72,8 @@ font-weight:bold;
 
 <body>
 
+<div id="navbar"></div>
+
 <div class="container">
 
 <h1>Download Center</h1>
@@ -96,21 +98,25 @@ Semua Brand
 
 <div id="downloads"></div>
 
-<div class="quick-nav">
 
-<a href="/">
-Home
-</a>
-
-<a href="/app/daftar-kasus.html">
-Database Kasus
-</a>
 
 </div>
 
 </div>
 
 <script>
+
+fetch(
+"/app/components/navigation-public.html"
+)
+.then(res=>res.text())
+.then(html=>{
+
+document.getElementById(
+"navbar"
+).innerHTML = html;
+
+});
 
 let allDownloads = [];
 
