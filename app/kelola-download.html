@@ -205,9 +205,15 @@ return;
 }
 
 await fetch(
-"https://kutukabel-api.jalakpass.workers.dev/download?id="+id,
+"https://kutukabel-api.jalakpass.workers.dev/delete-download",
 {
-method:"DELETE"
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+id:id
+})
 }
 );
 
