@@ -217,8 +217,6 @@ return;
 
 }
 
-console.log("FETCH META:", url);
-
 const res =
 await fetch(
 "https://kutukabel-api.jalakpass.workers.dev/fetch-meta",
@@ -232,13 +230,6 @@ url:url
 })
 }
 );
-
-console.log("STATUS:", res.status);
-
-const data =
-await res.json();
-
-console.log("DATA:", data);
 
 const data =
 await res.json();
@@ -261,9 +252,7 @@ data.description;
 
 }
 
-alert(
-JSON.stringify(data)
-);
+
 }
 
 async function simpanDownload(){
