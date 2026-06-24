@@ -176,12 +176,6 @@ Isi Form Dari Hasil AI
 
 <input id="url">
 
-<button
-type="button"
-onclick="ambilData()">
-Ambil Data
-</button>
-<label>Access Type *</label>
 
 <select id="accessType">
 
@@ -200,60 +194,6 @@ Simpan Download
 
 <script>
 
-async function ambilData(){
-
-const url =
-document.getElementById("url")
-.value
-.trim();
-
-if(!url){
-
-alert(
-"Masukkan URL terlebih dahulu"
-);
-
-return;
-
-}
-
-const res =
-await fetch(
-"https://kutukabel-api.jalakpass.workers.dev/fetch-meta",
-{
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
-url:url
-})
-}
-);
-
-const data =
-await res.json();
-
-if(data.title){
-
-document
-.getElementById("name")
-.value =
-data.title;
-
-}
-
-if(data.description){
-
-document
-.getElementById("description")
-.value =
-data.description;
-
-}
-
-
-}
 
 function copyPrompt(){
 
