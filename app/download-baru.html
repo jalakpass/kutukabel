@@ -318,10 +318,23 @@ document.getElementById(
 ).value =
 ambil("Deskripsi");
 
+let url =
+ambil("URL");
+
+const markdownLink =
+url.match(/\((https?:\/\/.*?)\)/);
+
+if(markdownLink){
+
+url =
+markdownLink[1];
+
+}
+
 document.getElementById(
 "url"
 ).value =
-ambil("URL");
+url;
 
 document.getElementById(
 "accessType"
