@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>Kelola Download | KutuKabel</title>
+
+<style>
+
+body{
+font-family:Arial,sans-serif;
+background:#f5f5f5;
+margin:0;
+padding:20px;
+}
+
+.container{
+max-width:1000px;
+margin:auto;
+}
+
+input{
+width:100%;
+padding:12px;
+border:1px solid #ddd;
+border-radius:8px;
+margin-bottom:20px;
+box-sizing:border-box;
+}
+
+.card{
+background:#fff;
+padding:15px;
+border-radius:10px;
+margin-bottom:15px;
+box-shadow:0 2px 10px rgba(0,0,0,.08);
+}
+
+.title{
+font-size:18px;
+font-weight:bold;
+margin-bottom:5px;
+}
+
+.meta{
+font-size:14px;
+color:#666;
+margin-bottom:10px;
+}
+
+.btn{
+display:inline-block;
+padding:8px 12px;
+border-radius:6px;
+text-decoration:none;
+margin-right:8px;
+}
+
+.edit{
+background:#0d6efd;
+color:white;
+}
+
+.delete{
+background:#dc3545;
+color:white;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Kelola Download</h1>
+
+<input
+id="search"
+placeholder="Cari download..."
+onkeyup="filterDownloads()">
+
+<div id="list"></div>
+
+</div>
+
+<script>
+
+let allDownloads=[];
+
+async function loadDownloads(){
+
+const res =
+await fetch(
+"https://kutukabel-api.jalakpass.workers.dev/downloads"
+);
+
+allDownloads =
+await res.json();
+
+renderDownloads(
+allDownloads
+);
+
+}
+
+function renderDownloads(data){
+
+const list =
+document.getElementById(
+"list"
+);
+
+list.innerHTML="";
+
+data.forEach(item=>{
+
+list.innerHTML += `
+
+<div class="card">
+
+<div class="title">
+${item.name || "-"}
+</div>
+
+<div class="meta">
+
+${item.brand || "-"}
+
+<br>
+
+${item.type || "-"}
+
+<br>
+
+${item.status || "-"}
+
+</div>
+
+<a
+class="btn edit"
+href="/app/edit-download.html?id=${item.id}">
+
+Edit
+
+</a>
+
+<a
+class="btn delete"
+href="#"
+onclick="hapusDownload('${item.id}')">
+
+Hapus
+
+</a>
+
+</div>
+
+`;
+
+});
+
+}
+
+function filterDownloads(){
+
+const keyword =
+document
+.getElementById("search")
+.value
+.toLowerCase();
+
+const filtered =
+allDownloads.filter(item=>
+
+(item.name||"")
+.toLowerCase()
+.includes(keyword)
+
+||
+
+(item.brand||"")
+.toLowerCase()
+.includes(keyword)
+
+);
+
+renderDownloads(
+filtered
+);
+
+}
+
+async function hapusDownload(id){
+
+if(
+!confirm(
+"Hapus download ini?"
+)
+){
+return;
+}
+
+await fetch(
+"https://kutukabel-api.jalakpass.workers.dev/download?id="+id,
+{
+method:"DELETE"
+}
+);
+
+loadDownloads();
+
+}
+
+loadDownloads();
+
+</script>
+
+</body>
+</html>
