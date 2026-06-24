@@ -255,6 +255,81 @@ data.description;
 
 }
 
+function copyPrompt(){
+
+navigator.clipboard.writeText(
+document.getElementById(
+"promptAi"
+).value
+);
+
+alert(
+"Prompt berhasil dicopy"
+);
+
+}
+
+function parseAI(){
+
+const text =
+document.getElementById(
+"hasilAi"
+).value;
+
+function ambil(label){
+
+const regex =
+new RegExp(
+label + "\\s*:\\s*(.*)",
+"i"
+);
+
+const match =
+text.match(regex);
+
+return match
+? match[1].trim()
+: "";
+
+}
+
+document.getElementById(
+"category"
+).value =
+ambil("Kategori");
+
+document.getElementById(
+"brand"
+).value =
+ambil("Brand");
+
+document.getElementById(
+"type"
+).value =
+ambil("Type");
+
+document.getElementById(
+"name"
+).value =
+ambil("Nama");
+
+document.getElementById(
+"description"
+).value =
+ambil("Deskripsi");
+
+document.getElementById(
+"url"
+).value =
+ambil("URL");
+
+document.getElementById(
+"accessType"
+).value =
+ambil("Access Type");
+
+}
+
 async function simpanDownload(){
 
 const name =
