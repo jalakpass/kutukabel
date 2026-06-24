@@ -81,6 +81,17 @@ id="search"
 placeholder="Cari software..."
 onkeyup="filterDownloads()">
 
+<select
+id="brandFilter"
+onchange="filterDownloads()"
+style="width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;margin-bottom:20px;">
+
+<option value="">
+Semua Brand
+</option>
+
+</select>
+
 <div id="resultCount"></div>
 
 <div id="downloads"></div>
@@ -111,6 +122,8 @@ const res = await fetch(
 
 allDownloads =
 await res.json();
+
+isiBrandFilter();
 
 renderDownloads(
 allDownloads
@@ -190,6 +203,32 @@ ${(item.description || "")
 
 }
 
+function isiBrandFilter(){
+
+const brands =
+[...new Set(
+allDownloads
+.map(x=>x.brand)
+.filter(Boolean)
+)]
+.sort();
+
+const select =
+document.getElementById(
+"brandFilter"
+);
+
+brands.forEach(brand=>{
+
+select.innerHTML +=
+`<option value="${brand}">
+${brand}
+</option>`;
+
+});
+
+}
+
 function filterDownloads(){
 
 const keyword =
@@ -199,8 +238,16 @@ document.getElementById(
 .value
 .toLowerCase();
 
+const brand =
+document.getElementById(
+"brandFilter"
+)
+.value;
+
 const filtered =
-allDownloads.filter(item =>
+allDownloads.filter(item => {
+
+const cocokKeyword =
 
 (item.name || "")
 .toLowerCase()
@@ -216,9 +263,17 @@ allDownloads.filter(item =>
 
 (item.category || "")
 .toLowerCase()
-.includes(keyword)
+.includes(keyword);
 
-);
+const cocokBrand =
+
+!brand ||
+item.brand === brand;
+
+return cocokKeyword &&
+cocokBrand;
+
+});
 
 renderDownloads(
 filtered
