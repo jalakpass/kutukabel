@@ -91,12 +91,8 @@ onkeyup="filterDownloads()">
 Home
 </a>
 
-<a href="/app/dashboard.html">
-Dashboard
-</a>
-
-<a href="/app/download-baru.html">
-+ Download Baru
+<a href="/app/daftar-kasus.html">
+Database Kasus
 </a>
 
 </div>
@@ -157,18 +153,13 @@ ${item.name || "-"}
 
 <div class="meta">
 
-Brand:
-${item.brand || "-"}
+${(item.description || "-")
+.substring(0,150)}
 
-<br>
-
-Kategori:
-${item.category || "-"}
-
-<br>
-
-Type:
-${item.type || "-"}
+${(item.description || "")
+.length > 150
+? "..."
+: ""}
 
 </div>
 
@@ -178,7 +169,7 @@ ${item.type || "-"}
 href="${item.url}"
 target="_blank">
 
-Kunjungi Vendor
+⬇ Download Here
 
 </a>
 
