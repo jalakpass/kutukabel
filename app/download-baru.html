@@ -64,6 +64,78 @@ cursor:pointer;
 
 <h1>Download Baru</h1>
 
+<label>Prompt AI</label>
+
+<textarea
+id="promptAi"
+readonly
+style="min-height:250px;">
+
+Anda adalah admin database Download Center KutuKabel.
+
+Analisa screenshot halaman download software yang saya kirim.
+
+Keluarkan hasil dalam format berikut:
+
+Kategori:
+Brand:
+Type:
+Nama:
+Deskripsi:
+URL:
+Access Type:
+
+Aturan:
+
+Kategori hanya boleh:
+CCTV
+Access Control
+Jaringan
+PABX
+Alarm
+Smart Home
+Listrik
+
+Type hanya boleh:
+Software
+Mobile App
+Manual
+Datasheet
+Firmware
+Tool
+
+Access Type hanya boleh:
+Official Page
+Direct Download
+Agreement Required
+Login Required
+
+Jangan menambahkan informasi yang tidak terlihat pada gambar.
+
+Tampilkan hasil akhir saja tanpa penjelasan.
+
+</textarea>
+
+<button
+type="button"
+onclick="copyPrompt()">
+Copy Prompt AI
+</button>
+
+<label>Hasil AI</label>
+
+<textarea
+id="hasilAi"
+placeholder="Paste hasil AI disini..."
+style="min-height:180px;">
+</textarea>
+
+<button
+type="button"
+onclick="parseAI()">
+Isi Form Dari Hasil AI
+</button>
+
 <label>Kategori *</label>
 
 <select id="category">
@@ -242,7 +314,17 @@ document.getElementById("description").value,
 url:url,
 
 access_type:
-document.getElementById("accessType").value
+document.getElementById("accessType").value,
+
+prompt_ai:
+document.getElementById("promptAi")
+? document.getElementById("promptAi").value
+: "",
+
+hasil_ai:
+document.getElementById("hasilAi")
+? document.getElementById("hasilAi").value
+: ""
 
 })
 }
