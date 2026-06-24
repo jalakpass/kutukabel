@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Download Center | KutuKabel</title>
+
+<style>
+
+body{
+font-family:Arial,sans-serif;
+background:#f5f5f5;
+padding:20px;
+margin:0;
+}
+
+.container{
+max-width:1000px;
+margin:auto;
+}
+
+input{
+width:100%;
+padding:12px;
+border:1px solid #ddd;
+border-radius:8px;
+box-sizing:border-box;
+margin-bottom:20px;
+}
+
+.card{
+background:white;
+padding:20px;
+border-radius:10px;
+margin-bottom:15px;
+box-shadow:0 2px 10px rgba(0,0,0,.08);
+cursor:pointer;
+}
+
+.title{
+font-size:18px;
+font-weight:bold;
+margin-bottom:8px;
+}
+
+.meta{
+font-size:13px;
+color:#666;
+}
+
+.quick-nav{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+margin-top:20px;
+}
+
+.quick-nav a{
+background:#f3f3f3;
+padding:10px 15px;
+border-radius:8px;
+text-decoration:none;
+color:#222;
+font-weight:bold;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Download Center</h1>
+
+<input
+id="search"
+placeholder="Cari software..."
+onkeyup="filterDownloads()">
+
+<div id="resultCount"></div>
+
+<div id="downloads"></div>
+
+<div class="quick-nav">
+
+<a href="/">
+Home
+</a>
+
+<a href="/app/dashboard.html">
+Dashboard
+</a>
+
+<a href="/app/download-baru.html">
++ Download Baru
+</a>
+
+</div>
+
+</div>
+
+<script>
+
+let allDownloads = [];
+
+async function loadDownloads(){
+
+const res = await fetch(
+"https://kutukabel-api.jalakpass.workers.dev/downloads"
+);
+
+allDownloads =
+await res.json();
+
+renderDownloads(
+allDownloads
+);
+
+}
+
+function renderDownloads(data){
+
+const container =
+document.getElementById(
+"downloads"
+);
+
+container.innerHTML = "";
+
+document.getElementById(
+"resultCount"
+).innerHTML =
+data.length +
+" download ditemukan";
+
+if(data.length === 0){
+
+container.innerHTML =
+"<div class='card'>Data tidak ditemukan</div>";
+
+return;
+
+}
+
+data.forEach(item=>{
+
+container.innerHTML += `
+<div class="card">
+
+<div class="title">
+${item.name || "-"}
+</div>
+
+<div class="meta">
+
+Brand:
+${item.brand || "-"}
+
+<br>
+
+Kategori:
+${item.category || "-"}
+
+<br>
+
+Type:
+${item.type || "-"}
+
+</div>
+
+<br>
+
+<a
+href="${item.url}"
+target="_blank">
+
+Kunjungi Vendor
+
+</a>
+
+</div>
+`;
+
+});
+
+}
+
+function filterDownloads(){
+
+const keyword =
+document.getElementById(
+"search"
+)
+.value
+.toLowerCase();
+
+const filtered =
+allDownloads.filter(item =>
+
+(item.name || "")
+.toLowerCase()
+.includes(keyword)
+
+||
+
+(item.brand || "")
+.toLowerCase()
+.includes(keyword)
+
+||
+
+(item.category || "")
+.toLowerCase()
+.includes(keyword)
+
+);
+
+renderDownloads(
+filtered
+);
+
+}
+
+loadDownloads();
+
+</script>
+
+</body>
+</html>
