@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Edit Download | KutuKabel</title>
+
+<style>
+
+body{
+font-family:Arial,sans-serif;
+background:#f5f5f5;
+padding:20px;
+margin:0;
+}
+
+.card{
+max-width:900px;
+margin:auto;
+background:white;
+padding:25px;
+border-radius:12px;
+box-shadow:0 2px 10px rgba(0,0,0,.08);
+}
+
+label{
+display:block;
+margin-top:15px;
+margin-bottom:5px;
+font-weight:bold;
+}
+
+input,select,textarea{
+width:100%;
+padding:12px;
+border:1px solid #ddd;
+border-radius:8px;
+box-sizing:border-box;
+}
+
+textarea{
+min-height:120px;
+}
+
+button{
+margin-top:20px;
+padding:12px 20px;
+border:none;
+border-radius:8px;
+background:#d46316;
+color:white;
+font-weight:bold;
+cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+<h1>Edit Download</h1>
+
+<label>Kategori</label>
+
+<select id="category">
+<option>CCTV</option>
+<option>Access Control</option>
+<option>Jaringan</option>
+<option>PABX</option>
+<option>Alarm</option>
+<option>Smart Home</option>
+<option>Listrik</option>
+</select>
+
+<label>Brand</label> <input id="brand">
+
+<label>Type</label>
+
+<select id="type">
+<option>Software</option>
+<option>Mobile App</option>
+<option>Manual</option>
+<option>Datasheet</option>
+<option>Firmware</option>
+<option>Tool</option>
+</select>
+
+<label>Nama</label> <input id="name">
+
+<label>Deskripsi</label>
+
+<textarea id="description"></textarea>
+
+<label>URL</label> <input id="url">
+
+<label>Access Type</label>
+
+<select id="accessType">
+<option>Official Page</option>
+<option>Direct Download</option>
+<option>Agreement Required</option>
+<option>Login Required</option>
+</select>
+
+<button onclick="simpanPerubahan()">
+Simpan Perubahan
+</button>
+
+</div>
+
+<script>
+
+const id =
+new URLSearchParams(
+window.location.search
+).get("id");
+
+async function loadDownload(){
+
+const res =
+await fetch(
+"https://kutukabel-api.jalakpass.workers.dev/download?id=" + id
+);
+
+const data =
+await res.json();
+
+document.getElementById("category").value =
+data.category || "";
+
+document.getElementById("brand").value =
+data.brand || "";
+
+document.getElementById("type").value =
+data.type || "";
+
+document.getElementById("name").value =
+data.name || "";
+
+document.getElementById("description").value =
+data.description || "";
+
+document.getElementById("url").value =
+data.url || "";
+
+document.getElementById("accessType").value =
+data.access_type || "";
+
+}
+
+async function simpanPerubahan(){
+
+const res =
+await fetch(
+"https://kutukabel-api.jalakpass.workers.dev/update-download",
+{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+
+id:id,
+
+category:
+document.getElementById("category").value,
+
+brand:
+document.getElementById("brand").value,
+
+type:
+document.getElementById("type").value,
+
+name:
+document.getElementById("name").value,
+
+description:
+document.getElementById("description").value,
+
+url:
+document.getElementById("url").value,
+
+access_type:
+document.getElementById("accessType").value
+
+})
+}
+);
+
+const data =
+await res.json();
+
+if(data.success){
+
+alert(
+"Perubahan berhasil disimpan"
+);
+
+}else{
+
+alert(
+"Gagal menyimpan"
+);
+
+}
+
+}
+
+loadDownload();
+
+</script>
+
+</body>
+</html>
