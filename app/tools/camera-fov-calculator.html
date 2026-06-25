@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Camera FoV Calculator | KutuKabel</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+:root{
+  --orange:   #d46316;
+  --orange-dk:#a84d0f;
+  --orange-lt:#fff0e6;
+  --black:    #1a1a1a;
+  --gray-90:  #2d2d2d;
+  --gray-60:  #666;
+  --gray-40:  #999;
+  --gray-20:  #e0e0e0;
+  --gray-10:  #f5f5f5;
+  --white:    #ffffff;
+  --green:    #1d8a4e;
+  --green-lt: #e9f7ef;
+  --red:      #c0392b;
+  --red-lt:   #fdecea;
+  --yellow:   #b7950b;
+  --yellow-lt:#fef9e7;
+  --blue:     #1a6fa8;
+  --blue-lt:  #e8f4fd;
+}
+
+body{
+  font-family:'Inter',Arial,sans-serif;
+  background:var(--gray-10);
+  min-height:100vh;
+  padding:24px 16px 48px;
+  color:var(--black);
+}
+
+.header{
+  max-width:960px;margin:0 auto 20px;
+  display:flex;align-items:center;gap:12px;
+}
+.logo-mark{
+  width:40px;height:40px;background:var(--orange);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Space Mono',monospace;font-size:14px;font-weight:700;
+  color:white;letter-spacing:-1px;flex-shrink:0;
+}
+.header-text h1{
+  font-family:'Space Mono',monospace;font-size:18px;font-weight:700;letter-spacing:-0.5px;
+}
+.header-text p{font-size:12px;color:var(--gray-60);margin-top:2px;}
+
+.card{
+  max-width:960px;margin:0 auto 16px;
+  background:var(--white);border-radius:14px;
+  box-shadow:0 2px 16px rgba(0,0,0,.07);overflow:hidden;
+}
+.card-top{
+  background:var(--black);padding:16px 24px;
+  display:flex;align-items:center;gap:10px;
+}
+.card-top .dot{width:8px;height:8px;border-radius:50%;background:var(--orange);}
+.card-top span{
+  font-family:'Space Mono',monospace;font-size:11px;color:#888;
+  letter-spacing:1px;text-transform:uppercase;
+}
+.card-top .tag{
+  margin-left:auto;font-family:'Space Mono',monospace;font-size:10px;
+  color:#555;background:#2a2a2a;padding:3px 8px;border-radius:4px;
+}
+
+.form-body{padding:24px;}
+
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.span-2{grid-column:span 2;}
+
+.field{display:flex;flex-direction:column;gap:6px;}
+label{
+  font-size:12px;font-weight:600;color:var(--gray-60);
+  letter-spacing:0.5px;text-transform:uppercase;
+}
+label .hint{font-weight:400;text-transform:none;letter-spacing:0;color:var(--gray-40);font-size:11px;}
+
+input,select{
+  width:100%;padding:11px 14px;
+  border:1.5px solid var(--gray-20);border-radius:8px;
+  font-size:14px;font-family:'Inter',Arial,sans-serif;
+  color:var(--black);background:var(--white);
+  transition:border-color .15s;appearance:none;-webkit-appearance:none;
+}
+input:focus,select:focus{outline:none;border-color:var(--orange);}
+input.mono{font-family:'Space Mono',monospace;font-size:13px;}
+select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;
+}
+
+/* Mode toggle */
+.mode-toggle{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.mode-btn{
+  padding:12px 8px;border:1.5px solid var(--gray-20);border-radius:8px;
+  background:var(--white);font-size:11px;font-weight:700;
+  font-family:'Space Mono',monospace;color:var(--gray-60);cursor:pointer;
+  transition:all .15s;text-align:center;line-height:1.5;
+}
+.mode-btn .mode-icon{font-size:18px;display:block;margin-bottom:4px;}
+.mode-btn .mode-sub{font-size:9px;font-weight:400;font-family:'Inter',sans-serif;color:var(--gray-40);}
+.mode-btn.active{border-color:var(--orange);background:var(--orange-lt);color:var(--orange-dk);}
+
+/* Sensor preset chips */
+.preset-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px;}
+.preset-chip{
+  padding:5px 11px;border:1.5px solid var(--gray-20);border-radius:16px;
+  font-size:11px;font-weight:600;color:var(--gray-60);cursor:pointer;
+  transition:all .15s;background:var(--white);white-space:nowrap;
+}
+.preset-chip:hover{border-color:var(--orange);color:var(--orange);background:var(--orange-lt);}
+.preset-chip.active-chip{border-color:var(--orange);background:var(--orange-lt);color:var(--orange-dk);}
+
+/* Lens preset */
+.lens-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.lens-chip{
+  padding:5px 10px;border:1.5px solid var(--gray-20);border-radius:6px;
+  font-size:11px;font-weight:700;font-family:'Space Mono',monospace;
+  color:var(--gray-60);cursor:pointer;transition:all .15s;background:var(--white);
+}
+.lens-chip:hover{border-color:var(--orange);color:var(--orange);background:var(--orange-lt);}
+
+.divider{border:none;border-top:1px solid var(--gray-20);margin:20px 0;}
+
+.btn{
+  padding:11px 16px;border:none;border-radius:8px;
+  font-size:13px;font-weight:700;font-family:'Space Mono',monospace;
+  cursor:pointer;transition:all .15s;white-space:nowrap;
+}
+.btn-primary{background:var(--orange);color:white;}
+.btn-primary:hover{background:var(--orange-dk);}
+.btn-secondary{background:var(--gray-10);color:var(--gray-60);border:1.5px solid var(--gray-20);}
+.btn-secondary:hover{border-color:var(--orange);color:var(--orange);}
+.btn-full{width:100%;padding:14px;font-size:15px;}
+
+/* ── Result ── */
+.result-divider{height:4px;background:linear-gradient(90deg,var(--orange),var(--orange-dk));}
+.result-body{padding:24px;background:var(--gray-10);}
+.result-headline{
+  font-family:'Space Mono',monospace;font-size:11px;
+  letter-spacing:1px;text-transform:uppercase;color:var(--gray-60);margin-bottom:16px;
+}
+
+/* Two-column layout */
+.result-cols{display:grid;grid-template-columns:1fr 360px;gap:16px;margin-bottom:16px;}
+
+/* FoV visual canvas */
+.fov-canvas-wrap{
+  background:var(--white);border-radius:12px;
+  border:1px solid var(--gray-20);overflow:hidden;
+}
+.fov-canvas-header{
+  padding:12px 16px;border-bottom:1px solid var(--gray-10);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.fov-canvas-title{
+  font-family:'Space Mono',monospace;font-size:10px;
+  color:var(--gray-60);letter-spacing:1px;text-transform:uppercase;
+}
+canvas#fov-canvas{display:block;width:100%;}
+
+/* Result numbers */
+.result-numbers{display:flex;flex-direction:column;gap:10px;}
+
+.num-card{
+  background:var(--white);border-radius:10px;
+  border:1px solid var(--gray-20);padding:14px 16px;
+}
+.num-card.primary{border-color:var(--orange);background:var(--orange-lt);}
+.num-card.green-card{border-color:var(--green);background:var(--green-lt);}
+.num-card.blue-card{border-color:var(--blue);background:var(--blue-lt);}
+.num-label{
+  font-size:10px;font-weight:600;letter-spacing:0.5px;
+  text-transform:uppercase;color:var(--gray-60);margin-bottom:6px;
+}
+.num-val{
+  font-family:'Space Mono',monospace;font-size:26px;
+  font-weight:700;color:var(--black);line-height:1;
+}
+.num-val.orange{color:var(--orange-dk);}
+.num-val.green{color:var(--green);}
+.num-val.blue{color:var(--blue);}
+.num-unit{font-size:12px;color:var(--gray-60);margin-top:4px;}
+.num-sub{font-size:11px;color:var(--gray-40);margin-top:2px;font-family:'Space Mono',monospace;}
+
+/* Stat row */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+.stat-box{
+  background:var(--white);border-radius:10px;padding:14px;border:1px solid var(--gray-20);
+}
+.stat-box.highlight{border-color:var(--orange);background:var(--orange-lt);}
+.stat-label{font-size:10px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;color:var(--gray-60);margin-bottom:6px;}
+.stat-val{font-family:'Space Mono',monospace;font-size:18px;font-weight:700;color:var(--black);line-height:1;}
+.stat-unit{font-size:11px;color:var(--gray-60);margin-top:3px;}
+
+/* PPF / DORI table */
+.dori-section{
+  background:var(--white);border-radius:12px;border:1px solid var(--gray-20);
+  overflow:hidden;margin-bottom:16px;
+}
+.dori-header{
+  background:var(--black);padding:12px 16px;
+  display:flex;align-items:center;gap:10px;
+}
+.dori-header span{
+  font-family:'Space Mono',monospace;font-size:10px;
+  color:#888;letter-spacing:1px;text-transform:uppercase;
+}
+.dori-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+}
+.dori-cell{
+  padding:16px;border-right:1px solid var(--gray-10);
+  border-bottom:1px solid var(--gray-10);
+}
+.dori-cell:nth-child(4n){border-right:none;}
+.dori-cell .d-label{
+  font-size:10px;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;margin-bottom:4px;
+}
+.dori-cell .d-range{
+  font-family:'Space Mono',monospace;font-size:15px;
+  font-weight:700;color:var(--black);margin-bottom:4px;
+}
+.dori-cell .d-desc{font-size:11px;color:var(--gray-60);line-height:1.4;}
+.dori-cell .d-use{
+  margin-top:6px;font-size:10px;font-weight:600;
+  padding:2px 7px;border-radius:3px;display:inline-block;
+}
+
+/* Lens comparison table */
+.lens-table-wrap{
+  background:var(--white);border-radius:12px;border:1px solid var(--gray-20);
+  overflow:hidden;margin-bottom:16px;
+}
+.lens-table-wrap table{width:100%;border-collapse:collapse;font-size:12px;}
+.lens-table-wrap thead tr{background:var(--black);}
+.lens-table-wrap thead th{
+  padding:10px 12px;font-family:'Space Mono',monospace;font-size:10px;
+  font-weight:700;letter-spacing:0.5px;text-transform:uppercase;
+  color:#888;text-align:left;white-space:nowrap;
+}
+.lens-table-wrap tbody tr{border-bottom:1px solid var(--gray-10);}
+.lens-table-wrap tbody tr:hover{background:var(--gray-10);}
+.lens-table-wrap tbody tr.active-row{background:var(--orange-lt);}
+.lens-table-wrap tbody td{padding:9px 12px;vertical-align:middle;}
+td.mono{font-family:'Space Mono',monospace;font-size:12px;}
+
+.badge{
+  display:inline-block;padding:3px 8px;border-radius:4px;
+  font-size:10px;font-weight:700;
+  font-family:'Space Mono',monospace;white-space:nowrap;
+}
+.badge-detect {background:#e8f4fd;color:#1a6fa8;}
+.badge-observe{background:#e9f7ef;color:#1d8a4e;}
+.badge-recog  {background:#fff0e6;color:#d46316;}
+.badge-id     {background:#fdecea;color:#c0392b;}
+
+/* Rec box */
+.rec-box{
+  background:var(--green-lt);border-left:3px solid var(--green);
+  border-radius:0 8px 8px 0;padding:14px 16px;
+  font-size:12px;color:var(--green);
+  font-family:'Space Mono',monospace;line-height:1.8;
+}
+.rec-box span{color:var(--gray-60);font-family:'Inter',sans-serif;}
+
+/* Alert */
+.alert-warn{
+  background:var(--yellow-lt);border:1px solid var(--yellow);border-radius:10px;
+  padding:14px 16px;font-size:12px;color:var(--yellow);
+  font-family:'Space Mono',monospace;margin-bottom:16px;line-height:1.8;display:none;
+}
+
+/* Range slider custom */
+input[type=range]{
+  -webkit-appearance:auto;appearance:auto;border:none;padding:0;
+  accent-color:var(--orange);height:4px;cursor:pointer;
+}
+
+.tip-icon{
+  display:inline-block;width:15px;height:15px;
+  background:var(--gray-20);border-radius:50%;
+  font-size:9px;text-align:center;line-height:15px;
+  color:var(--gray-60);cursor:help;
+  font-family:'Space Mono',monospace;font-weight:700;margin-left:4px;vertical-align:middle;
+}
+
+@media(max-width:700px){
+  .grid-3,.grid-2{grid-template-columns:1fr;}
+  .span-2{grid-column:1;}
+  .result-cols{grid-template-columns:1fr;}
+  .stat-row{grid-template-columns:1fr 1fr;}
+  .dori-grid{grid-template-columns:1fr 1fr;}
+  .mode-toggle{grid-template-columns:1fr 1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo-mark">KK</div>
+  <div class="header-text">
+    <h1>Camera FoV Calculator</h1>
+    <p>Hitung sudut pandang, jarak coverage, dan kebutuhan kamera — formula optik standar industri</p>
+  </div>
+</div>
+
+<!-- Card: Mode -->
+<div class="card">
+  <div class="card-top">
+    <div class="dot"></div>
+    <span>Mode Kalkulasi</span>
+    <div class="tag">DORI Standard — EN 62676-4</div>
+  </div>
+  <div class="form-body">
+
+    <div class="mode-toggle" style="margin-bottom:20px;">
+      <button class="mode-btn active" onclick="setMode('fov',this)">
+        <span class="mode-icon">🔭</span>
+        FoV dari Lensa
+        <span class="mode-sub">Punya lensa X mm,<br>coverage seberapa luas?</span>
+      </button>
+      <button class="mode-btn" onclick="setMode('lens',this)">
+        <span class="mode-icon">📐</span>
+        Lensa dari Target
+        <span class="mode-sub">Mau cover area X meter,<br>butuh lensa berapa mm?</span>
+      </button>
+      <button class="mode-btn" onclick="setMode('room',this)">
+        <span class="mode-icon">🏢</span>
+        Kamera per Ruangan
+        <span class="mode-sub">Ruangan X × Y meter,<br>butuh berapa kamera?</span>
+      </button>
+    </div>
+
+    <!-- ── SENSOR SIZE ── -->
+    <div class="grid-2" style="margin-bottom:16px;">
+      <div class="field">
+        <label>Sensor Size <span class="tip-icon" title="Ukuran sensor kamera. Hikvision dome 2MP umumnya 1/2.8 inch. PTZ biasanya 1/2.8 atau 1/3 inch.">?</span></label>
+        <select id="sensor-size" onchange="onSensorChange()">
+          <optgroup label="── Sensor Umum CCTV">
+            <option value="1/4">1/4 inch — entry level (2.4×3.2mm)</option>
+            <option value="1/3">1/3 inch — standar lama (3.6×4.8mm)</option>
+            <option value="1/2.8" selected>1/2.8 inch — standar modern (3.7×4.96mm)</option>
+            <option value="1/2.7">1/2.7 inch (3.85×5.12mm)</option>
+            <option value="1/2">1/2 inch (4.8×6.4mm)</option>
+            <option value="1/1.8">1/1.8 inch (5.32×7.18mm)</option>
+          </optgroup>
+          <optgroup label="── Sensor Besar / Varifocal">
+            <option value="1/1.2">1/1.2 inch (7.2×9.6mm)</option>
+            <option value="2/3">2/3 inch (6.6×8.8mm)</option>
+            <option value="1">1 inch (9.6×12.8mm)</option>
+            <option value="custom">Custom (masukkan manual)</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="field">
+        <label>Resolusi Sensor <span class="tip-icon" title="Resolusi menentukan jumlah pixel per meter (PPM) — kualitas detail yang bisa diidentifikasi.">?</span></label>
+        <select id="resolution">
+          <option value="1280x720">1MP — 1280×720 (HD)</option>
+          <option value="1920x1080" selected>2MP — 1920×1080 (Full HD)</option>
+          <option value="2688x1520">4MP — 2688×1520</option>
+          <option value="2560x1920">5MP — 2560×1920</option>
+          <option value="3072x2048">6MP — 3072×2048</option>
+          <option value="3840x2160">8MP — 3840×2160 (4K)</option>
+          <option value="4000x3000">12MP — 4000×3000</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Custom sensor size input -->
+    <div id="custom-sensor-row" style="display:none;margin-bottom:16px;">
+      <div class="grid-2">
+        <div class="field">
+          <label>Lebar Sensor (mm)</label>
+          <input type="number" id="sensor-w-custom" value="4.96" step="0.01" class="mono">
+        </div>
+        <div class="field">
+          <label>Tinggi Sensor (mm)</label>
+          <input type="number" id="sensor-h-custom" value="3.72" step="0.01" class="mono">
+        </div>
+      </div>
+    </div>
+
+    <!-- Preset kamera populer -->
+    <label style="margin-bottom:8px;display:block;">
+      Preset Kamera Populer
+      <span class="hint"> — klik untuk isi otomatis</span>
+    </label>
+    <div class="preset-row" style="margin-bottom:20px;">
+      <div class="preset-chip" onclick="loadCamera('1920x1080','1/2.8','2.8')">Hikvision Dome 2MP 2.8mm</div>
+      <div class="preset-chip" onclick="loadCamera('1920x1080','1/2.8','4')">Hikvision Dome 2MP 4mm</div>
+      <div class="preset-chip" onclick="loadCamera('1920x1080','1/2.8','6')">Hikvision Dome 2MP 6mm</div>
+      <div class="preset-chip" onclick="loadCamera('2688x1520','1/2.8','2.8')">Hikvision 4MP 2.8mm</div>
+      <div class="preset-chip" onclick="loadCamera('2688x1520','1/2.8','4')">Hikvision 4MP 4mm</div>
+      <div class="preset-chip" onclick="loadCamera('3840x2160','1/2.8','2.8')">Hikvision 4K 2.8mm</div>
+      <div class="preset-chip" onclick="loadCamera('3840x2160','1/2.8','4')">Hikvision 4K 4mm</div>
+      <div class="preset-chip" onclick="loadCamera('1920x1080','1/2.8','2.8')">Dahua Dome 2MP 2.8mm</div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- ── MODE A: FoV dari Lensa ── -->
+    <div id="mode-fov">
+      <div class="grid-3">
+        <div class="field">
+          <label>Panjang Lensa (mm) <span class="tip-icon" title="Tertera di body kamera atau di packaging. Contoh: 2.8mm, 4mm, 6mm, 8mm.">?</span></label>
+          <input type="number" id="focal-length" value="2.8" min="0.5" max="300" step="0.1" class="mono"
+            oninput="livePreview()">
+        </div>
+        <div class="field">
+          <label>Jarak ke Objek (meter) <span class="hint">— optional</span></label>
+          <input type="number" id="distance" value="10" min="0.1" max="500" step="0.1" class="mono"
+            oninput="livePreview()">
+        </div>
+        <div class="field">
+          <label>Ketinggian Pasang (meter)</label>
+          <input type="number" id="mount-height" value="3" min="0.5" max="30" step="0.1" class="mono">
+        </div>
+      </div>
+      <div style="margin-top:12px;">
+        <label style="margin-bottom:8px;display:block;">Pilih Lensa Cepat</label>
+        <div class="lens-chips">
+          <div class="lens-chip" onclick="setLens(1.7)">1.7mm</div>
+          <div class="lens-chip" onclick="setLens(2)">2mm</div>
+          <div class="lens-chip" onclick="setLens(2.8)">2.8mm</div>
+          <div class="lens-chip" onclick="setLens(3.6)">3.6mm</div>
+          <div class="lens-chip" onclick="setLens(4)">4mm</div>
+          <div class="lens-chip" onclick="setLens(6)">6mm</div>
+          <div class="lens-chip" onclick="setLens(8)">8mm</div>
+          <div class="lens-chip" onclick="setLens(12)">12mm</div>
+          <div class="lens-chip" onclick="setLens(16)">16mm</div>
+          <div class="lens-chip" onclick="setLens(25)">25mm</div>
+          <div class="lens-chip" onclick="setLens(35)">35mm</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MODE B: Lensa dari Target ── -->
+    <div id="mode-lens" style="display:none;">
+      <div class="grid-3">
+        <div class="field">
+          <label>Lebar Area yang Ingin Di-cover (meter)</label>
+          <input type="number" id="target-width" value="8" min="0.1" max="500" step="0.1" class="mono">
+        </div>
+        <div class="field">
+          <label>Jarak Kamera ke Area (meter)</label>
+          <input type="number" id="target-distance" value="10" min="0.1" max="500" step="0.1" class="mono">
+        </div>
+        <div class="field">
+          <label>Tujuan Perekaman <span class="tip-icon" title="Menentukan standar DORI: Detection, Observation, Recognition, Identification">?</span></label>
+          <select id="target-purpose">
+            <option value="detect">Detection — orang atau kendaraan ada/tidak</option>
+            <option value="observe" selected>Observation — arah gerak, pakaian</option>
+            <option value="recognize">Recognition — kenali wajah familiar</option>
+            <option value="identify">Identification — forensik wajah detail</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MODE C: Kamera per Ruangan ── -->
+    <div id="mode-room" style="display:none;">
+      <div class="grid-3">
+        <div class="field">
+          <label>Panjang Ruangan (meter)</label>
+          <input type="number" id="room-length" value="12" min="1" max="500" step="0.1" class="mono">
+        </div>
+        <div class="field">
+          <label>Lebar Ruangan (meter)</label>
+          <input type="number" id="room-width" value="8" min="1" max="500" step="0.1" class="mono">
+        </div>
+        <div class="field">
+          <label>Panjang Lensa (mm)</label>
+          <input type="number" id="room-focal" value="2.8" min="0.5" max="300" step="0.1" class="mono">
+        </div>
+        <div class="field">
+          <label>Ketinggian Pasang (meter)</label>
+          <input type="number" id="room-height" value="3" min="0.5" max="30" step="0.1" class="mono">
+        </div>
+        <div class="field">
+          <label>Tipe Ruangan</label>
+          <select id="room-type">
+            <option value="office">Kantor / Ruang kerja</option>
+            <option value="lobby">Lobby / Resepsionis</option>
+            <option value="parking">Parkir / Outdoor</option>
+            <option value="retail">Retail / Toko</option>
+            <option value="corridor">Koridor / Gang</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Tujuan Perekaman</label>
+          <select id="room-purpose">
+            <option value="detect">Detection</option>
+            <option value="observe" selected>Observation</option>
+            <option value="recognize">Recognition</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider">
+    <button class="btn btn-primary btn-full" onclick="calculate()">▶ HITUNG FIELD OF VIEW</button>
+  </div>
+</div>
+
+<!-- Result Card -->
+<div class="card" id="result-card" style="display:none;">
+  <div class="result-divider"></div>
+  <div class="result-body">
+    <div class="result-headline" id="result-headline">// FoV Calculation Result</div>
+
+    <div class="alert-warn" id="alert-warn"></div>
+
+    <!-- Two-col: canvas + numbers -->
+    <div class="result-cols" id="result-cols">
+      <div class="fov-canvas-wrap">
+        <div class="fov-canvas-header">
+          <div class="fov-canvas-title">Top-View FoV Diagram</div>
+          <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--gray-40);" id="canvas-label"></div>
+        </div>
+        <canvas id="fov-canvas" width="560" height="300"></canvas>
+      </div>
+      <div class="result-numbers" id="result-numbers"></div>
+    </div>
+
+    <!-- Stat row -->
+    <div class="stat-row" id="stat-row"></div>
+
+    <!-- DORI Table -->
+    <div class="dori-section" id="dori-section">
+      <div class="dori-header">
+        <div class="dot" style="width:8px;height:8px;border-radius:50%;background:var(--orange);"></div>
+        <span>Standar DORI — EN 62676-4 (Pixels per Meter)</span>
+      </div>
+      <div class="dori-grid" id="dori-grid"></div>
+    </div>
+
+    <!-- Lens comparison -->
+    <div class="lens-table-wrap" id="lens-table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Lensa</th><th>H-FoV</th><th>V-FoV</th>
+            <th>Lebar cover @<span id="th-dist">10</span>m</th>
+            <th>PPM Horizontal</th><th>DORI Level</th>
+            <th>Cocok untuk</th>
+          </tr>
+        </thead>
+        <tbody id="lens-tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- Recommendation -->
+    <div class="rec-box" id="rec-box"></div>
+
+  </div>
+</div>
+
+<div style="max-width:960px;margin:20px auto 0;font-size:11px;color:var(--gray-60);text-align:center;line-height:1.6;">
+  KutuKabel Tools — FoV formula: 2 × arctan(sensor_size / (2 × focal_length)) &nbsp;|&nbsp;
+  DORI standard: EN 62676-4 · Detection 25 PPM · Observation 62 PPM · Recognition 125 PPM · Identification 250 PPM
+</div>
+
+<script>
+// ── Sensor size database (width × height in mm)
+const SENSOR_DB = {
+  '1/4':   [3.20, 2.40],
+  '1/3':   [4.80, 3.60],
+  '1/2.8': [4.96, 3.72],
+  '1/2.7': [5.12, 3.85],
+  '1/2':   [6.40, 4.80],
+  '1/1.8': [7.18, 5.32],
+  '1/1.2': [9.60, 7.20],
+  '2/3':   [8.80, 6.60],
+  '1':     [12.80,9.60],
+};
+
+// DORI standard (pixels per meter) — EN 62676-4
+const DORI = {
+  detect:    { ppm:25,  label:'Detection',    color:'#1a6fa8', badgeClass:'badge-detect',  desc:'Orang / kendaraan hadir atau tidak' },
+  observe:   { ppm:62,  label:'Observation',  color:'#1d8a4e', badgeClass:'badge-observe', desc:'Arah, pakaian, perilaku umum' },
+  recognize: { ppm:125, label:'Recognition',  color:'#d46316', badgeClass:'badge-recog',   desc:'Kenali wajah yang sudah dikenal' },
+  identify:  { ppm:250, label:'Identification',color:'#c0392b',badgeClass:'badge-id',      desc:'Forensik wajah detail, tidak dikenal' },
+};
+
+const LENS_SERIES = [1.7, 2, 2.8, 3.6, 4, 6, 8, 12, 16, 25, 35, 50];
+
+let currentMode   = 'fov';
+let currentSensor = [4.96, 3.72];
+let currentRes    = [1920, 1080];
+
+function setMode(mode, btn) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  ['mode-fov','mode-lens','mode-room'].forEach(id =>
+    document.getElementById(id).style.display = 'none');
+  document.getElementById('mode-' + mode).style.display = 'block';
+}
+
+function onSensorChange() {
+  const val = document.getElementById('sensor-size').value;
+  document.getElementById('custom-sensor-row').style.display = val === 'custom' ? 'block' : 'none';
+  if (val !== 'custom') currentSensor = SENSOR_DB[val] || [4.96, 3.72];
+}
+
+function getSensor() {
+  const val = document.getElementById('sensor-size').value;
+  if (val === 'custom') {
+    return [
+      parseFloat(document.getElementById('sensor-w-custom').value) || 4.96,
+      parseFloat(document.getElementById('sensor-h-custom').value) || 3.72,
+    ];
+  }
+  return SENSOR_DB[val] || [4.96, 3.72];
+}
+
+function getRes() {
+  const v = document.getElementById('resolution').value.split('x');
+  return [parseInt(v[0]), parseInt(v[1])];
+}
+
+function loadCamera(res, sensor, focal) {
+  document.getElementById('resolution').value    = res;
+  document.getElementById('sensor-size').value   = sensor;
+  document.getElementById('focal-length').value  = focal;
+  document.getElementById('room-focal').value    = focal;
+  onSensorChange();
+  livePreview();
+}
+
+function setLens(mm) {
+  document.getElementById('focal-length').value = mm;
+  livePreview();
+}
+
+// ── Core formula: FoV angle
+// FoV = 2 × arctan(sensor_size / (2 × focal_length))
+function calcFoV(sensorMM, focalMM) {
+  return 2 * Math.atan(sensorMM / (2 * focalMM)) * (180 / Math.PI);
+}
+
+// FoV width/height at distance
+function coverageAt(fovDeg, distanceM) {
+  return 2 * distanceM * Math.tan((fovDeg / 2) * Math.PI / 180);
+}
+
+// Focal from desired coverage width
+function focalFromCoverage(sensorMM, targetWidthM, distanceM) {
+  return (sensorMM * distanceM) / targetWidthM;
+}
+
+// Pixels per meter
+function ppm(resPixels, coverageM) {
+  return resPixels / coverageM;
+}
+
+// DORI max distance given PPM requirement
+function doriMaxDist(sensor, focal, resPixels, requiredPPM) {
+  // coverage = resPixels / requiredPPM
+  const maxCoverage = resPixels / requiredPPM;
+  // from coverage = 2 * d * tan(FoV/2): d = coverage / (2 * tan(FoV/2))
+  const fovRad = 2 * Math.atan(sensor / (2 * focal));
+  return maxCoverage / (2 * Math.tan(fovRad / 2));
+}
+
+function getDoriLevel(ppmVal) {
+  if (ppmVal >= 250) return 'identify';
+  if (ppmVal >= 125) return 'recognize';
+  if (ppmVal >= 62)  return 'observe';
+  if (ppmVal >= 25)  return 'detect';
+  return null;
+}
+
+// ── Live preview (updates canvas while typing)
+function livePreview() {
+  if (currentMode !== 'fov') return;
+  const focal    = parseFloat(document.getElementById('focal-length').value) || 2.8;
+  const distance = parseFloat(document.getElementById('distance').value)     || 10;
+  const sensor   = getSensor();
+  const res      = getRes();
+  const hFoV = calcFoV(sensor[0], focal);
+  const vFoV = calcFoV(sensor[1], focal);
+  const hCov = coverageAt(hFoV, distance);
+  const vCov = coverageAt(vFoV, distance);
+  drawFoVCanvas(hFoV, vFoV, hCov, vCov, distance, focal);
+}
+
+// ── Draw top-view FoV diagram
+function drawFoVCanvas(hFoV, vFoV, hCov, vCov, distance, focal) {
+  const canvas = document.getElementById('fov-canvas');
+  const ctx    = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#fafafa';
+  ctx.fillRect(0, 0, W, H);
+
+  // Camera position
+  const camX = W / 2;
+  const camY = 28;
+  const scale = Math.min((H - 80) / Math.max(distance, 1), 22);
+
+  // FoV cone
+  const halfFoV = (hFoV / 2) * Math.PI / 180;
+  const endY    = camY + distance * scale;
+  const endLX   = camX - Math.tan(halfFoV) * distance * scale;
+  const endRX   = camX + Math.tan(halfFoV) * distance * scale;
+
+  // Cone fill gradient
+  const grad = ctx.createLinearGradient(camX, camY, camX, endY);
+  grad.addColorStop(0, 'rgba(212,99,22,0.08)');
+  grad.addColorStop(1, 'rgba(212,99,22,0.18)');
+  ctx.beginPath();
+  ctx.moveTo(camX, camY);
+  ctx.lineTo(endLX, endY);
+  ctx.lineTo(endRX, endY);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Cone border
+  ctx.beginPath();
+  ctx.moveTo(camX, camY);
+  ctx.lineTo(endLX, endY);
+  ctx.strokeStyle = 'rgba(212,99,22,0.6)';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([5, 3]);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(camX, camY);
+  ctx.lineTo(endRX, endY);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Center axis
+  ctx.beginPath();
+  ctx.moveTo(camX, camY);
+  ctx.lineTo(camX, endY + 10);
+  ctx.strokeStyle = '#ccc';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // Coverage line at distance
+  ctx.beginPath();
+  ctx.moveTo(endLX, endY);
+  ctx.lineTo(endRX, endY);
+  ctx.strokeStyle = var_orange = '#d46316';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // Coverage label
+  ctx.fillStyle = '#d46316';
+  ctx.font = 'bold 12px Space Mono, monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText(hCov.toFixed(1) + ' m', camX, endY + 18);
+
+  // Distance label on axis
+  ctx.fillStyle = '#aaa';
+  ctx.font = '10px Space Mono, monospace';
+  ctx.textAlign = 'left';
+  ctx.fillText(distance.toFixed(1) + ' m', camX + 4, camY + (distance * scale) / 2);
+
+  // DORI distance rings
+  const res = getRes();
+  ['detect','observe','recognize','identify'].forEach(key => {
+    const d   = DORI[key];
+    const dr  = doriMaxDist(getSensor()[0], focal, res[0], d.ppm);
+    if (dr > 0 && dr <= distance * 1.5) {
+      const ringY = camY + dr * scale;
+      if (ringY < H - 20) {
+        ctx.beginPath();
+        ctx.moveTo(endLX - 4, ringY);
+        ctx.lineTo(endRX + 4, ringY);
+        ctx.strokeStyle = d.color + '55';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([3, 3]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = d.color;
+        ctx.font = '9px Inter, sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillText(d.label[0] + ' ' + dr.toFixed(1) + 'm', endLX - 6, ringY - 2);
+      }
+    }
+  });
+
+  // Camera icon
+  ctx.fillStyle = '#1a1a1a';
+  ctx.beginPath();
+  ctx.roundRect(camX - 12, camY - 18, 24, 14, 3);
+  ctx.fill();
+  ctx.fillStyle = '#d46316';
+  ctx.beginPath();
+  ctx.arc(camX, camY - 11, 4, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Focal label
+  ctx.fillStyle = '#666';
+  ctx.font = '10px Space Mono, monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText(focal + 'mm · ' + hFoV.toFixed(0) + '°', camX, camY - 22);
+
+  document.getElementById('canvas-label').textContent =
+    'H:' + hFoV.toFixed(1) + '° × V:' + vFoV.toFixed(1) + '°';
+}
+
+// ── Main calculate
+function calculate() {
+  const sensor = getSensor();
+  const res    = getRes();
+
+  if (currentMode === 'fov')  calcModeFoV(sensor, res);
+  if (currentMode === 'lens') calcModeLens(sensor, res);
+  if (currentMode === 'room') calcModeRoom(sensor, res);
+
+  document.getElementById('result-card').style.display = 'block';
+  document.getElementById('result-card').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+// ── MODE A: FoV dari Lensa
+function calcModeFoV(sensor, res) {
+  const focal    = parseFloat(document.getElementById('focal-length').value)  || 2.8;
+  const distance = parseFloat(document.getElementById('distance').value)      || 10;
+  const mountH   = parseFloat(document.getElementById('mount-height').value)  || 3;
+
+  const hFoV = calcFoV(sensor[0], focal);
+  const vFoV = calcFoV(sensor[1], focal);
+  const hCov = coverageAt(hFoV, distance);
+  const vCov = coverageAt(vFoV, distance);
+  const ppmH = ppm(res[0], hCov);
+  const doriKey = getDoriLevel(ppmH);
+
+  // DORI max distances
+  const dDist = doriMaxDist(sensor[0], focal, res[0], DORI.detect.ppm);
+  const oDist = doriMaxDist(sensor[0], focal, res[0], DORI.observe.ppm);
+  const rDist = doriMaxDist(sensor[0], focal, res[0], DORI.recognize.ppm);
+  const iDist = doriMaxDist(sensor[0], focal, res[0], DORI.identify.ppm);
+
+  drawFoVCanvas(hFoV, vFoV, hCov, vCov, distance, focal);
+  document.getElementById('canvas-label').textContent =
+    'H:' + hFoV.toFixed(1) + '° × V:' + vFoV.toFixed(1) + '°';
+
+  document.getElementById('result-headline').textContent = '// FoV — Lensa ' + focal + 'mm';
+
+  // Numbers panel
+  document.getElementById('result-numbers').innerHTML = `
+    <div class="num-card primary">
+      <div class="num-label">H-FoV (Horizontal)</div>
+      <div class="num-val orange">${hFoV.toFixed(1)}<span style="font-size:16px;">°</span></div>
+      <div class="num-unit">Coverage: <strong>${hCov.toFixed(2)} m</strong> @ ${distance}m</div>
+    </div>
+    <div class="num-card">
+      <div class="num-label">V-FoV (Vertikal)</div>
+      <div class="num-val">${vFoV.toFixed(1)}<span style="font-size:16px;">°</span></div>
+      <div class="num-unit">Coverage: <strong>${vCov.toFixed(2)} m</strong> @ ${distance}m</div>
+    </div>
+    <div class="num-card green-card">
+      <div class="num-label">Resolusi Gambar</div>
+      <div class="num-val green">${ppmH.toFixed(0)}</div>
+      <div class="num-unit">pixels/meter — ${doriKey ? DORI[doriKey].label : 'Below Detection'}</div>
+    </div>
+    <div class="num-card blue-card">
+      <div class="num-label">Tinggi Frame @ ${distance}m</div>
+      <div class="num-val blue">${vCov.toFixed(1)}<span style="font-size:14px;">m</span></div>
+      <div class="num-unit">Mount ${mountH}m — floor gap: ${Math.max(0, mountH - vCov / 2).toFixed(1)}m</div>
+    </div>
+  `;
+
+  // Stat row
+  document.getElementById('stat-row').innerHTML = `
+    <div class="stat-box highlight">
+      <div class="stat-label">Lensa</div>
+      <div class="stat-val">${focal}mm</div>
+      <div class="stat-unit">focal length</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Max Detection</div>
+      <div class="stat-val">${dDist.toFixed(0)}m</div>
+      <div class="stat-unit">25 PPM</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Max Observation</div>
+      <div class="stat-val">${oDist.toFixed(0)}m</div>
+      <div class="stat-unit">62 PPM</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Max Recognition</div>
+      <div class="stat-val">${rDist.toFixed(0)}m</div>
+      <div class="stat-unit">125 PPM</div>
+    </div>
+  `;
+
+  renderDori(iDist, rDist, oDist, dDist, ppmH, distance);
+  renderLensTable(sensor, res, distance, null);
+  renderRec('fov', { focal, hFoV, hCov, distance, doriKey, ppmH, dDist, oDist, rDist, iDist });
+}
+
+// ── MODE B: Lensa dari Target
+function calcModeLens(sensor, res) {
+  const targetW  = parseFloat(document.getElementById('target-width').value)    || 8;
+  const distance = parseFloat(document.getElementById('target-distance').value) || 10;
+  const purpose  = document.getElementById('target-purpose').value;
+
+  // Required PPM for purpose
+  const reqPPM = DORI[purpose].ppm;
+  // Min pixels covering targetW at reqPPM: must have >= reqPPM * targetW pixels
+  // ppm = res[0] / coverage → coverage = res[0] / reqPPM → this is max coverage for that level
+  const maxCov = res[0] / reqPPM;
+
+  // Ideal focal: hCov = targetW → focal = (sensor[0] * distance) / targetW
+  const idealFocal = focalFromCoverage(sensor[0], targetW, distance);
+
+  // Nearest standard lenses
+  const nearestLenses = LENS_SERIES
+    .map(l => ({ mm: l, diff: Math.abs(l - idealFocal) }))
+    .sort((a, b) => a.diff - b.diff)
+    .slice(0, 3).map(l => l.mm);
+
+  const bestFocal = nearestLenses[0];
+  const hFoV     = calcFoV(sensor[0], bestFocal);
+  const vFoV     = calcFoV(sensor[1], bestFocal);
+  const hCov     = coverageAt(hFoV, distance);
+  const ppmH     = ppm(res[0], hCov);
+
+  drawFoVCanvas(hFoV, vFoV, hCov, coverageAt(vFoV, distance), distance, bestFocal);
+
+  document.getElementById('result-headline').textContent = '// Lensa Ideal untuk Coverage ' + targetW + 'm';
+
+  document.getElementById('result-numbers').innerHTML = `
+    <div class="num-card primary">
+      <div class="num-label">Lensa Ideal</div>
+      <div class="num-val orange">${idealFocal.toFixed(1)}<span style="font-size:16px;">mm</span></div>
+      <div class="num-unit">Terdekat di pasaran: <strong>${bestFocal}mm</strong></div>
+    </div>
+    <div class="num-card">
+      <div class="num-label">Coverage dengan ${bestFocal}mm</div>
+      <div class="num-val">${hCov.toFixed(1)}<span style="font-size:14px;">m</span></div>
+      <div class="num-unit">Target: ${targetW}m — selisih ${(hCov - targetW).toFixed(1)}m</div>
+    </div>
+    <div class="num-card green-card">
+      <div class="num-label">H-FoV</div>
+      <div class="num-val green">${hFoV.toFixed(1)}<span style="font-size:14px;">°</span></div>
+      <div class="num-unit">${ppmH.toFixed(0)} PPM — ${getDoriLevel(ppmH) ? DORI[getDoriLevel(ppmH)].label : '—'}</div>
+    </div>
+    <div class="num-card blue-card">
+      <div class="num-label">Alternatif Lensa</div>
+      <div class="num-val blue" style="font-size:18px;">${nearestLenses.join(' / ')}<span style="font-size:12px;">mm</span></div>
+      <div class="num-unit">pilihan terdekat</div>
+    </div>
+  `;
+
+  const dDist = doriMaxDist(sensor[0], bestFocal, res[0], DORI.detect.ppm);
+  const oDist = doriMaxDist(sensor[0], bestFocal, res[0], DORI.observe.ppm);
+  const rDist = doriMaxDist(sensor[0], bestFocal, res[0], DORI.recognize.ppm);
+  const iDist = doriMaxDist(sensor[0], bestFocal, res[0], DORI.identify.ppm);
+
+  document.getElementById('stat-row').innerHTML = `
+    <div class="stat-box highlight">
+      <div class="stat-label">Lensa Ideal</div>
+      <div class="stat-val">${idealFocal.toFixed(1)}mm</div>
+      <div class="stat-unit">→ pakai ${bestFocal}mm</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Level Tujuan</div>
+      <div class="stat-val" style="font-size:13px;">${DORI[purpose].label}</div>
+      <div class="stat-unit">${reqPPM} PPM required</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">PPM Aktual</div>
+      <div class="stat-val">${ppmH.toFixed(0)}</div>
+      <div class="stat-unit">pixels/meter</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Max Obs Dist</div>
+      <div class="stat-val">${oDist.toFixed(0)}m</div>
+      <div class="stat-unit">62 PPM</div>
+    </div>
+  `;
+
+  renderDori(iDist, rDist, oDist, dDist, ppmH, distance);
+  renderLensTable(sensor, res, distance, bestFocal);
+  renderRec('lens', { idealFocal, bestFocal, hCov, targetW, purpose, ppmH });
+}
+
+// ── MODE C: Kamera per Ruangan
+function calcModeRoom(sensor, res) {
+  const roomL   = parseFloat(document.getElementById('room-length').value) || 12;
+  const roomW   = parseFloat(document.getElementById('room-width').value)  || 8;
+  const focal   = parseFloat(document.getElementById('room-focal').value)  || 2.8;
+  const mountH  = parseFloat(document.getElementById('room-height').value) || 3;
+  const purpose = document.getElementById('room-purpose').value;
+
+  const hFoV  = calcFoV(sensor[0], focal);
+  const vFoV  = calcFoV(sensor[1], focal);
+
+  // Effective coverage radius on floor from corner mount
+  // Di pojok ruangan, kamera menghadap diagonal → coverage diagonal
+  // Jarak dari pojok ke pojok terjauh = diagonal ruangan
+  const diagonal = Math.sqrt(roomL * roomL + roomW * roomW);
+
+  // Coverage width at max distance
+  const maxDist = mountH * 1.5 + Math.max(roomL, roomW);
+  const hCovAtMax = coverageAt(hFoV, maxDist);
+
+  // Pendekatan: tiap kamera cover area = (hCovAtRoom × vCovAtRoom)
+  // Jarak efektif dari kamera ke ujung terjauh area yang perlu di-cover
+  // Untuk ruangan persegi → dari pojok, kamera cover sudut FoV
+  // Coverage per kamera ≈ (2 × tan(hFoV/2) × depth) × depth
+  // depth = max distance kamera bisa cover sambil tetap meeting DORI requirement
+  const reqPPM = DORI[purpose].ppm;
+  const maxDistForDORI = doriMaxDist(sensor[0], focal, res[0], reqPPM);
+
+  // Effective coverage width at DORI distance
+  const covW = coverageAt(hFoV, Math.min(maxDistForDORI, Math.max(roomL, roomW)));
+  const covH = coverageAt(vFoV, Math.min(maxDistForDORI, Math.max(roomL, roomW)));
+
+  // Area coverage per kamera (simplified, assuming optimal placement)
+  const areaPerCam = covW * Math.min(maxDistForDORI, roomL);
+
+  // Jumlah kamera minimum
+  const roomArea = roomL * roomW;
+  const camCount = Math.ceil(roomArea / areaPerCam);
+  const optCamCount = Math.max(1, camCount);
+
+  // Layout suggestion
+  const layout = suggestLayout(roomL, roomW, optCamCount);
+
+  // Draw room diagram
+  drawRoomCanvas(roomL, roomW, layout, focal, hFoV, mountH);
+  document.getElementById('canvas-label').textContent =
+    roomL + '×' + roomW + 'm — ' + optCamCount + ' kamera';
+
+  document.getElementById('result-headline').textContent =
+    '// Ruangan ' + roomL + '×' + roomW + 'm — ' + DORI[purpose].label;
+
+  document.getElementById('result-numbers').innerHTML = `
+    <div class="num-card primary">
+      <div class="num-label">Jumlah Kamera</div>
+      <div class="num-val orange">${optCamCount}</div>
+      <div class="num-unit">kamera ${focal}mm untuk ${DORI[purpose].label}</div>
+    </div>
+    <div class="num-card">
+      <div class="num-label">Coverage per Kamera</div>
+      <div class="num-val">${covW.toFixed(1)}<span style="font-size:14px;">m</span></div>
+      <div class="num-unit">lebar @ ${Math.min(maxDistForDORI, roomL).toFixed(1)}m</div>
+    </div>
+    <div class="num-card green-card">
+      <div class="num-label">Luas Ruangan</div>
+      <div class="num-val green">${roomArea.toFixed(0)}<span style="font-size:14px;">m²</span></div>
+      <div class="num-unit">${(roomArea / optCamCount).toFixed(1)} m² per kamera</div>
+    </div>
+    <div class="num-card blue-card">
+      <div class="num-label">Max DORI Dist</div>
+      <div class="num-val blue">${maxDistForDORI.toFixed(1)}<span style="font-size:14px;">m</span></div>
+      <div class="num-unit">${DORI[purpose].label} (${reqPPM} PPM)</div>
+    </div>
+  `;
+
+  const dDist = doriMaxDist(sensor[0], focal, res[0], DORI.detect.ppm);
+  const oDist = doriMaxDist(sensor[0], focal, res[0], DORI.observe.ppm);
+  const rDist = doriMaxDist(sensor[0], focal, res[0], DORI.recognize.ppm);
+  const iDist = doriMaxDist(sensor[0], focal, res[0], DORI.identify.ppm);
+
+  document.getElementById('stat-row').innerHTML = `
+    <div class="stat-box highlight">
+      <div class="stat-label">Total Kamera</div>
+      <div class="stat-val">${optCamCount}</div>
+      <div class="stat-unit">unit diperlukan</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Layout</div>
+      <div class="stat-val" style="font-size:14px;">${layout.desc}</div>
+      <div class="stat-unit">penempatan optimal</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Lensa</div>
+      <div class="stat-val">${focal}mm</div>
+      <div class="stat-unit">FoV ${hFoV.toFixed(0)}°</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Blind Spot</div>
+      <div class="stat-val" style="font-size:14px;">${optCamCount >= camCount ? 'Minim' : 'Ada'}</div>
+      <div class="stat-unit">${optCamCount >= 2 ? 'Perlu overlap 15%' : 'Posisi optimal'}</div>
+    </div>
+  `;
+
+  renderDori(iDist, rDist, oDist, dDist, covW > 0 ? ppm(res[0], covW) : 0, Math.max(roomL, roomW));
+  renderLensTable(sensor, res, Math.max(roomL, roomW) / 2, focal);
+  renderRec('room', { optCamCount, focal, hFoV, roomL, roomW, purpose, maxDistForDORI, layout });
+}
+
+function suggestLayout(L, W, n) {
+  if (n === 1) return { desc: '1 sudut diagonal', positions: [[0.1, 0.1]] };
+  if (n === 2) return { desc: '2 sudut berhadapan', positions: [[0.1, 0.1],[0.9, 0.9]] };
+  if (n === 3) return { desc: '3 sudut + tengah', positions: [[0.1,0.1],[0.9,0.1],[0.5,0.9]] };
+  if (n === 4) return { desc: '4 sudut', positions: [[0.1,0.1],[0.9,0.1],[0.1,0.9],[0.9,0.9]] };
+  const rows = Math.ceil(Math.sqrt(n));
+  const cols = Math.ceil(n / rows);
+  const positions = [];
+  for (let r = 0; r < rows; r++)
+    for (let c = 0; c < cols && positions.length < n; c++)
+      positions.push([(c + 0.5) / cols, (r + 0.5) / rows]);
+  return { desc: `${rows}×${cols} grid`, positions };
+}
+
+function drawRoomCanvas(L, W, layout, focal, hFoV, mountH) {
+  const canvas = document.getElementById('fov-canvas');
+  const ctx    = canvas.getContext('2d');
+  const CW = canvas.width, CH = canvas.height;
+  ctx.clearRect(0, 0, CW, CH);
+  ctx.fillStyle = '#fafafa'; ctx.fillRect(0, 0, CW, CH);
+
+  const pad  = 40;
+  const scaleX = (CW - pad * 2) / L;
+  const scaleY = (CH - pad * 2) / W;
+  const scale  = Math.min(scaleX, scaleY);
+  const offX   = (CW - L * scale) / 2;
+  const offY   = (CH - W * scale) / 2;
+
+  // Room floor
+  ctx.fillStyle = '#f0f0f0';
+  ctx.fillRect(offX, offY, L * scale, W * scale);
+  ctx.strokeStyle = '#1a1a1a';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(offX, offY, L * scale, W * scale);
+
+  // Dimension labels
+  ctx.fillStyle = '#999'; ctx.font = '10px Space Mono, monospace'; ctx.textAlign = 'center';
+  ctx.fillText(L + ' m', offX + L * scale / 2, offY - 8);
+  ctx.save(); ctx.translate(offX - 12, offY + W * scale / 2);
+  ctx.rotate(-Math.PI / 2); ctx.fillText(W + ' m', 0, 0); ctx.restore();
+
+  // Camera FoV cones
+  const halfFoV = (hFoV / 2) * Math.PI / 180;
+  layout.positions.forEach((pos, i) => {
+    const cx = offX + pos[0] * L * scale;
+    const cy = offY + pos[1] * W * scale;
+
+    // Determine direction toward room center
+    const dx = 0.5 - pos[0], dy = 0.5 - pos[1];
+    const angle = Math.atan2(dy, dx);
+    const reach = Math.max(L, W) * scale * 0.8;
+
+    // Cone
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, reach, angle - halfFoV, angle + halfFoV);
+    ctx.closePath();
+    ctx.fillStyle = `rgba(212,99,22,${0.10 + i * 0.02})`;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(212,99,22,0.4)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Camera dot
+    ctx.beginPath();
+    ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+    ctx.fillStyle = '#1a1a1a'; ctx.fill();
+    ctx.fillStyle = '#d46316';
+    ctx.beginPath();
+    ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Label
+    ctx.fillStyle = '#1a1a1a';
+    ctx.font = 'bold 10px Space Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('C' + (i + 1), cx, cy - 10);
+  });
+  document.getElementById('canvas-label').textContent =
+    L + '×' + W + 'm · ' + layout.positions.length + ' kamera · ' + focal + 'mm';
+}
+
+// ── DORI section
+function renderDori(iDist, rDist, oDist, dDist, currentPPM, distance) {
+  const items = [
+    { key:'detect',    dist:dDist },
+    { key:'observe',   dist:oDist },
+    { key:'recognize', dist:rDist },
+    { key:'identify',  dist:iDist },
+  ];
+  const gridEl = document.getElementById('dori-grid');
+  gridEl.innerHTML = items.map(item => {
+    const d = DORI[item.key];
+    const active = currentPPM >= d.ppm;
+    const reached = item.dist >= distance;
+    return `
+      <div class="dori-cell" style="${active ? 'background:' + d.color + '0a;' : ''}">
+        <div class="d-label" style="color:${d.color}">${d.label}</div>
+        <div class="d-range">${item.dist.toFixed(1)}<span style="font-size:11px;"> m</span></div>
+        <div class="d-desc" style="font-size:11px;">${d.desc}</div>
+        <div class="d-use" style="background:${active ? d.color : '#eee'};color:${active ? 'white' : '#999'}">
+          ${d.ppm} PPM · ${active ? '✓ Tercapai' : '✗ Tidak tercapai'}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ── Lens comparison table
+function renderLensTable(sensor, res, distance, activeFocal) {
+  document.getElementById('th-dist').textContent = distance.toFixed(0);
+  const tbody = document.getElementById('lens-tbody');
+  tbody.innerHTML = LENS_SERIES.map(fl => {
+    const hFoV = calcFoV(sensor[0], fl);
+    const vFoV = calcFoV(sensor[1], fl);
+    const hCov = coverageAt(hFoV, distance);
+    const ppmH = ppm(res[0], hCov);
+    const dk   = getDoriLevel(ppmH);
+    const isActive = activeFocal && Math.abs(fl - activeFocal) < 0.1;
+    const useCase = fl <= 2.8 ? 'Wide — lobby, parkir' :
+                    fl <= 4   ? 'Standar — ruangan' :
+                    fl <= 6   ? 'Menengah — koridor' :
+                    fl <= 12  ? 'Telephoto — jarak menengah' : 'Long — outdoor jauh';
+    return `<tr class="${isActive ? 'active-row' : ''}">
+      <td class="mono" style="font-weight:700;${isActive ? 'color:var(--orange-dk)' : ''}">${fl}mm ${isActive ? '★' : ''}</td>
+      <td class="mono">${hFoV.toFixed(1)}°</td>
+      <td class="mono">${vFoV.toFixed(1)}°</td>
+      <td class="mono">${hCov.toFixed(1)} m</td>
+      <td class="mono">${ppmH.toFixed(0)}</td>
+      <td>${dk ? '<span class="badge ' + DORI[dk].badgeClass + '">' + DORI[dk].label + '</span>' : '<span style="color:#ccc;font-size:11px;">Below Det.</span>'}</td>
+      <td style="color:var(--gray-60);font-size:11px;">${useCase}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Recommendation
+function renderRec(mode, data) {
+  let html = '';
+  if (mode === 'fov') {
+    const { focal, hFoV, hCov, distance, doriKey, ppmH, dDist, oDist, rDist } = data;
+    html = `<span>Hasil lensa ${focal}mm @ ${distance}m:</span><br>
+→ Coverage horizontal: ${hCov.toFixed(2)} m · FoV: ${hFoV.toFixed(1)}°<br>
+→ ${ppmH.toFixed(0)} PPM — ${doriKey ? DORI[doriKey].label : 'Di bawah standar Detection'}<br>
+→ Max Detection: ${dDist.toFixed(1)}m · Observation: ${oDist.toFixed(1)}m · Recognition: ${rDist.toFixed(1)}m<br>
+${focal <= 2.8 ? '→ Wide angle — cocok untuk lobby, parkir, ruangan luas' :
+  focal <= 4   ? '→ Lensa standar — paling serbaguna untuk instalasi umum' :
+  focal <= 8   ? '→ Lensa menengah — koridor, pintu masuk, area fokus' :
+                 '→ Telephoto — monitoring jarak jauh, tidak untuk ruangan sempit'}`;
+  } else if (mode === 'lens') {
+    const { idealFocal, bestFocal, hCov, targetW, purpose, ppmH } = data;
+    html = `<span>Untuk cover ${targetW}m dengan ${DORI[purpose].label}:</span><br>
+→ Lensa ideal: ${idealFocal.toFixed(1)}mm → pakai <strong>${bestFocal}mm</strong> (tersedia di pasaran)<br>
+→ Coverage aktual dengan ${bestFocal}mm: ${hCov.toFixed(2)}m (${(hCov - targetW) >= 0 ? '+' : ''}${(hCov - targetW).toFixed(2)}m dari target)<br>
+→ PPM aktual: ${ppmH.toFixed(0)} — ${getDoriLevel(ppmH) ? DORI[getDoriLevel(ppmH)].label : 'Below Detection'}<br>
+${hCov < targetW ? '⚠ Coverage kurang dari target — pertimbangkan lensa yang lebih pendek' :
+  '✓ Coverage cukup — lensa ini memenuhi kebutuhan area target'}`;
+  } else {
+    const { optCamCount, focal, hFoV, roomL, roomW, purpose, maxDistForDORI, layout } = data;
+    html = `<span>Ruangan ${roomL}×${roomW}m dengan lensa ${focal}mm untuk ${DORI[purpose].label}:</span><br>
+→ Butuh <strong>${optCamCount} kamera</strong> — layout: ${layout.desc}<br>
+→ Max jarak ${DORI[purpose].label}: ${maxDistForDORI.toFixed(1)}m per kamera<br>
+→ FoV: ${hFoV.toFixed(1)}° — ${focal <= 2.8 ? 'wide angle, cocok untuk ruangan ini' : focal <= 4 ? 'standar, coverage baik' : 'sempit, pertimbangkan lensa lebih pendek'}<br>
+${optCamCount > 1 ? '→ Pastikan overlap 10–15% antar kamera untuk menghindari blind spot' :
+  '→ 1 kamera cukup — pasang di sudut dengan pandangan ke diagonal ruangan'}`;
+  }
+  document.getElementById('rec-box').innerHTML = html;
+}
+
+// Init live preview
+livePreview();
+</script>
+</body>
+</html>
