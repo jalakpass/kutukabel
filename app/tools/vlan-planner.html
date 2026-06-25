@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VLAN Planner | KutuKabel</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+:root{
+  --orange:   #d46316;
+  --orange-dk:#a84d0f;
+  --orange-lt:#fff0e6;
+  --black:    #1a1a1a;
+  --gray-90:  #2d2d2d;
+  --gray-60:  #666;
+  --gray-40:  #999;
+  --gray-20:  #e0e0e0;
+  --gray-10:  #f5f5f5;
+  --white:    #ffffff;
+  --green:    #1d8a4e;
+  --green-lt: #e9f7ef;
+  --red:      #c0392b;
+  --red-lt:   #fdecea;
+  --yellow:   #b7950b;
+  --yellow-lt:#fef9e7;
+  --blue:     #1a6fa8;
+  --blue-lt:  #e8f4fd;
+  --purple:   #6c3483;
+  --purple-lt:#f5eef8;
+  --teal:     #0e7490;
+  --teal-lt:  #e0f2fe;
+
+  /* VLAN color palette */
+  --vlan-cctv:   #d46316;
+  --vlan-office: #1a6fa8;
+  --vlan-acs:    #1d8a4e;
+  --vlan-ap:     #6c3483;
+  --vlan-server: #c0392b;
+  --vlan-mgmt:   #0e7490;
+  --vlan-voip:   #b7950b;
+  --vlan-custom: #555;
+}
+
+body{
+  font-family:'Inter',Arial,sans-serif;
+  background:var(--gray-10);
+  min-height:100vh;
+  padding:24px 16px 48px;
+  color:var(--black);
+}
+
+.header{
+  max-width:980px;margin:0 auto 20px;
+  display:flex;align-items:center;gap:12px;
+}
+.logo-mark{
+  width:40px;height:40px;background:var(--orange);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Space Mono',monospace;font-size:14px;font-weight:700;
+  color:white;letter-spacing:-1px;flex-shrink:0;
+}
+.header-text h1{font-family:'Space Mono',monospace;font-size:18px;font-weight:700;letter-spacing:-0.5px;}
+.header-text p{font-size:12px;color:var(--gray-60);margin-top:2px;}
+
+.card{
+  max-width:980px;margin:0 auto 16px;background:var(--white);
+  border-radius:14px;box-shadow:0 2px 16px rgba(0,0,0,.07);overflow:hidden;
+}
+.card-top{
+  background:var(--black);padding:16px 24px;
+  display:flex;align-items:center;gap:10px;
+}
+.card-top .dot{width:8px;height:8px;border-radius:50%;background:var(--orange);}
+.card-top span{font-family:'Space Mono',monospace;font-size:11px;color:#888;letter-spacing:1px;text-transform:uppercase;}
+.card-top .tag{margin-left:auto;font-family:'Space Mono',monospace;font-size:10px;color:#555;background:#2a2a2a;padding:3px 8px;border-radius:4px;}
+
+.form-body{padding:24px;}
+
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.field{display:flex;flex-direction:column;gap:6px;}
+label{font-size:12px;font-weight:600;color:var(--gray-60);letter-spacing:0.5px;text-transform:uppercase;}
+label .hint{font-weight:400;text-transform:none;letter-spacing:0;color:var(--gray-40);font-size:11px;}
+
+input,select{
+  width:100%;padding:11px 14px;border:1.5px solid var(--gray-20);border-radius:8px;
+  font-size:14px;font-family:'Inter',Arial,sans-serif;color:var(--black);background:var(--white);
+  transition:border-color .15s;appearance:none;-webkit-appearance:none;
+}
+input:focus,select:focus{outline:none;border-color:var(--orange);}
+input.mono{font-family:'Space Mono',monospace;font-size:13px;}
+select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;
+}
+
+/* VLAN type pills */
+.vlan-type-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+.vtype-btn{
+  padding:10px 4px;border:1.5px solid var(--gray-20);border-radius:8px;
+  background:var(--white);font-size:10px;font-weight:700;
+  font-family:'Space Mono',monospace;color:var(--gray-60);cursor:pointer;
+  transition:all .15s;text-align:center;line-height:1.5;
+}
+.vtype-btn .vt-icon{font-size:16px;display:block;margin-bottom:3px;}
+.vtype-btn.active{border-width:2px;}
+
+/* Add row */
+.add-row{
+  display:grid;grid-template-columns:auto 1fr 1fr 1fr 1fr auto;
+  gap:10px;align-items:end;
+  padding:16px;background:var(--gray-10);border-radius:10px;margin-top:4px;
+}
+
+.btn{
+  padding:11px 16px;border:none;border-radius:8px;
+  font-size:13px;font-weight:700;font-family:'Space Mono',monospace;
+  cursor:pointer;transition:all .15s;white-space:nowrap;
+}
+.btn-primary{background:var(--orange);color:white;}
+.btn-primary:hover{background:var(--orange-dk);}
+.btn-secondary{background:var(--gray-10);color:var(--gray-60);border:1.5px solid var(--gray-20);}
+.btn-secondary:hover{border-color:var(--orange);color:var(--orange);}
+.btn-full{width:100%;padding:14px;font-size:15px;}
+
+.divider{border:none;border-top:1px solid var(--gray-20);margin:20px 0;}
+
+/* VLAN table */
+.vlan-table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead tr{background:var(--black);}
+thead th{padding:10px 12px;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#888;text-align:left;white-space:nowrap;}
+tbody tr{border-bottom:1px solid var(--gray-10);}
+tbody tr:hover{background:var(--gray-10);}
+tbody td{padding:10px 12px;vertical-align:middle;}
+td.mono{font-family:'Space Mono',monospace;font-size:12px;}
+
+.vlan-dot{
+  width:10px;height:10px;border-radius:50%;display:inline-block;
+  margin-right:6px;vertical-align:middle;flex-shrink:0;
+}
+.badge{display:inline-block;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:700;font-family:'Space Mono',monospace;white-space:nowrap;}
+.del-btn{background:none;border:none;color:var(--gray-40);cursor:pointer;font-size:16px;padding:4px 6px;border-radius:4px;transition:all .15s;}
+.del-btn:hover{color:var(--red);background:var(--red-lt);}
+.edit-btn{background:none;border:none;color:var(--gray-40);cursor:pointer;font-size:13px;padding:4px 6px;border-radius:4px;transition:all .15s;}
+.edit-btn:hover{color:var(--orange);background:var(--orange-lt);}
+
+/* ── Result ── */
+.result-divider{height:4px;background:linear-gradient(90deg,var(--orange),var(--orange-dk));}
+.result-body{padding:24px;background:var(--gray-10);}
+.result-headline{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gray-60);margin-bottom:16px;}
+
+/* Topology diagram */
+.topology-wrap{
+  background:var(--white);border-radius:12px;border:1px solid var(--gray-20);
+  overflow:hidden;margin-bottom:16px;
+}
+.topo-header{
+  background:var(--black);padding:12px 18px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.topo-title{font-family:'Space Mono',monospace;font-size:10px;color:#888;letter-spacing:1px;text-transform:uppercase;}
+canvas#topo-canvas{display:block;width:100%;}
+
+/* VLAN summary cards */
+.vlan-cards{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+.vlan-card{
+  background:var(--white);border-radius:10px;
+  border:1.5px solid var(--gray-20);overflow:hidden;
+}
+.vlan-card-header{
+  display:flex;align-items:center;gap:12px;padding:14px 16px;
+  border-bottom:1px solid var(--gray-10);
+}
+.vlan-color-bar{width:4px;height:40px;border-radius:2px;flex-shrink:0;}
+.vlan-id{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;color:var(--black);line-height:1;}
+.vlan-id-label{font-size:10px;color:var(--gray-40);font-family:'Space Mono',monospace;letter-spacing:0.5px;text-transform:uppercase;}
+.vlan-name{font-size:14px;font-weight:700;color:var(--black);margin-bottom:2px;}
+.vlan-type-label{font-size:11px;color:var(--gray-60);}
+.vlan-card-body{padding:12px 16px;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+.vcard-stat{display:flex;flex-direction:column;gap:2px;}
+.vcard-stat-label{font-size:10px;color:var(--gray-40);font-family:'Space Mono',monospace;letter-spacing:0.3px;text-transform:uppercase;}
+.vcard-stat-val{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--black);}
+
+/* IP address block display */
+.ip-block{
+  font-family:'Space Mono',monospace;font-size:12px;
+  background:var(--gray-10);border-radius:6px;
+  padding:8px 12px;margin-top:10px;line-height:2;
+}
+.ip-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px;}
+.ip-key{font-size:10px;color:var(--gray-60);font-family:'Inter',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:0.3px;}
+.ip-val{font-weight:700;color:var(--black);}
+
+/* Inter-VLAN routing table */
+.routing-wrap{
+  background:var(--white);border-radius:12px;border:1px solid var(--gray-20);
+  overflow:hidden;margin-bottom:16px;
+}
+.routing-header{background:var(--black);padding:12px 18px;}
+.routing-header span{font-family:'Space Mono',monospace;font-size:10px;color:#888;letter-spacing:1px;text-transform:uppercase;}
+.routing-grid{padding:16px;display:grid;gap:4px;}
+.routing-row{
+  display:grid;grid-template-columns:120px 24px 120px 1fr auto;
+  align-items:center;gap:8px;
+  padding:8px 10px;border-radius:6px;font-size:12px;
+}
+.routing-row:hover{background:var(--gray-10);}
+.routing-row.allow{border-left:3px solid var(--green);}
+.routing-row.deny {border-left:3px solid var(--red);}
+.routing-row.cond {border-left:3px solid var(--yellow);}
+.r-vlan{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;}
+.r-arrow{color:var(--gray-40);font-size:14px;text-align:center;}
+.r-action{font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px;font-family:'Space Mono',monospace;white-space:nowrap;}
+.r-action.allow{background:var(--green-lt);color:var(--green);}
+.r-action.deny {background:var(--red-lt);color:var(--red);}
+.r-action.cond {background:var(--yellow-lt);color:var(--yellow);}
+.r-note{font-size:11px;color:var(--gray-60);}
+
+/* Switch port mapping */
+.port-map-wrap{
+  background:var(--white);border-radius:12px;border:1px solid var(--gray-20);
+  overflow:hidden;margin-bottom:16px;
+}
+.port-map-header{
+  background:var(--black);padding:12px 18px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.port-map-header span{font-family:'Space Mono',monospace;font-size:10px;color:#888;letter-spacing:1px;text-transform:uppercase;}
+.port-grid{padding:16px;display:flex;flex-wrap:wrap;gap:6px;}
+.port-slot{
+  width:52px;height:38px;border-radius:6px;border:2px solid var(--gray-20);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-size:10px;font-family:'Space Mono',monospace;font-weight:700;
+  cursor:default;transition:transform .1s;position:relative;
+}
+.port-slot:hover{transform:scale(1.08);}
+.port-slot .p-num{font-size:9px;color:rgba(255,255,255,.6);font-weight:400;}
+.port-slot .p-vlan{font-size:11px;font-weight:700;color:white;}
+.port-slot .p-mode{font-size:8px;color:rgba(255,255,255,.5);font-weight:400;}
+.port-slot.trunk{border-style:dashed;}
+.port-slot.untagged-only{opacity:.5;}
+.port-uplink{
+  width:52px;height:38px;border-radius:6px;border:2px solid #555;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-size:9px;font-family:'Space Mono',monospace;color:#888;font-weight:700;
+}
+
+/* Stat row */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+.stat-box{background:var(--white);border-radius:10px;padding:14px;border:1px solid var(--gray-20);}
+.stat-box.highlight{border-color:var(--orange);background:var(--orange-lt);}
+.stat-label{font-size:10px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;color:var(--gray-60);margin-bottom:6px;}
+.stat-val{font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--black);line-height:1;}
+.stat-unit{font-size:11px;color:var(--gray-60);margin-top:3px;}
+
+/* Rec box */
+.rec-box{background:var(--green-lt);border-left:3px solid var(--green);border-radius:0 8px 8px 0;padding:14px 16px;font-size:12px;color:var(--green);font-family:'Space Mono',monospace;line-height:1.8;margin-bottom:16px;}
+.rec-box span{color:var(--gray-60);font-family:'Inter',sans-serif;}
+
+/* Alert */
+.alert-warn{background:var(--yellow-lt);border:1px solid var(--yellow);border-radius:10px;padding:14px 16px;font-size:12px;color:var(--yellow);font-family:'Space Mono',monospace;margin-bottom:16px;line-height:1.8;display:none;}
+
+/* Export bar */
+.export-bar{display:flex;gap:10px;flex-wrap:wrap;}
+
+/* Empty */
+.empty-state{text-align:center;padding:32px;color:var(--gray-40);font-size:13px;}
+.empty-state .big{font-size:32px;margin-bottom:8px;}
+
+/* Preset chips */
+.preset-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px;}
+.preset-chip{padding:5px 11px;border:1.5px solid var(--gray-20);border-radius:16px;font-size:11px;font-weight:600;color:var(--gray-60);cursor:pointer;transition:all .15s;background:var(--white);white-space:nowrap;}
+.preset-chip:hover{border-color:var(--orange);color:var(--orange);background:var(--orange-lt);}
+
+.tip-icon{display:inline-block;width:15px;height:15px;background:var(--gray-20);border-radius:50%;font-size:9px;text-align:center;line-height:15px;color:var(--gray-60);cursor:help;font-family:'Space Mono',monospace;font-weight:700;margin-left:4px;vertical-align:middle;}
+
+@media(max-width:700px){
+  .grid-3,.grid-2{grid-template-columns:1fr;}
+  .vlan-type-grid{grid-template-columns:repeat(4,1fr);}
+  .add-row{grid-template-columns:1fr 1fr;}
+  .stat-row{grid-template-columns:1fr 1fr;}
+  .vlan-card-body{grid-template-columns:1fr 1fr;}
+  .routing-row{grid-template-columns:1fr auto 1fr auto auto;}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo-mark">KK</div>
+  <div class="header-text">
+    <h1>VLAN Planner</h1>
+    <p>Segmentasi jaringan CCTV, Office, ACS, AP — standar IEEE 802.1Q &amp; best practice keamanan jaringan</p>
+  </div>
+</div>
+
+<!-- Card 1: Project Setup -->
+<div class="card">
+  <div class="card-top">
+    <div class="dot"></div>
+    <span>Setup Proyek</span>
+    <div class="tag">IEEE 802.1Q VLAN Tagging</div>
+  </div>
+  <div class="form-body">
+    <div class="grid-3" style="margin-bottom:16px;">
+      <div class="field">
+        <label>Nama Proyek / Site</label>
+        <input type="text" id="project-name" placeholder="Contoh: Gedung Kantor Bekasi Lt.2">
+      </div>
+      <div class="field">
+        <label>IP Network Utama <span class="tip-icon" title="Network base untuk seluruh proyek. Setiap VLAN akan mendapat subnet berbeda dari range ini.">?</span></label>
+        <select id="base-network">
+          <option value="192.168">192.168.x.x — Private Class C (umum)</option>
+          <option value="172.16">172.16.x.x — Private Class B</option>
+          <option value="10.0">10.0.x.x — Private Class A (enterprise)</option>
+          <option value="10.10">10.10.x.x</option>
+          <option value="172.20">172.20.x.x</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Subnet per VLAN</label>
+        <select id="subnet-size">
+          <option value="28">/28 — 14 host (ruangan kecil)</option>
+          <option value="27">/27 — 30 host</option>
+          <option value="26">/26 — 62 host</option>
+          <option value="25">/25 — 126 host</option>
+          <option value="24" selected>/24 — 254 host (standar)</option>
+          <option value="23">/23 — 510 host</option>
+          <option value="22">/22 — 1022 host (gedung besar)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Template proyek -->
+    <label style="margin-bottom:8px;display:block;">Template Cepat <span class="hint">— isi otomatis VLAN umum</span></label>
+    <div class="preset-row" style="margin-bottom:16px;">
+      <div class="preset-chip" onclick="loadTemplate('cctv_office')">🏢 CCTV + Office</div>
+      <div class="preset-chip" onclick="loadTemplate('cctv_acs')">🔑 CCTV + ACS</div>
+      <div class="preset-chip" onclick="loadTemplate('full')">🏗 Full Setup (CCTV+Office+ACS+AP+Server)</div>
+      <div class="preset-chip" onclick="loadTemplate('apartment')">🏠 Apartemen / Perumahan</div>
+      <div class="preset-chip" onclick="loadTemplate('warehouse')">🏭 Gudang / Industri</div>
+    </div>
+  </div>
+</div>
+
+<!-- Card 2: Tambah VLAN -->
+<div class="card">
+  <div class="card-top">
+    <div class="dot"></div>
+    <span>Konfigurasi VLAN</span>
+  </div>
+  <div class="form-body">
+
+    <!-- Type selector -->
+    <label style="margin-bottom:10px;display:block;">Tipe VLAN</label>
+    <div class="vlan-type-grid" id="vtype-grid" style="margin-bottom:16px;">
+      <button class="vtype-btn active" onclick="selectType('CCTV',this)" style="border-color:var(--vlan-cctv);color:var(--vlan-cctv);">
+        <span class="vt-icon">📷</span>CCTV
+      </button>
+      <button class="vtype-btn" onclick="selectType('Office',this)" style="">
+        <span class="vt-icon">💼</span>Office
+      </button>
+      <button class="vtype-btn" onclick="selectType('ACS',this)">
+        <span class="vt-icon">🔑</span>ACS
+      </button>
+      <button class="vtype-btn" onclick="selectType('AP',this)">
+        <span class="vt-icon">📡</span>WiFi AP
+      </button>
+      <button class="vtype-btn" onclick="selectType('Server',this)">
+        <span class="vt-icon">🗄️</span>Server
+      </button>
+      <button class="vtype-btn" onclick="selectType('Management',this)">
+        <span class="vt-icon">⚙️</span>Mgmt
+      </button>
+      <button class="vtype-btn" onclick="selectType('Custom',this)">
+        <span class="vt-icon">✏️</span>Custom
+      </button>
+    </div>
+
+    <div class="add-row">
+      <div class="field">
+        <label>VLAN ID <span class="tip-icon" title="Range valid: 1–4094. VLAN 1 adalah native VLAN (default switch). Hindari VLAN 1 untuk security.">?</span></label>
+        <input type="number" id="vlan-id" value="10" min="2" max="4094" class="mono" style="width:90px;">
+      </div>
+      <div class="field">
+        <label>Nama VLAN</label>
+        <input type="text" id="vlan-name" placeholder="Contoh: CCTV-LT1" class="mono">
+      </div>
+      <div class="field">
+        <label>Deskripsi / Fungsi</label>
+        <input type="text" id="vlan-desc" placeholder="Contoh: Kamera lantai 1">
+      </div>
+      <div class="field">
+        <label>Jumlah Device</label>
+        <input type="number" id="vlan-devices" value="16" min="1" max="1000" class="mono">
+      </div>
+      <div class="field">
+        <label>Prioritas QoS <span class="tip-icon" title="CoS/DSCP priority. CCTV dan VoIP butuh prioritas tinggi. Office biasanya normal.">?</span></label>
+        <select id="vlan-qos">
+          <option value="7">7 — Network Control</option>
+          <option value="6">6 — Telephony / VoIP</option>
+          <option value="5" selected>5 — Video Surveillance</option>
+          <option value="4">4 — Controlled Load</option>
+          <option value="3">3 — Excellent Effort</option>
+          <option value="0">0 — Best Effort (Office)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>&nbsp;</label>
+        <button class="btn btn-primary" onclick="addVlan()">+ Tambah</button>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- VLAN table -->
+    <div class="vlan-table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>VLAN ID</th><th>Nama</th><th>Tipe</th><th>Subnet</th>
+            <th>Gateway</th><th>Device</th><th>QoS</th><th>Deskripsi</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="vlan-tbody">
+          <tr><td colspan="9">
+            <div class="empty-state">
+              <div class="big">🌐</div>
+              Belum ada VLAN. Tambahkan di atas atau pilih template.
+            </div>
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="divider">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn btn-primary btn-full" onclick="generate()" style="flex:2;">▶ GENERATE VLAN PLAN</button>
+      <button class="btn btn-secondary" onclick="clearAll()" style="flex:1;">Reset</button>
+    </div>
+  </div>
+</div>
+
+<!-- Result Card -->
+<div class="card" id="result-card" style="display:none;">
+  <div class="result-divider"></div>
+  <div class="result-body">
+    <div class="result-headline">// VLAN Design Report</div>
+
+    <div class="alert-warn" id="alert-warn"></div>
+
+    <!-- Stat row -->
+    <div class="stat-row" id="stat-row"></div>
+
+    <!-- Topology diagram -->
+    <div class="topology-wrap">
+      <div class="topo-header">
+        <div class="topo-title">Network Topology Diagram</div>
+        <div style="font-family:'Space Mono',monospace;font-size:10px;color:#555;" id="topo-label"></div>
+      </div>
+      <canvas id="topo-canvas" width="940" height="320"></canvas>
+    </div>
+
+    <!-- VLAN detail cards -->
+    <div style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gray-60);margin-bottom:12px;">// Detail per VLAN</div>
+    <div class="vlan-cards" id="vlan-cards"></div>
+
+    <!-- Inter-VLAN routing policy -->
+    <div class="routing-wrap">
+      <div class="routing-header">
+        <span>Inter-VLAN Routing Policy (Rekomendasi ACL)</span>
+      </div>
+      <div class="routing-grid" id="routing-grid"></div>
+    </div>
+
+    <!-- Switch port mapping -->
+    <div class="port-map-wrap">
+      <div class="port-map-header">
+        <span>Switch Port Assignment (Simulasi 24-Port)</span>
+        <div style="font-family:'Space Mono',monospace;font-size:10px;color:#555;">Trunk | Access | Uplink</div>
+      </div>
+      <div class="port-grid" id="port-grid"></div>
+    </div>
+
+    <!-- Recommendation -->
+    <div class="rec-box" id="rec-box"></div>
+
+    <!-- Export -->
+    <div class="export-bar">
+      <button class="btn btn-secondary" onclick="copyMikrotik()">📋 Salin Script MikroTik</button>
+      <button class="btn btn-secondary" onclick="copyCisco()">📋 Salin Script Cisco/Huawei</button>
+      <button class="btn btn-secondary" onclick="copyCSV()">📋 Salin CSV</button>
+      <button class="btn btn-secondary" onclick="exportHTML()">💾 Simpan HTML</button>
+    </div>
+  </div>
+</div>
+
+<div style="max-width:980px;margin:20px auto 0;font-size:11px;color:var(--gray-60);text-align:center;line-height:1.6;">
+  KutuKabel Tools — VLAN Planning standar IEEE 802.1Q &nbsp;|&nbsp; Best practice: CCTV isolated, ACS restricted, Management VLAN terpisah
+</div>
+
+<script>
+// ── State
+let vlans = [];
+let vlanCounter = 0;
+let currentType = 'CCTV';
+
+// ── VLAN type config
+const VTYPE = {
+  CCTV:       { color:'#d46316', icon:'📷', qos:5,  defaultName:'VLAN-CCTV',   desc:'IP Camera & NVR' },
+  Office:     { color:'#1a6fa8', icon:'💼', qos:0,  defaultName:'VLAN-OFFICE', desc:'PC & workstation' },
+  ACS:        { color:'#1d8a4e', icon:'🔑', qos:4,  defaultName:'VLAN-ACS',    desc:'Access control & intercom' },
+  AP:         { color:'#6c3483', icon:'📡', qos:4,  defaultName:'VLAN-AP',     desc:'Wireless access point' },
+  Server:     { color:'#c0392b', icon:'🗄️', qos:6,  defaultName:'VLAN-SERVER', desc:'Server & NAS' },
+  Management: { color:'#0e7490', icon:'⚙️', qos:7,  defaultName:'VLAN-MGMT',   desc:'Switch & device management' },
+  Custom:     { color:'#555',    icon:'✏️', qos:0,  defaultName:'VLAN-CUSTOM', desc:'Custom segment' },
+};
+
+// ── IP utils
+function ipToInt(ip){const p=ip.split('.');return((+p[0]<<24)|(+p[1]<<16)|(+p[2]<<8)|+p[3])>>>0;}
+function intToIp(n){return[(n>>>24)&255,(n>>>16)&255,(n>>>8)&255,n&255].join('.');}
+function cidrMask(c){return c===0?0:(0xffffffff<<(32-c))>>>0;}
+function subnetInfo(base, cidr) {
+  const mask = cidrMask(cidr);
+  const net  = (ipToInt(base) & mask)>>>0;
+  const bc   = (net|(~mask>>>0))>>>0;
+  return { network:intToIp(net), gateway:intToIp(net+1), broadcast:intToIp(bc), firstHost:intToIp(net+1), lastHost:intToIp(bc-1), total:Math.pow(2,32-cidr)-2 };
+}
+
+function getBaseOctets(){
+  const v = document.getElementById('base-network').value;
+  return v.split('.');
+}
+
+function assignSubnet(vlanIndex) {
+  const [o1,o2] = getBaseOctets();
+  const cidr = parseInt(document.getElementById('subnet-size').value);
+  // Each VLAN gets its own /24 (or chosen CIDR) on incrementing third octet
+  const thirdOctet = vlanIndex + 1;
+  const base = `${o1}.${o2}.${thirdOctet}.0`;
+  return { ...subnetInfo(base, cidr), cidr, base };
+}
+
+// ── Select type
+function selectType(type, btn) {
+  currentType = type;
+  document.querySelectorAll('.vtype-btn').forEach(b => {
+    b.classList.remove('active');
+    b.style.borderColor = '';
+    b.style.color = '';
+    b.style.background = '';
+  });
+  btn.classList.add('active');
+  btn.style.borderColor = VTYPE[type].color;
+  btn.style.color       = VTYPE[type].color;
+  btn.style.background  = VTYPE[type].color + '12';
+
+  // Auto-fill
+  const vtype = VTYPE[type];
+  if (!document.getElementById('vlan-name').value || document.getElementById('vlan-name').value === prevDefaultName) {
+    document.getElementById('vlan-name').value = vtype.defaultName;
+    prevDefaultName = vtype.defaultName;
+  }
+  document.getElementById('vlan-qos').value = vtype.qos;
+  document.getElementById('vlan-desc').value = vtype.desc;
+}
+let prevDefaultName = 'VLAN-CCTV';
+
+// ── VLAN ID auto-suggest by type
+const TYPE_ID_START = { CCTV:10, Office:20, ACS:30, AP:40, Server:50, Management:99, Custom:100 };
+
+// ── Add VLAN
+function addVlan() {
+  const id   = parseInt(document.getElementById('vlan-id').value);
+  const name = document.getElementById('vlan-name').value.trim();
+  const desc = document.getElementById('vlan-desc').value.trim();
+  const devs = parseInt(document.getElementById('vlan-devices').value) || 10;
+  const qos  = parseInt(document.getElementById('vlan-qos').value);
+
+  if (!id || id < 2 || id > 4094) { alert('VLAN ID harus antara 2–4094'); return; }
+  if (!name) { document.getElementById('vlan-name').focus(); return; }
+  if (vlans.find(v => v.id === id)) { alert(`VLAN ID ${id} sudah ada!`); return; }
+
+  vlanCounter++;
+  const subnetIdx = vlans.length;
+  const subnet = assignSubnet(subnetIdx);
+  vlans.push({ uid:vlanCounter, id, name, type:currentType, desc, devices:devs, qos, subnet });
+  vlans.sort((a,b) => a.id - b.id);
+  renderVlanTable();
+
+  // Auto-increment ID
+  document.getElementById('vlan-id').value = id + 10;
+}
+
+function removeVlan(uid) {
+  vlans = vlans.filter(v => v.uid !== uid);
+  // Reassign subnets
+  vlans.forEach((v, i) => { v.subnet = assignSubnet(i); });
+  renderVlanTable();
+}
+
+function renderVlanTable() {
+  const tbody = document.getElementById('vlan-tbody');
+  if (vlans.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="big">🌐</div>Belum ada VLAN.</div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = vlans.map(v => `
+    <tr>
+      <td class="mono" style="font-weight:700;">
+        <span class="vlan-dot" style="background:${VTYPE[v.type].color}"></span>
+        ${v.id}
+      </td>
+      <td class="mono">${v.name}</td>
+      <td><span class="badge" style="background:${VTYPE[v.type].color}22;color:${VTYPE[v.type].color};">${VTYPE[v.type].icon} ${v.type}</span></td>
+      <td class="mono">${v.subnet.network}/${v.subnet.cidr}</td>
+      <td class="mono">${v.subnet.gateway}</td>
+      <td class="mono">${v.devices}</td>
+      <td><span class="badge" style="background:var(--gray-10);color:var(--gray-60);">CoS ${v.qos}</span></td>
+      <td style="font-size:12px;color:var(--gray-60);">${v.desc}</td>
+      <td><button class="del-btn" onclick="removeVlan(${v.uid})">✕</button></td>
+    </tr>
+  `).join('');
+}
+
+// ── Templates
+const TEMPLATES = {
+  cctv_office: [
+    { id:10, name:'CCTV',   type:'CCTV',   desc:'IP Kamera & NVR',    devices:24, qos:5 },
+    { id:20, name:'OFFICE', type:'Office',  desc:'PC & workstation',   devices:30, qos:0 },
+    { id:99, name:'MGMT',   type:'Management', desc:'Switch management', devices:8, qos:7 },
+  ],
+  cctv_acs: [
+    { id:10, name:'CCTV',   type:'CCTV',   desc:'IP Kamera & NVR',    devices:24, qos:5 },
+    { id:30, name:'ACS',    type:'ACS',    desc:'Access control & intercom', devices:16, qos:4 },
+    { id:99, name:'MGMT',   type:'Management', desc:'Switch management', devices:5, qos:7 },
+  ],
+  full: [
+    { id:10, name:'CCTV',   type:'CCTV',   desc:'IP Kamera & NVR',    devices:32, qos:5 },
+    { id:20, name:'OFFICE', type:'Office',  desc:'PC & workstation',   devices:50, qos:0 },
+    { id:30, name:'ACS',    type:'ACS',    desc:'Access control',      devices:16, qos:4 },
+    { id:40, name:'WIFI',   type:'AP',     desc:'Wireless client',     devices:40, qos:4 },
+    { id:50, name:'SERVER', type:'Server', desc:'Server & NAS',        devices:10, qos:6 },
+    { id:99, name:'MGMT',   type:'Management', desc:'Network management', devices:10, qos:7 },
+  ],
+  apartment: [
+    { id:10, name:'CCTV',   type:'CCTV',   desc:'Kamera area publik',  devices:48, qos:5 },
+    { id:20, name:'TENANT', type:'Office',  desc:'Internet penghuni',   devices:120,qos:0 },
+    { id:30, name:'ACS',    type:'ACS',    desc:'Akses pintu & lift',   devices:30, qos:4 },
+    { id:40, name:'WIFI',   type:'AP',     desc:'WiFi lobby & koridor', devices:60, qos:4 },
+    { id:99, name:'MGMT',   type:'Management', desc:'Manajemen perangkat',devices:15, qos:7 },
+  ],
+  warehouse: [
+    { id:10, name:'CCTV',   type:'CCTV',   desc:'Kamera gudang & loading', devices:32, qos:5 },
+    { id:20, name:'OFFICE', type:'Office',  desc:'PC admin & WMS',      devices:20, qos:0 },
+    { id:30, name:'ACS',    type:'ACS',    desc:'Gate & pintu gudang',  devices:12, qos:4 },
+    { id:99, name:'MGMT',   type:'Management', desc:'Switch & NVR mgmt', devices:8, qos:7 },
+  ],
+};
+
+function loadTemplate(key) {
+  if (vlans.length > 0 && !confirm('Load template akan menghapus VLAN yang sudah ada. Lanjut?')) return;
+  vlans = [];
+  vlanCounter = 0;
+  const tmpl = TEMPLATES[key];
+  tmpl.forEach((t, i) => {
+    vlanCounter++;
+    const subnet = assignSubnet(i);
+    vlans.push({ uid:vlanCounter, ...t, subnet });
+  });
+  renderVlanTable();
+}
+
+// ── Generate
+function generate() {
+  if (vlans.length === 0) { alert('Tambahkan minimal 1 VLAN.'); return; }
+
+  // Warnings
+  const warns = [];
+  const hasVlan1 = vlans.find(v => v.id === 1);
+  if (hasVlan1) warns.push('⚠ VLAN 1 (native VLAN) sebaiknya tidak digunakan untuk traffic production — security risk.');
+  const cctvVlans  = vlans.filter(v => v.type === 'CCTV');
+  const hasMgmt    = vlans.find(v => v.type === 'Management');
+  if (!hasMgmt) warns.push('⚠ Tidak ada Management VLAN — disarankan tambah VLAN khusus untuk manajemen switch.');
+  const totalDev   = vlans.reduce((s,v) => s + v.devices, 0);
+  vlans.forEach(v => {
+    if (v.devices > v.subnet.total) warns.push(`⚠ VLAN ${v.id} (${v.name}): ${v.devices} device melebihi subnet capacity (${v.subnet.total} host).`);
+  });
+
+  const alertEl = document.getElementById('alert-warn');
+  if (warns.length) { alertEl.style.display='block'; alertEl.innerHTML = warns.join('<br>'); }
+  else alertEl.style.display='none';
+
+  // Stat row
+  document.getElementById('stat-row').innerHTML = `
+    <div class="stat-box highlight">
+      <div class="stat-label">Total VLAN</div>
+      <div class="stat-val">${vlans.length}</div>
+      <div class="stat-unit">segment terpisah</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Total Device</div>
+      <div class="stat-val">${totalDev}</div>
+      <div class="stat-unit">di semua VLAN</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">IP Range</div>
+      <div class="stat-val" style="font-size:14px;">${vlans[0]?.subnet.network}</div>
+      <div class="stat-unit">s/d ${vlans[vlans.length-1]?.subnet.broadcast}</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Tipe Segment</div>
+      <div class="stat-val">${[...new Set(vlans.map(v=>v.type))].length}</div>
+      <div class="stat-unit">kategori berbeda</div>
+    </div>
+  `;
+
+  // Topology diagram
+  drawTopology();
+
+  // VLAN detail cards
+  renderVlanCards();
+
+  // Inter-VLAN routing
+  renderRoutingPolicy();
+
+  // Port mapping
+  renderPortMap();
+
+  // Recommendation
+  renderRec();
+
+  document.getElementById('result-card').style.display = 'block';
+  document.getElementById('result-card').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+// ── Topology canvas
+function drawTopology() {
+  const canvas = document.getElementById('topo-canvas');
+  const ctx    = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth || 940;
+  const W = canvas.width, H = 320;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#fafafa'; ctx.fillRect(0,0,W,H);
+
+  // Internet cloud (top center)
+  const inet = { x:W/2, y:36 };
+  drawCloud(ctx, inet.x, inet.y, 48, '#ccc', '#e0e0e0', 'Internet / WAN');
+
+  // Core Router/Firewall
+  const rtr = { x:W/2, y:110 };
+  drawBox(ctx, rtr.x, rtr.y, 90, 30, '#1a1a1a', '#fff', 'Router / Firewall', 11);
+  // Line inet→rtr
+  drawLine(ctx, inet.x, inet.y+18, rtr.x, rtr.y-15, '#aaa', true);
+
+  // L3 Switch
+  const sw3 = { x:W/2, y:180 };
+  drawBox(ctx, sw3.x, sw3.y, 100, 28, '#d46316', '#fff', 'L3 Switch / MLS', 11);
+  drawLine(ctx, rtr.x, rtr.y+15, sw3.x, sw3.y-14, '#555', true);
+  ctx.fillStyle='#999'; ctx.font='9px Space Mono, monospace'; ctx.textAlign='center';
+  ctx.fillText('Trunk (all VLANs)', W/2 + 36, 150);
+
+  // VLAN branches
+  const n = vlans.length;
+  const spread = Math.min(W - 80, n * 120);
+  const startX = W/2 - spread/2 + (spread/(n||1))/2;
+
+  vlans.forEach((v, i) => {
+    const vx = startX + i * (spread / Math.max(n,1));
+    const vy = 268;
+    const color = VTYPE[v.type].color;
+
+    // Line sw3→vlan
+    drawLine(ctx, sw3.x, sw3.y+14, vx, vy-16, color+'88', false);
+
+    // VLAN node
+    ctx.beginPath();
+    ctx.roundRect(vx-46, vy-16, 92, 32, 6);
+    ctx.fillStyle = color + '18';
+    ctx.fill();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.fillStyle = color;
+    ctx.font = 'bold 11px Space Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('VLAN ' + v.id, vx, vy);
+    ctx.font = '9px Inter, sans-serif';
+    ctx.fillStyle = '#666';
+    ctx.fillText(v.name.substring(0,10), vx, vy+12);
+
+    // Subnet label
+    ctx.font = '8px Space Mono, monospace';
+    ctx.fillStyle = '#aaa';
+    ctx.fillText(v.subnet.network + '/' + v.subnet.cidr, vx, vy + 28);
+  });
+
+  document.getElementById('topo-label').textContent =
+    vlans.length + ' VLAN · ' + vlans.reduce((s,v)=>s+v.devices,0) + ' device';
+}
+
+function drawBox(ctx, cx, cy, w, h, bg, fg, label, fontSize) {
+  ctx.beginPath();
+  ctx.roundRect(cx-w/2, cy-h/2, w, h, 6);
+  ctx.fillStyle = bg; ctx.fill();
+  ctx.fillStyle = fg;
+  ctx.font = `bold ${fontSize}px Space Mono, monospace`;
+  ctx.textAlign = 'center';
+  ctx.fillText(label, cx, cy + fontSize*0.35);
+}
+
+function drawCloud(ctx, cx, cy, r, stroke, fill, label) {
+  ctx.beginPath();
+  ctx.arc(cx, cy, r*0.5, Math.PI*0.5, Math.PI*1.9);
+  ctx.arc(cx-r*0.3, cy-r*0.2, r*0.35, Math.PI*1.1, Math.PI*0.1, true);
+  ctx.arc(cx+r*0.25, cy-r*0.3, r*0.3, Math.PI*1.0, Math.PI*0.2, true);
+  ctx.arc(cx+r*0.5, cy, r*0.28, Math.PI*1.5, Math.PI*0.6, true);
+  ctx.closePath();
+  ctx.fillStyle = fill; ctx.fill();
+  ctx.strokeStyle = stroke; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.fillStyle = '#999'; ctx.font = '9px Inter, sans-serif'; ctx.textAlign='center';
+  ctx.fillText(label, cx, cy+r*0.7);
+}
+
+function drawLine(ctx, x1, y1, x2, y2, color, dashed) {
+  ctx.beginPath();
+  ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+  ctx.strokeStyle = color; ctx.lineWidth = 1.5;
+  if (dashed) ctx.setLineDash([4,3]); else ctx.setLineDash([]);
+  ctx.stroke(); ctx.setLineDash([]);
+}
+
+// ── VLAN detail cards
+function renderVlanCards() {
+  const el = document.getElementById('vlan-cards');
+  el.innerHTML = vlans.map(v => {
+    const color = VTYPE[v.type].color;
+    const util  = Math.round((v.devices / v.subnet.total) * 100);
+    return `
+    <div class="vlan-card">
+      <div class="vlan-card-header">
+        <div class="vlan-color-bar" style="background:${color}"></div>
+        <div>
+          <div class="vlan-id-label">VLAN ID</div>
+          <div class="vlan-id">${v.id}</div>
+        </div>
+        <div style="flex:1;padding-left:12px;">
+          <div class="vlan-name">${v.name}</div>
+          <div class="vlan-type-label">${VTYPE[v.type].icon} ${v.type} — ${v.desc}</div>
+        </div>
+        <div style="text-align:right;">
+          <span class="badge" style="background:${color}22;color:${color};">CoS ${v.qos}</span>
+        </div>
+      </div>
+      <div class="vlan-card-body">
+        <div class="vcard-stat">
+          <div class="vcard-stat-label">Network</div>
+          <div class="vcard-stat-val">${v.subnet.network}/${v.subnet.cidr}</div>
+        </div>
+        <div class="vcard-stat">
+          <div class="vcard-stat-label">Gateway</div>
+          <div class="vcard-stat-val">${v.subnet.gateway}</div>
+        </div>
+        <div class="vcard-stat">
+          <div class="vcard-stat-label">Host Range</div>
+          <div class="vcard-stat-val" style="font-size:11px;">${v.subnet.firstHost}<br>— ${v.subnet.lastHost}</div>
+        </div>
+        <div class="vcard-stat">
+          <div class="vcard-stat-label">Device / Total</div>
+          <div class="vcard-stat-val">${v.devices} / ${v.subnet.total}</div>
+        </div>
+        <div class="vcard-stat">
+          <div class="vcard-stat-label">Utilisasi IP</div>
+          <div class="vcard-stat-val" style="color:${util>80?'var(--red)':util>60?'var(--orange)':'var(--green)'}">
+            ${util}%
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Inter-VLAN routing policy
+function renderRoutingPolicy() {
+  // Security best practice rules
+  const rules = [];
+  const vTypes = vlans.map(v => v.type);
+
+  vlans.forEach(src => {
+    vlans.forEach(dst => {
+      if (src.uid === dst.uid) return;
+      const pair = [src.type, dst.type];
+
+      // CCTV → NVR/Server: allow (recording)
+      if (pair[0]==='CCTV' && pair[1]==='Server') {
+        rules.push({ src, dst, action:'allow', note:'Recording traffic ke NVR/Server', cls:'allow' });
+      }
+      // Office → Server: allow
+      else if (pair[0]==='Office' && pair[1]==='Server') {
+        rules.push({ src, dst, action:'allow', note:'Akses file server & aplikasi', cls:'allow' });
+      }
+      // Office → CCTV: deny (keamanan — staff tidak perlu akses langsung ke kamera)
+      else if (pair[0]==='Office' && pair[1]==='CCTV') {
+        rules.push({ src, dst, action:'deny', note:'Isolasi — akses kamera via aplikasi NVR saja', cls:'deny' });
+      }
+      // ACS → semua: deny (isolasi penuh)
+      else if (pair[0]==='ACS') {
+        rules.push({ src, dst, action:'deny', note:'ACS network harus fully isolated', cls:'deny' });
+      }
+      // Management → semua: allow
+      else if (pair[0]==='Management') {
+        rules.push({ src, dst, action:'allow', note:'Admin access dari MGMT VLAN', cls:'allow' });
+      }
+      // semua → Management: deny
+      else if (pair[1]==='Management') {
+        rules.push({ src, dst, action:'deny', note:'Lindungi MGMT VLAN dari akses umum', cls:'deny' });
+      }
+      // AP → Server: allow (internet browsing through proxy)
+      else if (pair[0]==='AP' && pair[1]==='Server') {
+        rules.push({ src, dst, action:'cond', note:'Conditional — via proxy/firewall rule', cls:'cond' });
+      }
+      // Default deny all
+      else {
+        rules.push({ src, dst, action:'deny', note:'Default deny — tidak ada kebutuhan routing', cls:'deny' });
+      }
+    });
+  });
+
+  // Limit display to max 12 rules
+  const displayed = rules.slice(0, 14);
+  const el = document.getElementById('routing-grid');
+  el.innerHTML = displayed.map(r => `
+    <div class="routing-row ${r.cls}">
+      <div class="r-vlan" style="color:${VTYPE[r.src.type].color};">
+        <span class="vlan-dot" style="background:${VTYPE[r.src.type].color}"></span>
+        VLAN ${r.src.id} ${r.src.name}
+      </div>
+      <div class="r-arrow">→</div>
+      <div class="r-vlan" style="color:${VTYPE[r.dst.type].color};">
+        <span class="vlan-dot" style="background:${VTYPE[r.dst.type].color}"></span>
+        VLAN ${r.dst.id} ${r.dst.name}
+      </div>
+      <div></div>
+      <div class="r-action ${r.cls}">${r.action.toUpperCase()}</div>
+      <div class="r-note">${r.note}</div>
+    </div>
+  `).join('') + (rules.length > 14 ? `<div style="padding:10px 12px;font-size:11px;color:var(--gray-40);font-family:'Space Mono',monospace;">... +${rules.length-14} rule lainnya</div>` : '');
+}
+
+// ── Port mapping simulation
+function renderPortMap() {
+  const totalPorts = 24;
+  const el = document.getElementById('port-grid');
+  let html = '';
+
+  // Distribute ports per VLAN proportionally
+  let portAssign = [];
+  // Port 1-2: uplink trunk
+  portAssign.push({ label:'UP', mode:'trunk', color:'#1a1a1a', vlanLabel:'TRUNK' });
+  portAssign.push({ label:'UP', mode:'trunk', color:'#1a1a1a', vlanLabel:'TRUNK' });
+
+  // Remaining ports distributed to VLANs
+  const remaining = totalPorts - 2;
+  const perVlan   = Math.floor(remaining / vlans.length);
+  let extra       = remaining % vlans.length;
+
+  vlans.forEach(v => {
+    const count = perVlan + (extra-- > 0 ? 1 : 0);
+    for (let i = 0; i < count; i++) {
+      portAssign.push({ label:'P', mode:'access', color:VTYPE[v.type].color, vlanLabel:v.id, vlanName:v.name });
+    }
+  });
+
+  portAssign.forEach((p, i) => {
+    if (p.mode === 'trunk') {
+      html += `<div class="port-uplink" title="Port ${i+1} — Uplink/Trunk">
+        <div style="font-size:9px;">P${i+1}</div>
+        <div>🔗</div>
+        <div style="font-size:8px;">TRUNK</div>
+      </div>`;
+    } else {
+      html += `<div class="port-slot" style="background:${p.color};border-color:${p.color};" title="Port ${i+1} — Access VLAN ${p.vlanLabel}">
+        <div class="p-num">P${i+1}</div>
+        <div class="p-vlan">${p.vlanLabel}</div>
+        <div class="p-mode">${(p.vlanName||'').substring(0,6)}</div>
+      </div>`;
+    }
+  });
+
+  el.innerHTML = html;
+
+  // Legend
+  el.innerHTML += `<div style="width:100%;margin-top:10px;display:flex;flex-wrap:wrap;gap:10px;padding-top:10px;border-top:1px solid var(--gray-10);">` +
+    vlans.map(v => `<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--gray-60);">
+      <div style="width:12px;height:12px;border-radius:3px;background:${VTYPE[v.type].color};flex-shrink:0;"></div>
+      VLAN ${v.id} — ${v.name}
+    </div>`).join('') + `</div>`;
+}
+
+// ── Recommendation
+function renderRec() {
+  const cctv   = vlans.find(v => v.type==='CCTV');
+  const mgmt   = vlans.find(v => v.type==='Management');
+  const acs    = vlans.find(v => v.type==='ACS');
+  const office = vlans.find(v => v.type==='Office');
+
+  let html = `<span>Best practice keamanan untuk konfigurasi ini:</span><br>`;
+  if (cctv) html += `→ VLAN ${cctv.id} (CCTV) — pastikan tidak ada route ke Office/AP kecuali ke NVR/Server<br>`;
+  if (acs)  html += `→ VLAN ${acs.id} (ACS) — fully isolated, jangan ada inter-VLAN routing sama sekali<br>`;
+  if (mgmt) html += `→ VLAN ${mgmt.id} (MGMT) — batasi akses hanya dari IP admin yang diketahui, gunakan ACL<br>`;
+  if (office && cctv) html += `→ Disable inter-VLAN routing OFFICE→CCTV — akses monitoring via aplikasi NVR saja<br>`;
+  html += `→ Enable DHCP Snooping dan Dynamic ARP Inspection di semua access port<br>`;
+  html += `→ Set native VLAN ke VLAN yang tidak digunakan (contoh: VLAN 999) untuk mencegah VLAN hopping`;
+  document.getElementById('rec-box').innerHTML = html;
+}
+
+// ── Export scripts
+function copyMikrotik() {
+  const proj = document.getElementById('project-name').value || 'KutuKabel';
+  let script = `# MikroTik VLAN Config — ${proj}\n# Generated: ${new Date().toLocaleString('id-ID')}\n\n`;
+  script += `/interface bridge add name=bridge-main\n\n`;
+  vlans.forEach(v => {
+    script += `# VLAN ${v.id} — ${v.name}\n`;
+    script += `/interface vlan add interface=bridge-main vlan-id=${v.id} name=vlan${v.id}\n`;
+    script += `/ip address add address=${v.subnet.gateway}/${v.subnet.cidr} interface=vlan${v.id}\n`;
+    script += `/ip pool add name=pool-vlan${v.id} ranges=${v.subnet.firstHost}-${v.subnet.lastHost}\n`;
+    script += `/ip dhcp-server add interface=vlan${v.id} address-pool=pool-vlan${v.id} name=dhcp-vlan${v.id}\n`;
+    script += `/ip dhcp-server network add address=${v.subnet.network}/${v.subnet.cidr} gateway=${v.subnet.gateway}\n\n`;
+  });
+  navigator.clipboard.writeText(script).then(() => showToast('Script MikroTik disalin!'));
+}
+
+function copyCisco() {
+  const proj = document.getElementById('project-name').value || 'KutuKabel';
+  let script = `! Cisco/Huawei VLAN Config — ${proj}\n! Generated: ${new Date().toLocaleString('id-ID')}\n!\n`;
+  vlans.forEach(v => {
+    script += `vlan ${v.id}\n  name ${v.name}\n!\n`;
+    script += `interface Vlan${v.id}\n  description ${v.desc}\n  ip address ${v.subnet.gateway} ${intToIp(cidrMask(v.subnet.cidr))}\n  no shutdown\n!\n`;
+  });
+  script += `! Trunk port config (contoh gi0/0)\ninterface GigabitEthernet0/0\n  switchport mode trunk\n  switchport trunk allowed vlan ${vlans.map(v=>v.id).join(',')}\n!`;
+  navigator.clipboard.writeText(script).then(() => showToast('Script Cisco disalin!'));
+}
+
+function copyCSV() {
+  const proj = document.getElementById('project-name').value || 'KutuKabel';
+  let csv = `Proyek: ${proj}\nGenerated: ${new Date().toLocaleString('id-ID')}\n\n`;
+  csv += 'VLAN ID,Nama,Tipe,Network,CIDR,Gateway,Host Range,Total Host,Device,QoS,Deskripsi\n';
+  csv += vlans.map(v =>
+    `${v.id},"${v.name}","${v.type}","${v.subnet.network}",/${v.subnet.cidr},"${v.subnet.gateway}","${v.subnet.firstHost}-${v.subnet.lastHost}",${v.subnet.total},${v.devices},${v.qos},"${v.desc}"`
+  ).join('\n');
+  navigator.clipboard.writeText(csv).then(() => showToast('CSV disalin!'));
+}
+
+function exportHTML() {
+  const proj = document.getElementById('project-name').value || 'VLAN-Plan';
+  const now  = new Date().toLocaleString('id-ID');
+  const rows = vlans.map(v => `<tr>
+    <td><strong>${v.id}</strong></td><td>${v.name}</td><td>${v.type}</td>
+    <td style="font-family:monospace">${v.subnet.network}/${v.subnet.cidr}</td>
+    <td style="font-family:monospace">${v.subnet.gateway}</td>
+    <td style="font-family:monospace">${v.subnet.firstHost} — ${v.subnet.lastHost}</td>
+    <td>${v.subnet.total}</td><td>${v.devices}</td><td>CoS ${v.qos}</td><td>${v.desc}</td>
+  </tr>`).join('');
+  const html = `<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><title>VLAN Plan — ${proj}</title>
+  <style>body{font-family:Arial,sans-serif;padding:24px;}h2{margin-bottom:4px;}p{color:#666;font-size:12px;margin-bottom:16px;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}th{background:#1a1a1a;color:#ccc;padding:8px 12px;text-align:left;font-size:11px;}
+  td{padding:8px 12px;border-bottom:1px solid #eee;}</style></head><body>
+  <h2>📋 VLAN Plan — ${proj}</h2><p>Generated: ${now} | KutuKabel Tools</p>
+  <table><thead><tr><th>VLAN</th><th>Nama</th><th>Tipe</th><th>Network</th><th>Gateway</th><th>Host Range</th><th>Total Host</th><th>Device</th><th>QoS</th><th>Deskripsi</th></tr></thead>
+  <tbody>${rows}</tbody></table></body></html>`;
+  const blob = new Blob([html], {type:'text/html'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `vlan-plan-${proj.replace(/\s+/g,'-').toLowerCase()}.html`;
+  a.click();
+}
+
+function clearAll() {
+  if (vlans.length > 0 && !confirm('Reset semua VLAN?')) return;
+  vlans = []; vlanCounter = 0;
+  renderVlanTable();
+  document.getElementById('result-card').style.display = 'none';
+}
+
+function showToast(msg) {
+  let t = document.getElementById('toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast';
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:white;padding:10px 20px;border-radius:8px;font-size:13px;z-index:999;font-family:Space Mono,monospace;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => t.style.display='none', 2200);
+}
+
+window.addEventListener('resize', () => {
+  if (document.getElementById('result-card').style.display !== 'none') drawTopology();
+});
+</script>
+</body>
+</html>
