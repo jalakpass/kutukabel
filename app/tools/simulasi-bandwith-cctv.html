@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulasi Bandwidth CCTV | KutuKabel</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+:root{
+  --orange:   #d46316;
+  --orange-dk:#a84d0f;
+  --orange-lt:#fff0e6;
+  --black:    #1a1a1a;
+  --gray-90:  #2d2d2d;
+  --gray-70:  #444;
+  --gray-60:  #666;
+  --gray-40:  #999;
+  --gray-20:  #e0e0e0;
+  --gray-10:  #f5f5f5;
+  --white:    #ffffff;
+  --green:    #1d8a4e;
+  --green-lt: #e9f7ef;
+  --red:      #c0392b;
+  --red-lt:   #fdecea;
+  --yellow:   #b7950b;
+  --yellow-lt:#fef9e7;
+  --blue:     #1a6fa8;
+  --blue-lt:  #e8f4fd;
+
+  /* Status colors */
+  --status-ok:   #1d8a4e;
+  --status-warn: #d46316;
+  --status-crit: #c0392b;
+}
+
+body{
+  font-family:'Inter',Arial,sans-serif;
+  background:var(--gray-10);
+  min-height:100vh;
+  padding:24px 16px 48px;
+  color:var(--black);
+}
+
+/* ── Header ── */
+.header{
+  max-width:920px;
+  margin:0 auto 20px;
+  display:flex;align-items:center;gap:12px;
+}
+.logo-mark{
+  width:40px;height:40px;
+  background:var(--orange);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Space Mono',monospace;
+  font-size:14px;font-weight:700;
+  color:white;letter-spacing:-1px;flex-shrink:0;
+}
+.header-text h1{
+  font-family:'Space Mono',monospace;
+  font-size:18px;font-weight:700;letter-spacing:-0.5px;
+}
+.header-text p{font-size:12px;color:var(--gray-60);margin-top:2px;}
+
+/* ── Card ── */
+.card{
+  max-width:920px;
+  margin:0 auto 16px;
+  background:var(--white);
+  border-radius:14px;
+  box-shadow:0 2px 16px rgba(0,0,0,.07);
+  overflow:hidden;
+}
+.card-top{
+  background:var(--black);
+  padding:16px 24px;
+  display:flex;align-items:center;gap:10px;
+}
+.card-top .dot{width:8px;height:8px;border-radius:50%;background:var(--orange);}
+.card-top .dot.green{background:#4ade80;}
+.card-top .dot.red{background:#f87171;}
+.card-top span{
+  font-family:'Space Mono',monospace;
+  font-size:11px;color:#888;
+  letter-spacing:1px;text-transform:uppercase;
+}
+.card-top .live-badge{
+  margin-left:auto;
+  display:flex;align-items:center;gap:6px;
+  font-family:'Space Mono',monospace;font-size:10px;color:#4ade80;
+  background:#0d2e1a;padding:4px 10px;border-radius:4px;
+}
+.live-badge .pulse{
+  width:7px;height:7px;border-radius:50%;
+  background:#4ade80;
+  animation:pulse 1.4s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(.7);}}
+
+.form-body{padding:24px;}
+
+/* ── Grid ── */
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.span-2{grid-column:span 2;}
+.span-3{grid-column:1/-1;}
+
+.field{display:flex;flex-direction:column;gap:6px;}
+label{
+  font-size:12px;font-weight:600;
+  color:var(--gray-60);
+  letter-spacing:0.5px;text-transform:uppercase;
+}
+label .hint{
+  font-weight:400;text-transform:none;letter-spacing:0;
+  color:var(--gray-40);font-size:11px;
+}
+
+input,select{
+  width:100%;padding:11px 14px;
+  border:1.5px solid var(--gray-20);border-radius:8px;
+  font-size:14px;font-family:'Inter',Arial,sans-serif;
+  color:var(--black);background:var(--white);
+  transition:border-color .15s;
+  appearance:none;-webkit-appearance:none;
+}
+input:focus,select:focus{outline:none;border-color:var(--orange);}
+input.mono{font-family:'Space Mono',monospace;font-size:13px;}
+select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;
+}
+
+/* Codec toggle */
+.codec-toggle{display:flex;gap:8px;}
+.codec-btn{
+  flex:1;padding:10px;
+  border:1.5px solid var(--gray-20);border-radius:8px;
+  background:var(--white);
+  font-size:11px;font-weight:700;
+  font-family:'Space Mono',monospace;
+  color:var(--gray-60);cursor:pointer;
+  transition:all .15s;text-align:center;
+}
+.codec-btn.active{border-color:var(--orange);background:var(--orange-lt);color:var(--orange-dk);}
+
+/* Add stream row */
+.add-row{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr auto auto;
+  gap:10px;align-items:end;
+  padding:16px;
+  background:var(--gray-10);
+  border-radius:10px;margin-top:4px;
+}
+
+.btn{
+  padding:11px 16px;border:none;border-radius:8px;
+  font-size:13px;font-weight:700;
+  font-family:'Space Mono',monospace;
+  cursor:pointer;transition:all .15s;white-space:nowrap;
+}
+.btn-primary{background:var(--orange);color:white;}
+.btn-primary:hover{background:var(--orange-dk);}
+.btn-secondary{background:var(--gray-10);color:var(--gray-60);border:1.5px solid var(--gray-20);}
+.btn-secondary:hover{border-color:var(--orange);color:var(--orange);}
+.btn-full{width:100%;padding:14px;font-size:15px;letter-spacing:0.5px;}
+
+.divider{border:none;border-top:1px solid var(--gray-20);margin:20px 0;}
+
+/* ── Stream table ── */
+.stream-table-wrap{overflow-x:auto;margin-top:4px;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead tr{background:var(--black);}
+thead th{
+  padding:10px 12px;
+  font-family:'Space Mono',monospace;
+  font-size:10px;font-weight:700;
+  letter-spacing:0.5px;text-transform:uppercase;
+  color:#888;text-align:left;white-space:nowrap;
+}
+tbody tr{border-bottom:1px solid var(--gray-10);}
+tbody tr:hover{background:var(--gray-10);}
+tbody td{padding:10px 12px;vertical-align:middle;}
+td.mono{font-family:'Space Mono',monospace;font-size:12px;}
+
+.badge{
+  display:inline-block;padding:3px 8px;border-radius:4px;
+  font-size:10px;font-weight:700;
+  font-family:'Space Mono',monospace;white-space:nowrap;
+}
+.badge-h265{background:#e9f7ef;color:#1d8a4e;}
+.badge-h264{background:#e8f4fd;color:#1a6fa8;}
+.badge-h265p{background:#f0fce8;color:#2d7a0a;}
+.badge-h264p{background:#eef4ff;color:#3d5bbe;}
+
+.del-btn{
+  background:none;border:none;color:var(--gray-40);
+  cursor:pointer;font-size:16px;padding:4px 6px;
+  border-radius:4px;transition:all .15s;
+}
+.del-btn:hover{color:var(--red);background:var(--red-lt);}
+
+/* ── Result ── */
+.result-divider{height:4px;background:linear-gradient(90deg,var(--orange),var(--orange-dk));}
+.result-body{padding:24px;background:var(--gray-10);}
+.result-headline{
+  font-family:'Space Mono',monospace;
+  font-size:11px;letter-spacing:1px;
+  text-transform:uppercase;color:var(--gray-60);
+  margin-bottom:16px;
+}
+
+/* ── Network capacity bar ── */
+.capacity-panel{
+  background:var(--black);
+  border-radius:12px;padding:20px 24px;
+  margin-bottom:16px;
+}
+.cap-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;flex-wrap:wrap;gap:8px;
+}
+.cap-title{
+  font-family:'Space Mono',monospace;font-size:11px;
+  color:#666;letter-spacing:1px;text-transform:uppercase;
+}
+.cap-status{
+  font-family:'Space Mono',monospace;font-size:12px;font-weight:700;
+  padding:4px 12px;border-radius:4px;
+}
+.status-ok  {background:#0d2e1a;color:#4ade80;}
+.status-warn{background:#2e1a00;color:#fb923c;}
+.status-crit{background:#2e0a0a;color:#f87171;}
+
+/* Meter bar */
+.meter-wrap{margin-bottom:16px;}
+.meter-label{
+  display:flex;justify-content:space-between;
+  font-family:'Space Mono',monospace;font-size:11px;
+  color:#666;margin-bottom:6px;
+}
+.meter-track{
+  height:16px;background:#2a2a2a;border-radius:8px;overflow:hidden;
+  position:relative;
+}
+.meter-fill{
+  height:100%;border-radius:8px;
+  transition:width .6s cubic-bezier(.4,0,.2,1);
+  position:relative;
+}
+.meter-fill::after{
+  content:'';
+  position:absolute;top:0;left:0;right:0;bottom:0;
+  background:repeating-linear-gradient(
+    90deg,
+    rgba(255,255,255,.06) 0px,
+    rgba(255,255,255,.06) 8px,
+    transparent 8px,
+    transparent 16px
+  );
+}
+.meter-fill.ok   {background:linear-gradient(90deg,#1d8a4e,#4ade80);}
+.meter-fill.warn {background:linear-gradient(90deg,#b7950b,#fb923c);}
+.meter-fill.crit {background:linear-gradient(90deg,#c0392b,#f87171);}
+
+/* Threshold ticks */
+.meter-ticks{
+  display:flex;justify-content:space-between;
+  font-family:'Space Mono',monospace;font-size:9px;
+  color:#555;margin-top:4px;
+}
+
+/* Stat row */
+.stat-row{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:10px;margin-bottom:16px;
+}
+.stat-box{
+  background:var(--white);border-radius:10px;
+  padding:14px;border:1px solid var(--gray-20);
+}
+.stat-box.highlight{border-color:var(--orange);background:var(--orange-lt);}
+.stat-box.warn-box {border-color:var(--yellow);background:var(--yellow-lt);}
+.stat-box.crit-box {border-color:var(--red);background:var(--red-lt);}
+.stat-label{
+  font-size:10px;font-weight:600;
+  letter-spacing:0.5px;text-transform:uppercase;
+  color:var(--gray-60);margin-bottom:6px;
+}
+.stat-val{
+  font-family:'Space Mono',monospace;
+  font-size:18px;font-weight:700;color:var(--black);
+  line-height:1;
+}
+.stat-unit{font-size:11px;color:var(--gray-60);margin-top:3px;}
+
+/* ── Live simulation canvas ── */
+.sim-panel{
+  background:var(--white);border-radius:12px;
+  border:1px solid var(--gray-20);
+  overflow:hidden;margin-bottom:16px;
+}
+.sim-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 18px;border-bottom:1px solid var(--gray-10);
+}
+.sim-title{
+  font-family:'Space Mono',monospace;font-size:11px;
+  color:var(--gray-60);letter-spacing:1px;text-transform:uppercase;
+  display:flex;align-items:center;gap:8px;
+}
+.sim-controls{display:flex;gap:8px;align-items:center;}
+.sim-btn{
+  padding:6px 12px;border:1.5px solid var(--gray-20);
+  border-radius:6px;background:var(--white);
+  font-size:11px;font-weight:700;
+  font-family:'Space Mono',monospace;
+  color:var(--gray-60);cursor:pointer;transition:all .15s;
+}
+.sim-btn:hover{border-color:var(--orange);color:var(--orange);}
+.sim-btn.active{border-color:var(--orange);background:var(--orange-lt);color:var(--orange-dk);}
+
+canvas#bw-chart{display:block;width:100%;height:160px;}
+
+/* Scenario selector */
+.scenario-row{
+  display:flex;gap:8px;padding:14px 18px;
+  border-top:1px solid var(--gray-10);flex-wrap:wrap;
+}
+.scenario-btn{
+  padding:6px 14px;border:1.5px solid var(--gray-20);
+  border-radius:6px;background:var(--white);
+  font-size:11px;font-weight:600;
+  color:var(--gray-60);cursor:pointer;transition:all .15s;
+}
+.scenario-btn:hover{border-color:var(--orange);color:var(--orange);}
+.scenario-btn.active{border-color:var(--orange);background:var(--orange-lt);color:var(--orange-dk);}
+.scenario-label{
+  font-size:11px;color:var(--gray-40);
+  display:flex;align-items:center;
+  font-family:'Space Mono',monospace;
+  letter-spacing:0.5px;margin-right:4px;
+}
+
+/* ── Per-stream breakdown ── */
+.breakdown-wrap{
+  background:var(--white);border-radius:12px;
+  border:1px solid var(--gray-20);overflow:hidden;
+  margin-bottom:16px;
+}
+.breakdown-wrap table{font-size:12px;}
+.breakdown-wrap thead th{padding:8px 12px;font-size:10px;}
+.breakdown-wrap tbody td{padding:9px 12px;}
+
+/* Mini bar */
+.mini-bar-track{
+  height:6px;background:var(--gray-10);border-radius:3px;
+  overflow:hidden;width:80px;display:inline-block;
+  vertical-align:middle;
+}
+.mini-bar-fill{height:100%;border-radius:3px;}
+.mini-bar-fill.ok  {background:var(--green);}
+.mini-bar-fill.warn{background:var(--orange);}
+.mini-bar-fill.crit{background:var(--red);}
+
+/* Warning box */
+.warn-box-panel{
+  background:var(--yellow-lt);border:1px solid var(--yellow);
+  border-radius:10px;padding:14px 16px;
+  font-size:12px;color:var(--yellow);
+  font-family:'Space Mono',monospace;
+  margin-bottom:16px;line-height:1.8;
+  display:none;
+}
+.crit-box-panel{
+  background:var(--red-lt);border:1px solid var(--red);
+  border-radius:10px;padding:14px 16px;
+  font-size:12px;color:var(--red);
+  font-family:'Space Mono',monospace;
+  margin-bottom:16px;line-height:1.8;
+  display:none;
+}
+
+/* Recommendation box */
+.rec-box{
+  background:var(--green-lt);border-left:3px solid var(--green);
+  border-radius:0 8px 8px 0;padding:14px 16px;
+  font-size:12px;color:var(--green);
+  font-family:'Space Mono',monospace;
+  line-height:1.8;margin-bottom:16px;
+}
+.rec-box span{color:var(--gray-60);font-family:'Inter',sans-serif;}
+
+/* Tooltip */
+.tip-icon{
+  display:inline-block;width:16px;height:16px;
+  background:var(--gray-20);border-radius:50%;
+  font-size:10px;text-align:center;line-height:16px;
+  color:var(--gray-60);cursor:help;
+  font-family:'Space Mono',monospace;font-weight:700;
+  margin-left:4px;
+}
+
+/* Empty state */
+.empty-state{
+  text-align:center;padding:32px;
+  color:var(--gray-40);font-size:13px;
+}
+.empty-state .big{font-size:32px;margin-bottom:8px;}
+
+@media(max-width:640px){
+  .grid-3,.grid-2{grid-template-columns:1fr;}
+  .span-2,.span-3{grid-column:1;}
+  .stat-row{grid-template-columns:1fr 1fr;}
+  .add-row{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="logo-mark">KK</div>
+  <div class="header-text">
+    <h1>Simulasi Bandwidth CCTV</h1>
+    <p>Hitung &amp; simulasi penggunaan bandwidth real-time — cross-check bitrate vs kapasitas jaringan</p>
+  </div>
+</div>
+
+<!-- Card 1: Setup Jaringan -->
+<div class="card">
+  <div class="card-top">
+    <div class="dot"></div>
+    <span>Kapasitas Jaringan</span>
+  </div>
+  <div class="form-body">
+    <div class="grid-3">
+
+      <div class="field">
+        <label>Kapasitas Uplink NVR → Switch <span class="tip-icon" title="Bandwidth maksimum port NVR ke switch core. Hikvision NVR umumnya 100Mbps atau 1Gbps.">?</span></label>
+        <select id="nvr-uplink">
+          <option value="100">100 Mbps (Fast Ethernet)</option>
+          <option value="1000" selected>1 Gbps (Gigabit) — standar NVR modern</option>
+          <option value="2500">2.5 Gbps</option>
+          <option value="10000">10 Gbps</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Kapasitas Switch PoE <span class="tip-icon" title="Total bandwidth switching capacity. Switch unmanaged biasanya 1Gbps total, managed bisa 8–16Gbps.">?</span></label>
+        <select id="switch-cap">
+          <option value="100">100 Mbps (unmanaged murah)</option>
+          <option value="200">200 Mbps</option>
+          <option value="500">500 Mbps</option>
+          <option value="1000" selected>1 Gbps (standar)</option>
+          <option value="2000">2 Gbps</option>
+          <option value="8000">8 Gbps (managed)</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Bandwidth ke NVR Recording <span class="tip-icon" title="Jumlah total kamera × bitrate tidak boleh melebihi ini. Ini adalah bottleneck utama.">?</span></label>
+        <select id="nvr-recording-cap">
+          <option value="80">80 Mbps (entry NVR)</option>
+          <option value="160" selected>160 Mbps (standar NVR 16ch)</option>
+          <option value="200">200 Mbps</option>
+          <option value="320">320 Mbps (NVR 32ch)</option>
+          <option value="640">640 Mbps (NVR 64ch)</option>
+          <option value="1000">1 Gbps (enterprise)</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Nama Proyek / Site</label>
+        <input type="text" id="project-name" placeholder="Contoh: Gedung Kantor Bekasi Lt.2">
+      </div>
+
+      <div class="field">
+        <label>Threshold Warning <span class="hint">— % kapasitas</span></label>
+        <select id="thresh-warn">
+          <option value="60">60%</option>
+          <option value="70" selected>70% (rekomendasi)</option>
+          <option value="80">80%</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Threshold Critical <span class="hint">— % kapasitas</span></label>
+        <select id="thresh-crit">
+          <option value="80">80%</option>
+          <option value="85">85%</option>
+          <option value="90" selected>90% (rekomendasi)</option>
+          <option value="95">95%</option>
+        </select>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Card 2: Tambah Stream Kamera -->
+<div class="card">
+  <div class="card-top">
+    <div class="dot"></div>
+    <span>Konfigurasi Stream Kamera</span>
+  </div>
+  <div class="form-body">
+
+    <div class="add-row">
+      <div class="field">
+        <label>Jumlah Kamera</label>
+        <input type="number" id="cam-qty" value="1" min="1" max="512">
+      </div>
+      <div class="field">
+        <label>Resolusi</label>
+        <select id="cam-res">
+          <option value="0.9">1MP — 720p</option>
+          <option value="2" selected>2MP — 1080p</option>
+          <option value="4">4MP</option>
+          <option value="5">5MP</option>
+          <option value="6">6MP</option>
+          <option value="8">8MP — 4K</option>
+          <option value="12">12MP</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Codec</label>
+        <div class="codec-toggle">
+          <button class="codec-btn active" onclick="setCodec('h265',this)">H.265</button>
+          <button class="codec-btn" onclick="setCodec('h264',this)">H.264</button>
+          <button class="codec-btn" onclick="setCodec('h265p',this)">H.265+</button>
+          <button class="codec-btn" onclick="setCodec('h264p',this)">H.264+</button>
+        </div>
+        <input type="hidden" id="cam-codec" value="h265">
+      </div>
+      <div class="field">
+        <label>FPS</label>
+        <select id="cam-fps">
+          <option value="10">10 FPS</option>
+          <option value="15">15 FPS</option>
+          <option value="20">20 FPS</option>
+          <option value="25" selected>25 FPS</option>
+          <option value="30">30 FPS</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>&nbsp;</label>
+        <button class="btn btn-primary" onclick="addStream()">+ Tambah</button>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="stream-table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Qty</th><th>Resolusi</th><th>Codec</th>
+            <th>FPS</th><th>Bitrate / Cam</th><th>Total Bitrate</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="stream-tbody">
+          <tr><td colspan="8">
+            <div class="empty-state">
+              <div class="big">📡</div>
+              Belum ada stream. Tambahkan kamera di atas.
+            </div>
+          </td></tr>
+        </tbody>
+        <tfoot id="stream-tfoot" style="display:none;">
+          <tr style="background:#f9f9f9;border-top:2px solid var(--gray-20);">
+            <td colspan="6" style="padding:10px 12px;font-size:12px;font-weight:600;color:var(--gray-60);">TOTAL</td>
+            <td colspan="2" class="mono" style="padding:10px 12px;font-weight:700;font-size:14px;" id="tfoot-total">—</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <hr class="divider">
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn btn-primary btn-full" onclick="runSimulation()" style="flex:2;">
+        ▶ JALANKAN SIMULASI
+      </button>
+      <button class="btn btn-secondary" onclick="clearAll()" style="flex:1;">Reset</button>
+    </div>
+  </div>
+</div>
+
+<!-- Result Card -->
+<div class="card" id="result-card" style="display:none;">
+  <div class="result-divider"></div>
+  <div class="result-body">
+    <div class="result-headline">// Bandwidth Simulation Report</div>
+
+    <!-- Alert boxes -->
+    <div class="crit-box-panel" id="crit-panel"></div>
+    <div class="warn-box-panel" id="warn-panel"></div>
+
+    <!-- Stat row -->
+    <div class="stat-row" id="stat-row"></div>
+
+    <!-- Capacity panel -->
+    <div class="capacity-panel" id="cap-panel"></div>
+
+    <!-- Live Simulation Chart -->
+    <div class="sim-panel">
+      <div class="sim-header">
+        <div class="sim-title">
+          <div class="pulse" style="width:7px;height:7px;border-radius:50%;background:#4ade80;animation:pulse 1.4s ease-in-out infinite;"></div>
+          LIVE SIMULATION
+        </div>
+        <div class="sim-controls">
+          <span style="font-size:11px;color:var(--gray-40);font-family:'Space Mono',monospace;" id="sim-time">T+0s</span>
+          <button class="sim-btn active" id="btn-play" onclick="toggleSim()">⏸ Pause</button>
+          <button class="sim-btn" onclick="resetChart()">↺ Reset</button>
+        </div>
+      </div>
+      <canvas id="bw-chart" width="900" height="160"></canvas>
+      <div class="scenario-row">
+        <span class="scenario-label">SKENARIO:</span>
+        <button class="scenario-btn active" onclick="setScenario('normal',this)">Normal (50–80%)</button>
+        <button class="scenario-btn" onclick="setScenario('peak',this)">Peak Hour (80–100%)</button>
+        <button class="scenario-btn" onclick="setScenario('night',this)">Malam (20–40%)</button>
+        <button class="scenario-btn" onclick="setScenario('spike',this)">Motion Spike</button>
+        <button class="scenario-btn" onclick="setScenario('stress',this)">Stress Test</button>
+      </div>
+    </div>
+
+    <!-- Per-stream breakdown -->
+    <div class="breakdown-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Resolusi</th><th>Codec</th><th>FPS</th>
+            <th>Qty</th><th>Bitrate/Cam</th><th>Total</th>
+            <th>% dari Kapasitas NVR</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="breakdown-tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- Recommendation -->
+    <div class="rec-box" id="rec-box"></div>
+
+  </div>
+</div>
+
+<div style="max-width:920px;margin:20px auto 0;font-size:11px;color:var(--gray-60);text-align:center;line-height:1.6;">
+  KutuKabel Tools — Simulasi Bandwidth CCTV berbasis Hikvision Official Bitrate Reference &nbsp;|&nbsp;
+  Nilai aktual dapat bervariasi ±20–40% tergantung scene complexity &amp; lighting
+</div>
+
+<script>
+// ── Hikvision bitrate table (H.264 base, Kbps, Average VBR)
+const BITRATE_H264 = {
+  0.9: [2048, 1792, 1536, 1280, 1024],
+  2:   [4096, 3584, 3072, 2560, 2048],
+  4:   [6144, 5120, 4608, 4096, 3072],
+  5:   [8192, 6656, 6144, 5120, 4096],
+  6:   [10240,8192, 7168, 6144, 4608],
+  8:   [16384,14336,12288,10240,8192],
+  12:  [21845,18043,16384,13107,10240],
+};
+const FPS_REFS   = [30, 25, 20, 15, 10];
+const CODEC_FACTOR = { h265:0.50, h264:1.00, h265p:0.35, h264p:0.50 };
+const CODEC_LABEL  = { h265:'H.265', h264:'H.264', h265p:'H.265+', h264p:'H.264+' };
+const RES_LABEL    = { 0.9:'1MP 720p', 2:'2MP 1080p', 4:'4MP', 5:'5MP', 6:'6MP', 8:'8MP 4K', 12:'12MP' };
+const BADGE_CODEC  = { h265:'badge-h265', h264:'badge-h264', h265p:'badge-h265p', h264p:'badge-h264p' };
+
+let streams = [];
+let streamCounter = 0;
+let currentCodec  = 'h265';
+
+// ── Bitrate lookup with linear interpolation
+function getBitrateKbps(mp, fps) {
+  const row = BITRATE_H264[mp]; if (!row) return 0;
+  if (fps >= 30) return row[0];
+  if (fps <= 10) return row[4];
+  for (let i = 0; i < FPS_REFS.length - 1; i++) {
+    const hi = FPS_REFS[i], lo = FPS_REFS[i+1];
+    if (fps <= hi && fps >= lo) {
+      const t = (fps - lo) / (hi - lo);
+      return Math.round(row[i+1] + t * (row[i] - row[i+1]));
+    }
+  }
+  return row[1];
+}
+
+function setCodec(val, btn) {
+  currentCodec = val;
+  document.getElementById('cam-codec').value = val;
+  document.querySelectorAll('.codec-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function addStream() {
+  const qty   = parseInt(document.getElementById('cam-qty').value) || 1;
+  const mp    = parseFloat(document.getElementById('cam-res').value);
+  const codec = document.getElementById('cam-codec').value;
+  const fps   = parseInt(document.getElementById('cam-fps').value);
+
+  const baseKbps   = getBitrateKbps(mp, fps);
+  const bitrateKbps = baseKbps * CODEC_FACTOR[codec];
+  const bitrateMbps = bitrateKbps / 1000;
+
+  streamCounter++;
+  streams.push({ id: streamCounter, qty, mp, codec, fps, bitrateMbps });
+  renderStreamTable();
+}
+
+function removeStream(id) {
+  streams = streams.filter(s => s.id !== id);
+  renderStreamTable();
+}
+
+function renderStreamTable() {
+  const tbody = document.getElementById('stream-tbody');
+  const tfoot = document.getElementById('stream-tfoot');
+  if (streams.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="big">📡</div>Belum ada stream.</div></td></tr>`;
+    tfoot.style.display = 'none';
+    return;
+  }
+  let totalMbps = 0;
+  tbody.innerHTML = streams.map((s, i) => {
+    const total = s.bitrateMbps * s.qty;
+    totalMbps += total;
+    return `<tr>
+      <td style="color:var(--gray-40);font-size:12px;">${i+1}</td>
+      <td class="mono" style="font-weight:700;">${s.qty}×</td>
+      <td>${RES_LABEL[s.mp]||s.mp+'MP'}</td>
+      <td><span class="badge ${BADGE_CODEC[s.codec]}">${CODEC_LABEL[s.codec]}</span></td>
+      <td class="mono">${s.fps}</td>
+      <td class="mono">${s.bitrateMbps.toFixed(2)} Mbps</td>
+      <td class="mono" style="font-weight:700;">${total.toFixed(2)} Mbps</td>
+      <td><button class="del-btn" onclick="removeStream(${s.id})">✕</button></td>
+    </tr>`;
+  }).join('');
+  tfoot.style.display = '';
+  document.getElementById('tfoot-total').textContent = totalMbps.toFixed(2) + ' Mbps';
+}
+
+// ── Simulation engine
+let simRunning = true;
+let simTick    = 0;
+let simScenario = 'normal';
+let chartData  = [];
+let animFrame  = null;
+let totalMbpsBase = 0;
+let nvrCap = 160;
+
+const SCENARIO = {
+  normal: { min:0.50, max:0.80, label:'Normal',     spike:0.05 },
+  peak:   { min:0.80, max:1.00, label:'Peak Hour',  spike:0.08 },
+  night:  { min:0.20, max:0.40, label:'Malam',      spike:0.02 },
+  spike:  { min:0.40, max:0.90, label:'Motion Spike', spike:0.20 },
+  stress: { min:0.85, max:1.10, label:'Stress Test', spike:0.05 },
+};
+
+function noiseVal(base, scenario) {
+  const s = SCENARIO[scenario];
+  const midpoint = (s.min + s.max) / 2;
+  let v = midpoint + (Math.random() - 0.5) * (s.max - s.min);
+  // Occasional spike
+  if (Math.random() < 0.08) v = Math.min(1.15, v + s.spike + Math.random() * s.spike);
+  return Math.max(0.05, v);
+}
+
+function setScenario(s, btn) {
+  simScenario = s;
+  document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function toggleSim() {
+  simRunning = !simRunning;
+  const btn = document.getElementById('btn-play');
+  btn.textContent = simRunning ? '⏸ Pause' : '▶ Play';
+  btn.classList.toggle('active', simRunning);
+  if (simRunning) animateSim();
+}
+
+function resetChart() {
+  chartData = [];
+  simTick   = 0;
+  document.getElementById('sim-time').textContent = 'T+0s';
+}
+
+function animateSim() {
+  if (!simRunning) return;
+  simTick++;
+  document.getElementById('sim-time').textContent = 'T+' + simTick + 's';
+
+  const factor = noiseVal(totalMbpsBase, simScenario);
+  const current = totalMbpsBase * factor;
+  chartData.push({ mbps: current, factor });
+  if (chartData.length > 120) chartData.shift();
+
+  drawChart();
+  setTimeout(() => { if (simRunning) animateSim(); }, 500);
+}
+
+function drawChart() {
+  const canvas = document.getElementById('bw-chart');
+  const ctx    = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const thWarn = parseFloat(document.getElementById('thresh-warn').value) / 100;
+  const thCrit = parseFloat(document.getElementById('thresh-crit').value) / 100;
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Background
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, W, H);
+
+  // Grid lines
+  const gridLines = [0.25, 0.50, 0.75, 1.00];
+  gridLines.forEach(gl => {
+    const y = H - (gl * (H - 30)) - 10;
+    ctx.strokeStyle = '#f0f0f0';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath(); ctx.moveTo(40, y); ctx.lineTo(W, y); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#ccc';
+    ctx.font = '9px Space Mono, monospace';
+    ctx.fillText((gl * nvrCap).toFixed(0) + 'M', 2, y + 4);
+  });
+
+  // Threshold lines
+  const yWarn = H - (thWarn * (H - 30)) - 10;
+  const yCrit = H - (thCrit * (H - 30)) - 10;
+
+  ctx.strokeStyle = '#b7950b44';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([6, 3]);
+  ctx.beginPath(); ctx.moveTo(40, yWarn); ctx.lineTo(W, yWarn); ctx.stroke();
+
+  ctx.strokeStyle = '#c0392b44';
+  ctx.beginPath(); ctx.moveTo(40, yCrit); ctx.lineTo(W, yCrit); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Labels
+  ctx.fillStyle = '#b7950b';
+  ctx.font = 'bold 9px Space Mono, monospace';
+  ctx.fillText('WARN ' + Math.round(thWarn * 100) + '%', W - 68, yWarn - 3);
+  ctx.fillStyle = '#c0392b';
+  ctx.fillText('CRIT ' + Math.round(thCrit * 100) + '%', W - 68, yCrit - 3);
+
+  if (chartData.length < 2) return;
+
+  // Fill area
+  const gradient = ctx.createLinearGradient(0, 0, 0, H);
+  gradient.addColorStop(0, 'rgba(212,99,22,0.18)');
+  gradient.addColorStop(1, 'rgba(212,99,22,0.01)');
+
+  ctx.beginPath();
+  chartData.forEach((d, i) => {
+    const x = 40 + (i / (120 - 1)) * (W - 44);
+    const y = H - (Math.min(d.factor, 1.15) * (H - 30)) - 10;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  });
+  ctx.lineTo(40 + ((chartData.length - 1) / 119) * (W - 44), H - 10);
+  ctx.lineTo(40, H - 10);
+  ctx.closePath();
+  ctx.fillStyle = gradient;
+  ctx.fill();
+
+  // Line — color by status
+  ctx.beginPath();
+  chartData.forEach((d, i) => {
+    const x = 40 + (i / (120 - 1)) * (W - 44);
+    const y = H - (Math.min(d.factor, 1.15) * (H - 30)) - 10;
+    const color = d.factor >= thCrit ? '#f87171' : d.factor >= thWarn ? '#fb923c' : '#d46316';
+    if (i === 0) {
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2;
+      ctx.moveTo(x, y);
+    } else {
+      const prevColor = chartData[i-1].factor >= thCrit ? '#f87171'
+                       : chartData[i-1].factor >= thWarn ? '#fb923c' : '#d46316';
+      if (color !== prevColor) {
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
+    }
+  });
+  ctx.stroke();
+
+  // Current value dot
+  const last = chartData[chartData.length - 1];
+  const xLast = 40 + ((chartData.length - 1) / 119) * (W - 44);
+  const yLast = H - (Math.min(last.factor, 1.15) * (H - 30)) - 10;
+  ctx.beginPath();
+  ctx.arc(xLast, yLast, 4, 0, Math.PI * 2);
+  ctx.fillStyle = last.factor >= thCrit ? '#f87171' : last.factor >= thWarn ? '#fb923c' : '#d46316';
+  ctx.fill();
+
+  // Current value label
+  const curMbps = (last.factor * totalMbpsBase).toFixed(1);
+  ctx.fillStyle = '#1a1a1a';
+  ctx.font = 'bold 11px Space Mono, monospace';
+  const labelX = Math.min(xLast + 8, W - 70);
+  ctx.fillText(curMbps + ' Mbps', labelX, yLast - 6);
+}
+
+// ── Main simulation runner
+function runSimulation() {
+  if (streams.length === 0) { alert('Tambahkan minimal 1 stream kamera terlebih dahulu.'); return; }
+
+  nvrCap   = parseFloat(document.getElementById('nvr-recording-cap').value);
+  const swCap    = parseFloat(document.getElementById('switch-cap').value);
+  const uplinkCap = parseFloat(document.getElementById('nvr-uplink').value);
+  const thWarnPct = parseFloat(document.getElementById('thresh-warn').value) / 100;
+  const thCritPct = parseFloat(document.getElementById('thresh-crit').value) / 100;
+
+  // Hitung total bitrate
+  totalMbpsBase = streams.reduce((s, st) => s + st.bitrateMbps * st.qty, 0);
+  const totalCams   = streams.reduce((s, st) => s + st.qty, 0);
+  const pctNvr      = totalMbpsBase / nvrCap;
+  const pctSwitch   = totalMbpsBase / swCap;
+  const pctUplink   = totalMbpsBase / uplinkCap;
+  const bottleneck  = Math.max(pctNvr, pctSwitch, pctUplink);
+
+  // Status
+  const getStatus = (pct) =>
+    pct >= thCritPct ? 'crit' : pct >= thWarnPct ? 'warn' : 'ok';
+  const statusNvr    = getStatus(pctNvr);
+  const statusSwitch = getStatus(pctSwitch);
+  const statusUplink = getStatus(pctUplink);
+  const overallStatus = [statusNvr, statusSwitch, statusUplink]
+    .includes('crit') ? 'crit' : [statusNvr, statusSwitch, statusUplink]
+    .includes('warn') ? 'warn' : 'ok';
+
+  const statusLabel = { ok:'✓ AMAN', warn:'⚠ PERHATIAN', crit:'✕ KRITIS' };
+  const statusClass = { ok:'status-ok', warn:'status-warn', crit:'status-crit' };
+
+  // ── Alert boxes
+  const critPanel = document.getElementById('crit-panel');
+  const warnPanel = document.getElementById('warn-panel');
+
+  const critIssues = [];
+  const warnIssues = [];
+  if (statusNvr    === 'crit') critIssues.push(`NVR recording overload: ${totalMbpsBase.toFixed(1)} Mbps > ${nvrCap} Mbps (${(pctNvr*100).toFixed(0)}%)`);
+  if (statusSwitch === 'crit') critIssues.push(`Switch capacity overload: ${totalMbpsBase.toFixed(1)} Mbps > ${swCap} Mbps (${(pctSwitch*100).toFixed(0)}%)`);
+  if (statusUplink === 'crit') critIssues.push(`NVR uplink overload: ${totalMbpsBase.toFixed(1)} Mbps > ${uplinkCap} Mbps (${(pctUplink*100).toFixed(0)}%)`);
+  if (statusNvr    === 'warn' && statusNvr !== 'crit') warnIssues.push(`NVR recording mendekati batas: ${(pctNvr*100).toFixed(0)}%`);
+  if (statusSwitch === 'warn' && statusSwitch !== 'crit') warnIssues.push(`Switch capacity mendekati batas: ${(pctSwitch*100).toFixed(0)}%`);
+
+  critPanel.style.display = critIssues.length ? 'block' : 'none';
+  critPanel.innerHTML = critIssues.length
+    ? '⚠️ CRITICAL — Rekaman bisa gagal atau frame drop:<br>' + critIssues.join('<br>') : '';
+  warnPanel.style.display = warnIssues.length ? 'block' : 'none';
+  warnPanel.innerHTML = warnIssues.length
+    ? '⚠ WARNING — Performa dapat menurun saat peak hour:<br>' + warnIssues.join('<br>') : '';
+
+  // ── Stat row
+  const statBoxClass = { ok:'', warn:'warn-box', crit:'crit-box' };
+  document.getElementById('stat-row').innerHTML = `
+    <div class="stat-box highlight">
+      <div class="stat-label">Total Bandwidth</div>
+      <div class="stat-val">${totalMbpsBase.toFixed(1)}</div>
+      <div class="stat-unit">Mbps — ${totalCams} kamera</div>
+    </div>
+    <div class="stat-box ${statBoxClass[statusNvr]}">
+      <div class="stat-label">NVR Recording</div>
+      <div class="stat-val">${(pctNvr*100).toFixed(0)}%</div>
+      <div class="stat-unit">${totalMbpsBase.toFixed(1)} / ${nvrCap} Mbps</div>
+    </div>
+    <div class="stat-box ${statBoxClass[statusSwitch]}">
+      <div class="stat-label">Switch PoE</div>
+      <div class="stat-val">${(pctSwitch*100).toFixed(0)}%</div>
+      <div class="stat-unit">${totalMbpsBase.toFixed(1)} / ${swCap} Mbps</div>
+    </div>
+    <div class="stat-box ${statBoxClass[statusUplink]}">
+      <div class="stat-label">NVR Uplink</div>
+      <div class="stat-val">${(pctUplink*100).toFixed(0)}%</div>
+      <div class="stat-unit">${totalMbpsBase.toFixed(1)} / ${uplinkCap} Mbps</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Headroom</div>
+      <div class="stat-val">${Math.max(0, nvrCap - totalMbpsBase).toFixed(1)}</div>
+      <div class="stat-unit">Mbps tersisa di NVR</div>
+    </div>
+  `;
+
+  // ── Capacity panel
+  const meterHTML = (label, used, cap, status) => {
+    const pct = Math.min((used / cap) * 100, 115);
+    return `
+      <div class="meter-wrap">
+        <div class="meter-label">
+          <span>${label}</span>
+          <span>${used.toFixed(1)} / ${cap} Mbps — ${Math.min((used/cap*100),999).toFixed(0)}%</span>
+        </div>
+        <div class="meter-track">
+          <div class="meter-fill ${status}" style="width:${Math.min(pct,100)}%"></div>
+        </div>
+        <div class="meter-ticks"><span>0</span><span>${cap*0.25|0}M</span><span>${cap*0.5|0}M</span><span>${cap*0.75|0}M</span><span>${cap}M</span></div>
+      </div>`;
+  };
+
+  document.getElementById('cap-panel').innerHTML = `
+    <div class="cap-header">
+      <div class="cap-title">Utilisasi Kapasitas Jaringan</div>
+      <div class="cap-status ${statusClass[overallStatus]}">${statusLabel[overallStatus]}</div>
+    </div>
+    ${meterHTML('NVR Recording Capacity', totalMbpsBase, nvrCap, statusNvr)}
+    ${meterHTML('Switch PoE Capacity', totalMbpsBase, swCap, statusSwitch)}
+    ${meterHTML('NVR Uplink Port', totalMbpsBase, uplinkCap, statusUplink)}
+  `;
+
+  // ── Per-stream breakdown
+  let cumMbps = 0;
+  document.getElementById('breakdown-tbody').innerHTML = streams.map((s, i) => {
+    const total   = s.bitrateMbps * s.qty;
+    const pctCap  = total / nvrCap;
+    const st      = pctCap >= thCritPct ? 'crit' : pctCap >= thWarnPct ? 'warn' : 'ok';
+    cumMbps += total;
+    const barW = Math.min(pctCap * 100, 100);
+    return `<tr>
+      <td style="color:var(--gray-40);font-size:11px;">${i+1}</td>
+      <td>${RES_LABEL[s.mp]||s.mp+'MP'}</td>
+      <td><span class="badge ${BADGE_CODEC[s.codec]}">${CODEC_LABEL[s.codec]}</span></td>
+      <td class="mono">${s.fps}</td>
+      <td class="mono" style="font-weight:700;">${s.qty}×</td>
+      <td class="mono">${s.bitrateMbps.toFixed(2)}</td>
+      <td class="mono" style="font-weight:700;">${total.toFixed(2)} Mbps</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="mini-bar-track"><div class="mini-bar-fill ${st}" style="width:${barW}%"></div></div>
+          <span style="font-family:'Space Mono',monospace;font-size:11px;">${(pctCap*100).toFixed(0)}%</span>
+        </div>
+      </td>
+      <td><span class="badge ${st==='ok'?'badge-h265':st==='warn'?'badge-h264p':'badge-h264'}">${st==='ok'?'OK':st==='warn'?'WARN':'CRIT'}</span></td>
+    </tr>`;
+  }).join('');
+
+  // ── Recommendation
+  const headroom = nvrCap - totalMbpsBase;
+  const addCamH265_1080p = Math.floor(headroom / 1.792);
+  const addCamH264_1080p = Math.floor(headroom / 3.584);
+  let recHTML = '';
+  if (overallStatus === 'ok') {
+    recHTML = `<span>✓ Jaringan dalam kondisi baik. Headroom ${headroom.toFixed(1)} Mbps.</span><br>
+    Dengan sisa kapasitas NVR, masih bisa tambah:<br>
+    + ${addCamH265_1080p} kamera H.265 1080p@25fps (1.79 Mbps/kamera)<br>
+    + ${addCamH264_1080p} kamera H.264 1080p@25fps (3.58 Mbps/kamera)`;
+  } else if (overallStatus === 'warn') {
+    recHTML = `<span>⚠ Kapasitas mendekati batas — pertimbangkan langkah berikut:</span><br>
+    → Turunkan resolusi atau FPS kamera yang kurang kritis<br>
+    → Aktifkan H.265 / H.265+ untuk efisiensi 50–65%<br>
+    → Pisahkan VLAN atau tambah switch dengan uplink dedicated<br>
+    → Batasi sub-stream kamera ke resolusi lebih rendah`;
+  } else {
+    recHTML = `<span>✕ OVERLOAD — rekaman akan frame drop atau gagal. Tindakan wajib:</span><br>
+    → SEGERA kurangi jumlah kamera aktif atau turunkan FPS<br>
+    → Ganti codec ke H.265+ atau H.264+ (hemat 50–65% bandwidth)<br>
+    → Upgrade NVR ke kapasitas lebih tinggi<br>
+    → Pisah recording ke 2 NVR (grouping per area)`;
+  }
+  document.getElementById('rec-box').innerHTML = recHTML;
+
+  // ── Show result & start sim
+  document.getElementById('result-card').style.display = 'block';
+  document.getElementById('result-card').scrollIntoView({ behavior:'smooth', block:'start' });
+
+  // Init chart canvas size
+  const canvas = document.getElementById('bw-chart');
+  canvas.width  = canvas.offsetWidth || 900;
+  canvas.height = 160;
+
+  // Reset & start simulation
+  chartData  = [];
+  simTick    = 0;
+  simRunning = true;
+  document.getElementById('btn-play').textContent = '⏸ Pause';
+  document.getElementById('btn-play').classList.add('active');
+  animateSim();
+}
+
+function clearAll() {
+  if (streams.length > 0 && !confirm('Reset semua stream?')) return;
+  streams = []; streamCounter = 0;
+  renderStreamTable();
+  document.getElementById('result-card').style.display = 'none';
+  simRunning = false; chartData = [];
+}
+
+// Resize canvas on window resize
+window.addEventListener('resize', () => {
+  const canvas = document.getElementById('bw-chart');
+  if (canvas && document.getElementById('result-card').style.display !== 'none') {
+    canvas.width = canvas.offsetWidth;
+    drawChart();
+  }
+});
+</script>
+</body>
+</html>
