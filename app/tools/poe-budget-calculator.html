@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PoE Budget Calculator | KutuKabel</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+:root{
+  --orange:   #d46316;
+  --orange-dk:#a84d0f;
+  --orange-lt:#fff0e6;
+  --black:    #1a1a1a;
+  --gray-90:  #2d2d2d;
+  --gray-60:  #666;
+  --gray-40:  #999;
+  --gray-20:  #e0e0e0;
+  --gray-10:  #f5f5f5;
+  --white:    #ffffff;
+  --green:    #1d8a4e;
+  --green-lt: #e9f7ef;
+  --red:      #c0392b;
+  --red-lt:   #fdecea;
+  --yellow:   #b7950b;
+  --yellow-lt:#fef9e7;
+  --blue:     #1a6fa8;
+  --blue-lt:  #e8f4fd;
+}
+
+body{
+  font-family:'Inter',Arial,sans-serif;
+  background:var(--gray-10);
+  min-height:100vh;
+  padding:24px 16px 48px;
+  color:var(--black);
+}
+
+/* ── Header ── */
+.header{
+  max-width:920px;
+  margin:0 auto 20px;
+  display:flex;align-items:center;gap:12px;
+}
+.logo-mark{
+  width:40px;height:40px;
+  background:var(--orange);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Space Mono',monospace;
+  font-size:14px;font-weight:700;
+  color:white;letter-spacing:-1px;flex-shrink:0;
+}
+.header-text h1{
+  font-family:'Space Mono',monospace;
+  font-size:18px;font-weight:700;letter-spacing:-0.5px;
+}
+.header-text p{font-size:12px;color:var(--gray-60);margin-top:2px;}
+
+/* ── Card ── */
+.card{
+  max-width:920px;
+  margin:0 auto 16px;
+  background:var(--white);
+  border-radius:14px;
+  box-shadow:0 2px 16px rgba(0,0,0,.07);
+  overflow:hidden;
+}
+.card-top{
+  background:var(--black);
+  padding:16px 24px;
+  display:flex;align-items:center;gap:10px;
+}
+.card-top .dot{width:8px;height:8px;border-radius:50%;background:var(--orange);}
+.card-top span{
+  font-family:'Space Mono',monospace;
+  font-size:11px;color:#888;
+  letter-spacing:1px;text-transform:uppercase;
+}
+.card-top .tag{
+  margin-left:auto;
+  font-family:'Space Mono',monospace;font-size:10px;
+  color:#555;background:#2a2a2a;
+  padding:3px 8px;border-radius:4px;letter-spacing:0.5px;
+}
+
+.form-body{padding:24px;}
+
+/* ── Grid ── */
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+
+.field{display:flex;flex-direction:column;gap:6px;}
+label{
+  font-size:12px;font-weight:600;
+  color:var(--gray-60);
+  letter-spacing:0.5px;text-transform:uppercase;
+}
+label .hint{
+  font-weight:400;text-transform:none;
+  letter-spacing:0;color:var(--gray-40);font-size:11px;
+}
+
+input,select{
+  width:100%;padding:11px 14px;
+  border:1.5px solid var(--gray-20);border-radius:8px;
+  font-size:14px;font-family:'Inter',Arial,sans-serif;
+  color:var(--black);background:var(--white);
+  transition:border-color .15s;
+  appearance:none;-webkit-appearance:none;
+}
+input:focus,select:focus{outline:none;border-color:var(--orange);}
+input.mono{font-family:'Space Mono',monospace;font-size:13px;}
+select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;
+}
+
+/* PoE standard pills */
+.poe-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+}
+.poe-btn{
+  padding:10px 6px;
+  border:1.5px solid var(--gray-20);border-radius:8px;
+  background:var(--white);
+  font-size:11px;font-weight:700;
+  font-family:'Space Mono',monospace;
+  color:var(--gray-60);cursor:pointer;
+  transition:all .15s;text-align:center;line-height:1.5;
+}
+.poe-btn .poe-watt{font-size:15px;display:block;color:var(--black);margin-bottom:2px;}
+.poe-btn .poe-std{font-size:9px;color:var(--gray-40);font-family:'Inter',sans-serif;font-weight:400;}
+.poe-btn.active{border-color:var(--orange);background:var(--orange-lt);}
+.poe-btn.active .poe-watt{color:var(--orange-dk);}
+
+/* Add device row */
+.add-row{
+  display:grid;
+  grid-template-columns:2fr 1fr 1fr 1fr auto;
+  gap:10px;align-items:end;
+  padding:16px;background:var(--gray-10);
+  border-radius:10px;margin-top:4px;
+}
+
+.btn{
+  padding:11px 16px;border:none;border-radius:8px;
+  font-size:13px;font-weight:700;
+  font-family:'Space Mono',monospace;
+  cursor:pointer;transition:all .15s;white-space:nowrap;
+}
+.btn-primary{background:var(--orange);color:white;}
+.btn-primary:hover{background:var(--orange-dk);}
+.btn-secondary{background:var(--gray-10);color:var(--gray-60);border:1.5px solid var(--gray-20);}
+.btn-secondary:hover{border-color:var(--orange);color:var(--orange);}
+.btn-full{width:100%;padding:14px;font-size:15px;letter-spacing:0.5px;}
+
+.divider{border:none;border-top:1px solid var(--gray-20);margin:20px 0;}
+
+/* Device preset chips */
+.preset-row{
+  display:flex;flex-wrap:wrap;gap:8px;
+  margin-bottom:16px;
+}
+.preset-chip{
+  padding:6px 12px;
+  border:1.5px solid var(--gray-20);border-radius:20px;
+  font-size:11px;font-weight:600;
+  color:var(--gray-60);cursor:pointer;
+  transition:all .15s;background:var(--white);
+  white-space:nowrap;
+}
+.preset-chip:hover{border-color:var(--orange);color:var(--orange);background:var(--orange-lt);}
+.preset-chip .chip-watt{
+  font-family:'Space Mono',monospace;
+  color:var(--black);margin-left:4px;
+}
+
+/* Table */
+.device-table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead tr{background:var(--black);}
+thead th{
+  padding:10px 12px;
+  font-family:'Space Mono',monospace;
+  font-size:10px;font-weight:700;
+  letter-spacing:0.5px;text-transform:uppercase;
+  color:#888;text-align:left;white-space:nowrap;
+}
+tbody tr{border-bottom:1px solid var(--gray-10);}
+tbody tr:hover{background:var(--gray-10);}
+tbody td{padding:10px 12px;vertical-align:middle;}
+td.mono{font-family:'Space Mono',monospace;font-size:12px;}
+
+.badge{
+  display:inline-block;padding:3px 8px;border-radius:4px;
+  font-size:10px;font-weight:700;
+  font-family:'Space Mono',monospace;white-space:nowrap;
+}
+.badge-af{background:#e8f4fd;color:#1a6fa8;}
+.badge-at{background:#e9f7ef;color:#1d8a4e;}
+.badge-bt60{background:#fff0e6;color:#d46316;}
+.badge-bt90{background:#fdecea;color:#c0392b;}
+.badge-passive{background:#f5eef8;color:#6c3483;}
+
+.del-btn{
+  background:none;border:none;color:var(--gray-40);
+  cursor:pointer;font-size:16px;padding:4px 6px;
+  border-radius:4px;transition:all .15s;
+}
+.del-btn:hover{color:var(--red);background:var(--red-lt);}
+
+/* ── Result ── */
+.result-divider{height:4px;background:linear-gradient(90deg,var(--orange),var(--orange-dk));}
+.result-body{padding:24px;background:var(--gray-10);}
+.result-headline{
+  font-family:'Space Mono',monospace;font-size:11px;
+  letter-spacing:1px;text-transform:uppercase;
+  color:var(--gray-60);margin-bottom:16px;
+}
+
+/* Big power display */
+.power-main{
+  background:var(--black);border-radius:12px;
+  padding:20px 24px;margin-bottom:16px;
+  display:flex;align-items:stretch;gap:0;
+  flex-wrap:wrap;overflow:hidden;
+}
+.power-used{
+  flex:1;padding-right:24px;
+  border-right:1px solid #2a2a2a;
+}
+.power-label{
+  font-family:'Space Mono',monospace;font-size:10px;
+  color:#666;letter-spacing:1px;text-transform:uppercase;
+  margin-bottom:6px;
+}
+.power-big{
+  font-family:'Space Mono',monospace;
+  font-size:52px;font-weight:700;
+  color:var(--orange);line-height:1;
+  letter-spacing:-2px;
+}
+.power-big sup{font-size:20px;letter-spacing:0;}
+.power-sub{
+  font-size:12px;color:#666;margin-top:6px;line-height:1.6;
+}
+.power-sub strong{color:#aaa;}
+
+.power-slots{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:16px;padding-left:24px;flex:1;
+}
+.power-slot{display:flex;flex-direction:column;justify-content:center;}
+.slot-label{
+  font-family:'Space Mono',monospace;font-size:10px;
+  color:#666;letter-spacing:1px;text-transform:uppercase;
+  margin-bottom:4px;
+}
+.slot-val{
+  font-family:'Space Mono',monospace;
+  font-size:22px;font-weight:700;line-height:1;
+}
+.slot-val.green{color:#4ade80;}
+.slot-val.red{color:#f87171;}
+.slot-val.orange{color:#fb923c;}
+.slot-unit{font-size:11px;color:#666;margin-top:3px;}
+
+/* Utilization meter */
+.util-panel{
+  background:var(--white);border-radius:12px;
+  border:1px solid var(--gray-20);
+  padding:20px;margin-bottom:16px;
+}
+.util-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:16px;flex-wrap:wrap;gap:8px;
+}
+.util-title{
+  font-family:'Space Mono',monospace;font-size:11px;
+  color:var(--gray-60);letter-spacing:1px;text-transform:uppercase;
+}
+.util-pct{
+  font-family:'Space Mono',monospace;font-size:28px;
+  font-weight:700;line-height:1;
+}
+
+/* Arc meter */
+.arc-wrap{
+  display:flex;align-items:center;gap:24px;flex-wrap:wrap;
+}
+.arc-svg{flex-shrink:0;}
+
+.meter-bar-section{flex:1;min-width:200px;}
+.meter-row{margin-bottom:12px;}
+.meter-row-label{
+  display:flex;justify-content:space-between;
+  font-size:12px;color:var(--gray-60);margin-bottom:5px;
+}
+.meter-row-label strong{color:var(--black);}
+.meter-track{
+  height:10px;background:var(--gray-10);border-radius:5px;overflow:hidden;
+}
+.meter-fill{
+  height:100%;border-radius:5px;
+  transition:width .8s cubic-bezier(.4,0,.2,1);
+}
+.meter-fill.ok  {background:linear-gradient(90deg,var(--green),#4ade80);}
+.meter-fill.warn{background:linear-gradient(90deg,var(--yellow),#fb923c);}
+.meter-fill.crit{background:linear-gradient(90deg,var(--red),#f87171);}
+
+/* Stat row */
+.stat-row{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:10px;margin-bottom:16px;
+}
+.stat-box{
+  background:var(--white);border-radius:10px;
+  padding:14px;border:1px solid var(--gray-20);
+}
+.stat-box.highlight{border-color:var(--orange);background:var(--orange-lt);}
+.stat-box.warn-box {border-color:var(--yellow);background:var(--yellow-lt);}
+.stat-box.crit-box {border-color:var(--red);background:var(--red-lt);}
+.stat-label{
+  font-size:10px;font-weight:600;
+  letter-spacing:0.5px;text-transform:uppercase;
+  color:var(--gray-60);margin-bottom:6px;
+}
+.stat-val{
+  font-family:'Space Mono',monospace;
+  font-size:20px;font-weight:700;color:var(--black);line-height:1;
+}
+.stat-unit{font-size:11px;color:var(--gray-60);margin-top:3px;}
+
+/* Per-port breakdown */
+.port-wrap{
+  background:var(--white);border-radius:12px;
+  border:1px solid var(--gray-20);overflow:hidden;
+  margin-bottom:16px;
+}
+.port-wrap table{font-size:12px;}
+.port-wrap thead th{padding:8px 12px;font-size:10px;}
+.port-wrap tbody td{padding:9px 12px;}
+
+/* Power bar mini */
+.pwr-bar-track{
+  height:6px;background:var(--gray-10);border-radius:3px;
+  overflow:hidden;width:80px;display:inline-block;vertical-align:middle;
+}
+.pwr-bar-fill{height:100%;border-radius:3px;}
+.pwr-bar-fill.ok  {background:var(--green);}
+.pwr-bar-fill.warn{background:var(--orange);}
+.pwr-bar-fill.crit{background:var(--red);}
+
+/* Alert boxes */
+.alert-box{
+  border-radius:10px;padding:14px 16px;
+  font-size:12px;font-family:'Space Mono',monospace;
+  margin-bottom:16px;line-height:1.8;display:none;
+}
+.alert-crit{background:var(--red-lt);border:1px solid var(--red);color:var(--red);}
+.alert-warn{background:var(--yellow-lt);border:1px solid var(--yellow);color:var(--yellow);}
+
+/* Recommendation */
+.rec-box{
+  background:var(--green-lt);border-left:3px solid var(--green);
+  border-radius:0 8px 8px 0;padding:14px 16px;
+  font-size:12px;color:var(--green);
+  font-family:'Space Mono',monospace;
+  line-height:1.8;
+}
+.rec-box span{color:var(--gray-60);font-family:'Inter',sans-serif;}
+
+/* Switch suggestion card */
+.switch-suggest{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:10px;margin-bottom:16px;
+}
+.switch-card{
+  background:var(--white);border-radius:10px;
+  border:1.5px solid var(--gray-20);
+  padding:14px;transition:border-color .15s;
+}
+.switch-card.recommended{border-color:var(--orange);background:var(--orange-lt);}
+.switch-card .sw-label{
+  font-size:10px;font-weight:600;letter-spacing:0.5px;
+  text-transform:uppercase;color:var(--gray-60);margin-bottom:6px;
+}
+.switch-card .sw-name{
+  font-family:'Space Mono',monospace;font-size:13px;
+  font-weight:700;color:var(--black);margin-bottom:4px;
+}
+.switch-card .sw-detail{font-size:11px;color:var(--gray-60);line-height:1.5;}
+.switch-card .sw-badge{
+  margin-top:8px;display:inline-block;
+  padding:2px 8px;border-radius:4px;font-size:10px;
+  font-weight:700;font-family:'Space Mono',monospace;
+}
+
+/* Empty state */
+.empty-state{
+  text-align:center;padding:32px;
+  color:var(--gray-40);font-size:13px;
+}
+.empty-state .big{font-size:32px;margin-bottom:8px;}
+
+/* Tip icon */
+.tip-icon{
+  display:inline-block;width:15px;height:15px;
+  background:var(--gray-20);border-radius:50%;
+  font-size:9px;text-align:center;line-height:15px;
+  color:var(--gray-60);cursor:help;
+  font-family:'Space Mono',monospace;font-weight:700;
+  margin-left:4px;vertical-align:middle;
+}
+
+@media(max-width:640px){
+  .grid-3,.grid-2{grid-template-columns:1fr;}
+  .add-row{grid-template-columns:1fr 1fr;}
+  .stat-row{grid-template-columns:1fr 1fr;}
+  .switch-suggest{grid-template-columns:1fr;}
+  .poe-grid{grid-template-columns:repeat(4,1fr);}
+  .power-slots{padding-left:0;padding-top:16px;border-left:none;border-top:1px solid #2a2a2a;}
+  .power-used{border-right:none;padding-right:0;padding-bottom:16px;}
+  .arc-wrap{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="logo-mark">KK</div>
+  <div class="header-text">
+    <h1>PoE Budget Calculator</h1>
+    <p>Hitung total daya PoE — standar IEEE 802.3af / 802.3at / 802.3bt</p>
+  </div>
+</div>
+
+<!-- Card 1: Switch Setup -->
+<div class="card">
+  <div class="card-top">
+    <div class="dot"></div>
+    <span>Kapasitas Switch PoE</span>
+    <div class="tag">IEEE 802.3af / at / bt</div>
+  </div>
+  <div class="form-body">
+
+    <div class="grid-3" style="margin-bottom:16px;">
+      <div class="field">
+        <label>Nama / Model Switch <span class="hint">— opsional</span></label>
+        <input type="text" id="switch-name" placeholder="Contoh: Hikvision DS-3E0518P-E">
+      </div>
+      <div class="field">
+        <label>Total PoE Budget Switch <span class="tip-icon" title="Lihat di spesifikasi switch: Total PoE Power Budget (Watt). Bukan watt per port.">?</span></label>
+        <input type="number" id="switch-budget" value="150" min="1" class="mono"
+          placeholder="Watt" oninput="updateBudgetPreview()">
+      </div>
+      <div class="field">
+        <label>Jumlah Port PoE</label>
+        <select id="switch-ports">
+          <option value="4">4 Port</option>
+          <option value="8" selected>8 Port</option>
+          <option value="16">16 Port</option>
+          <option value="24">24 Port</option>
+          <option value="48">48 Port</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Budget preview mini -->
+    <div id="budget-preview" style="
+      background:var(--gray-10);border-radius:8px;padding:12px 16px;
+      font-family:'Space Mono',monospace;font-size:12px;color:var(--gray-60);
+      margin-bottom:16px;display:flex;gap:24px;flex-wrap:wrap;">
+    </div>
+
+    <!-- Referensi switch populer -->
+    <label style="margin-bottom:10px;display:block;">
+      Referensi Switch Populer
+      <span class="hint"> — klik untuk isi otomatis</span>
+    </label>
+    <div class="preset-row" id="switch-presets">
+      <div class="preset-chip" onclick="loadSwitch('Hikvision DS-3E0310HP-E',8,96)">DS-3E0310HP-E <span class="chip-watt">96W / 8P</span></div>
+      <div class="preset-chip" onclick="loadSwitch('Hikvision DS-3E0518P-E',16,150)">DS-3E0518P-E <span class="chip-watt">150W / 16P</span></div>
+      <div class="preset-chip" onclick="loadSwitch('Hikvision DS-3E0528HP-E',24,370)">DS-3E0528HP-E <span class="chip-watt">370W / 24P</span></div>
+      <div class="preset-chip" onclick="loadSwitch('Huawei S1730S-L8P-A',8,65)">Huawei S1730S-L8P <span class="chip-watt">65W / 8P</span></div>
+      <div class="preset-chip" onclick="loadSwitch('Ruijie RG-ES108GC-P',8,65)">Ruijie RG-ES108GC-P <span class="chip-watt">65W / 8P</span></div>
+      <div class="preset-chip" onclick="loadSwitch('Ruijie RG-ES116GC-P',16,130)">Ruijie RG-ES116GC-P <span class="chip-watt">130W / 16P</span></div>
+      <div class="preset-chip" onclick="loadSwitch('Ruijie RG-ES124GC-P',24,185)">Ruijie RG-ES124GC-P <span class="chip-watt">185W / 24P</span></div>
+      <div class="preset-chip" onclick="loadSwitch('Generic 8-Port 120W',8,120)">Generic 8P <span class="chip-watt">120W / 8P</span></div>
+      <div class="preset-chip" onclick="loadSwitch('Generic 16-Port 250W',16,250)">Generic 16P <span class="chip-watt">250W / 16P</span></div>
+      <div class="preset-chip" onclick="loadSwitch('Generic 24-Port 400W',24,400)">Generic 24P <span class="chip-watt">400W / 24P</span></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Card 2: Tambah Device -->
+<div class="card">
+  <div class="card-top">
+    <div class="dot"></div>
+    <span>Tambah Device PoE</span>
+  </div>
+  <div class="form-body">
+
+    <!-- Device presets -->
+    <label style="margin-bottom:10px;display:block;">
+      Preset Device Umum
+      <span class="hint"> — klik untuk isi otomatis</span>
+    </label>
+    <div class="preset-row">
+      <div class="preset-chip" onclick="loadDevice('IP Cam Dome 2MP','CCTV','af',7)">Cam Dome 2MP <span class="chip-watt">7W</span></div>
+      <div class="preset-chip" onclick="loadDevice('IP Cam Bullet 2MP','CCTV','af',9)">Cam Bullet 2MP <span class="chip-watt">9W</span></div>
+      <div class="preset-chip" onclick="loadDevice('IP Cam 4MP','CCTV','af',10)">Cam 4MP <span class="chip-watt">10W</span></div>
+      <div class="preset-chip" onclick="loadDevice('IP Cam 8MP 4K','CCTV','at',12)">Cam 4K 8MP <span class="chip-watt">12W</span></div>
+      <div class="preset-chip" onclick="loadDevice('PTZ Kamera','PTZ','at',20)">PTZ Kamera <span class="chip-watt">20W</span></div>
+      <div class="preset-chip" onclick="loadDevice('PTZ High-Speed Dome','PTZ','at',25)">PTZ High-Speed <span class="chip-watt">25W</span></div>
+      <div class="preset-chip" onclick="loadDevice('Access Point Indoor','AP','af',8)">AP Indoor <span class="chip-watt">8W</span></div>
+      <div class="preset-chip" onclick="loadDevice('Access Point Outdoor','AP','at',15)">AP Outdoor <span class="chip-watt">15W</span></div>
+      <div class="preset-chip" onclick="loadDevice('Access Control Reader','ACS','af',7)">Access Control <span class="chip-watt">7W</span></div>
+      <div class="preset-chip" onclick="loadDevice('IP Intercom','ICS','af',6)">IP Intercom <span class="chip-watt">6W</span></div>
+      <div class="preset-chip" onclick="loadDevice('VoIP Phone','VoIP','af',5)">VoIP Phone <span class="chip-watt">5W</span></div>
+    </div>
+
+    <div class="add-row">
+      <div class="field">
+        <label>Nama Device</label>
+        <input type="text" id="dev-name" placeholder="Contoh: Kamera Lobby" class="mono"
+          onkeydown="if(event.key==='Enter')addDevice()">
+      </div>
+      <div class="field">
+        <label>Tipe</label>
+        <select id="dev-type">
+          <option value="CCTV">CCTV Kamera</option>
+          <option value="PTZ">PTZ Kamera</option>
+          <option value="AP">Access Point</option>
+          <option value="ACS">Access Control</option>
+          <option value="ICS">Intercom</option>
+          <option value="VoIP">VoIP Phone</option>
+          <option value="Other">Lainnya</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Standar PoE</label>
+        <select id="dev-poe">
+          <option value="af">802.3af (max 15.4W)</option>
+          <option value="at">802.3at (max 30W)</option>
+          <option value="bt60">802.3bt (max 60W)</option>
+          <option value="bt90">802.3bt (max 90W)</option>
+          <option value="passive">Passive PoE</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Daya (Watt) <span class="tip-icon" title="Lihat datasheet device: Power Consumption atau Maximum Power. Bukan PoE class.">?</span></label>
+        <input type="number" id="dev-watt" value="7" min="0.1" max="90" step="0.1" class="mono">
+      </div>
+      <div class="field">
+        <label>Qty</label>
+        <input type="number" id="dev-qty" value="1" min="1" max="200" style="max-width:80px;">
+      </div>
+      <div class="field">
+        <label>&nbsp;</label>
+        <button class="btn btn-primary" onclick="addDevice()">+ Tambah</button>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Device table -->
+    <div class="device-table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Nama Device</th><th>Tipe</th>
+            <th>Standar PoE</th><th>Watt / Unit</th>
+            <th>Qty</th><th>Total Watt</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="device-tbody">
+          <tr><td colspan="8">
+            <div class="empty-state">
+              <div class="big">🔌</div>
+              Belum ada device. Tambahkan di atas atau klik preset.
+            </div>
+          </td></tr>
+        </tbody>
+        <tfoot id="device-tfoot" style="display:none;">
+          <tr style="background:#f9f9f9;border-top:2px solid var(--gray-20);">
+            <td colspan="6" style="padding:10px 12px;font-size:12px;font-weight:600;color:var(--gray-60);">TOTAL</td>
+            <td class="mono" style="padding:10px 12px;font-weight:700;font-size:15px;" id="tfoot-total">—</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <hr class="divider">
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn btn-primary btn-full" onclick="calculate()" style="flex:2;">
+        ▶ HITUNG PoE BUDGET
+      </button>
+      <button class="btn btn-secondary" onclick="clearAll()" style="flex:1;">Reset</button>
+    </div>
+  </div>
+</div>
+
+<!-- Result Card -->
+<div class="card" id="result-card" style="display:none;">
+  <div class="result-divider"></div>
+  <div class="result-body">
+    <div class="result-headline">// PoE Budget Report</div>
+
+    <!-- Alerts -->
+    <div class="alert-box alert-crit" id="alert-crit"></div>
+    <div class="alert-box alert-warn" id="alert-warn"></div>
+
+    <!-- Big display -->
+    <div class="power-main" id="power-main"></div>
+
+    <!-- Utilization meter -->
+    <div class="util-panel">
+      <div class="util-header">
+        <div class="util-title">Utilisasi PoE Budget</div>
+        <div class="util-pct" id="util-pct-big">—</div>
+      </div>
+      <div class="arc-wrap">
+        <canvas id="arc-canvas" width="160" height="160" class="arc-svg"></canvas>
+        <div class="meter-bar-section" id="meter-bars"></div>
+      </div>
+    </div>
+
+    <!-- Stat row -->
+    <div class="stat-row" id="stat-row"></div>
+
+    <!-- Switch recommendation -->
+    <div style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gray-60);margin-bottom:12px;">
+      // Rekomendasi Switch PoE
+    </div>
+    <div class="switch-suggest" id="switch-suggest"></div>
+
+    <!-- Per-port breakdown -->
+    <div class="port-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Nama Device</th><th>Tipe</th><th>Standar</th>
+            <th>Watt/Unit</th><th>Qty</th><th>Total W</th>
+            <th>% Budget</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="breakdown-tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- Recommendation -->
+    <div class="rec-box" id="rec-box"></div>
+
+  </div>
+</div>
+
+<div style="max-width:920px;margin:20px auto 0;font-size:11px;color:var(--gray-60);text-align:center;line-height:1.6;">
+  KutuKabel Tools — PoE Budget berbasis IEEE 802.3af (15.4W) · 802.3at (30W) · 802.3bt (60W/90W) &nbsp;|&nbsp;
+  Faktor derating 20% sudah diterapkan sesuai rekomendasi vendor
+</div>
+
+<script>
+// ── State
+let devices = [];
+let devCounter = 0;
+
+// ── PoE standard max watt
+const POE_STD = {
+  af:      { label:'802.3af', max:15.4,  color:'#1a6fa8' },
+  at:      { label:'802.3at', max:30.0,  color:'#1d8a4e' },
+  bt60:    { label:'802.3bt', max:60.0,  color:'#d46316' },
+  bt90:    { label:'802.3bt', max:90.0,  color:'#c0392b' },
+  passive: { label:'Passive', max:30.0,  color:'#6c3483' },
+};
+const BADGE_POE = {
+  af:'badge-af', at:'badge-at', bt60:'badge-bt60', bt90:'badge-bt90', passive:'badge-passive'
+};
+
+// ── Load switch preset
+function loadSwitch(name, ports, budget) {
+  document.getElementById('switch-name').value   = name;
+  document.getElementById('switch-ports').value  = ports;
+  document.getElementById('switch-budget').value = budget;
+  updateBudgetPreview();
+}
+
+// ── Load device preset
+function loadDevice(name, type, poe, watt) {
+  document.getElementById('dev-name').value = name;
+  document.getElementById('dev-type').value = type;
+  document.getElementById('dev-poe').value  = poe;
+  document.getElementById('dev-watt').value = watt;
+  document.getElementById('dev-qty').value  = 1;
+  document.getElementById('dev-name').focus();
+}
+
+// ── Budget preview
+function updateBudgetPreview() {
+  const budget = parseFloat(document.getElementById('switch-budget').value) || 0;
+  const ports  = parseInt(document.getElementById('switch-ports').value)    || 8;
+  const avgPerPort = budget / ports;
+  // 80% rule — don't exceed 80% of total budget (derating)
+  const safe = budget * 0.80;
+
+  document.getElementById('budget-preview').innerHTML = `
+    <span>Budget Total: <strong style="color:var(--black)">${budget}W</strong></span>
+    <span>Port PoE: <strong style="color:var(--black)">${ports}</strong></span>
+    <span>Avg per Port: <strong style="color:var(--black)">${avgPerPort.toFixed(1)}W</strong></span>
+    <span>Safe Budget (80%): <strong style="color:var(--green)">${safe.toFixed(0)}W</strong></span>
+  `;
+}
+
+// ── Add device
+function addDevice() {
+  const name = document.getElementById('dev-name').value.trim();
+  if (!name) { document.getElementById('dev-name').focus(); return; }
+  const type  = document.getElementById('dev-type').value;
+  const poe   = document.getElementById('dev-poe').value;
+  const watt  = parseFloat(document.getElementById('dev-watt').value) || 0;
+  const qty   = parseInt(document.getElementById('dev-qty').value)    || 1;
+
+  // Validate vs PoE standard max
+  const std = POE_STD[poe];
+  if (watt > std.max) {
+    alert(`⚠ Watt (${watt}W) melebihi maksimum standar ${std.label} (${std.max}W).\nPastikan standar PoE sudah sesuai.`);
+    return;
+  }
+
+  devCounter++;
+  devices.push({ id: devCounter, name, type, poe, watt, qty });
+  renderTable();
+
+  document.getElementById('dev-name').value = '';
+  document.getElementById('dev-qty').value  = 1;
+  document.getElementById('dev-name').focus();
+}
+
+function removeDevice(id) {
+  devices = devices.filter(d => d.id !== id);
+  renderTable();
+}
+
+function renderTable() {
+  const tbody = document.getElementById('device-tbody');
+  const tfoot = document.getElementById('device-tfoot');
+  if (devices.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="big">🔌</div>Belum ada device.</div></td></tr>`;
+    tfoot.style.display = 'none';
+    return;
+  }
+  let total = 0;
+  tbody.innerHTML = devices.map((d, i) => {
+    const t = d.watt * d.qty;
+    total += t;
+    return `<tr>
+      <td style="color:var(--gray-40);font-size:12px;">${i+1}</td>
+      <td class="mono">${d.name}</td>
+      <td style="font-size:12px;color:var(--gray-60);">${d.type}</td>
+      <td><span class="badge ${BADGE_POE[d.poe]}">${POE_STD[d.poe].label}</span></td>
+      <td class="mono">${d.watt}W</td>
+      <td class="mono" style="font-weight:700;">${d.qty}×</td>
+      <td class="mono" style="font-weight:700;">${t.toFixed(1)}W</td>
+      <td><button class="del-btn" onclick="removeDevice(${d.id})">✕</button></td>
+    </tr>`;
+  }).join('');
+  tfoot.style.display = '';
+  document.getElementById('tfoot-total').textContent = total.toFixed(1) + ' W';
+}
+
+// ── Arc meter draw
+function drawArc(pct) {
+  const canvas = document.getElementById('arc-canvas');
+  const ctx    = canvas.getContext('2d');
+  const cx = 80, cy = 85, r = 62;
+  const startAngle = Math.PI * 0.75;
+  const endAngle   = Math.PI * 2.25;
+  const fillEnd    = startAngle + (endAngle - startAngle) * Math.min(pct / 100, 1.05);
+
+  ctx.clearRect(0, 0, 160, 160);
+
+  // Track
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, startAngle, endAngle);
+  ctx.strokeStyle = '#f0f0f0';
+  ctx.lineWidth = 14;
+  ctx.lineCap = 'round';
+  ctx.stroke();
+
+  // Fill
+  const color = pct >= 90 ? '#c0392b' : pct >= 70 ? '#d46316' : '#1d8a4e';
+  const grad  = ctx.createLinearGradient(cx - r, cy, cx + r, cy);
+  grad.addColorStop(0, color);
+  grad.addColorStop(1, pct >= 90 ? '#f87171' : pct >= 70 ? '#fb923c' : '#4ade80');
+
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, startAngle, fillEnd);
+  ctx.strokeStyle = grad;
+  ctx.lineWidth = 14;
+  ctx.lineCap = 'round';
+  ctx.stroke();
+
+  // Center text
+  ctx.fillStyle = '#1a1a1a';
+  ctx.font = 'bold 22px Space Mono, monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText(Math.min(pct, 999).toFixed(0) + '%', cx, cy + 4);
+  ctx.font = '11px Inter, sans-serif';
+  ctx.fillStyle = '#999';
+  ctx.fillText('utilisasi', cx, cy + 20);
+}
+
+// ── Main calculate
+function calculate() {
+  if (devices.length === 0) { alert('Tambahkan minimal 1 device PoE.'); return; }
+
+  const budget    = parseFloat(document.getElementById('switch-budget').value) || 150;
+  const ports     = parseInt(document.getElementById('switch-ports').value)    || 8;
+  const swName    = document.getElementById('switch-name').value || 'Switch PoE';
+
+  // Total watt dari semua device
+  const totalWatt     = devices.reduce((s, d) => s + d.watt * d.qty, 0);
+  const totalDevices  = devices.reduce((s, d) => s + d.qty, 0);
+  const pct           = (totalWatt / budget) * 100;
+  const safeBudget    = budget * 0.80;   // 80% derating rule
+  const headroom      = budget - totalWatt;
+  const safeHeadroom  = safeBudget - totalWatt;
+  const portsUsed     = totalDevices;
+  const portsLeft     = ports - portsUsed;
+
+  // Status thresholds
+  const status = pct >= 90 ? 'crit' : pct >= 70 ? 'warn' : 'ok';
+  const safeStatus = totalWatt > safeBudget ? (totalWatt > budget ? 'crit' : 'warn') : 'ok';
+
+  // ── Alerts
+  const alertCrit = document.getElementById('alert-crit');
+  const alertWarn = document.getElementById('alert-warn');
+
+  if (status === 'crit') {
+    alertCrit.style.display = 'block';
+    alertCrit.innerHTML = `⚠️ OVERLOAD — Total daya ${totalWatt.toFixed(1)}W melebihi ${pct.toFixed(0)}% budget switch (${budget}W).<br>
+Kamera / device akan mati bergantian atau tidak menyala. Segera kurangi device atau ganti switch.`;
+  } else alertCrit.style.display = 'none';
+
+  if (status === 'warn' && safeStatus !== 'ok') {
+    alertWarn.style.display = 'block';
+    alertWarn.innerHTML = `⚠ PERHATIAN — Penggunaan ${pct.toFixed(0)}% mendekati batas aman (80% = ${safeBudget.toFixed(0)}W).<br>
+Saat startup semua kamera menyala bersamaan, daya bisa spike 10–20% di atas nilai nominal.`;
+  } else alertWarn.style.display = 'none';
+
+  // ── Big display
+  const powerColor = status === 'crit' ? '#f87171' : status === 'warn' ? '#fb923c' : '#d46316';
+  document.getElementById('power-main').innerHTML = `
+    <div class="power-used">
+      <div class="power-label">Total Daya Terpakai</div>
+      <div class="power-big" style="color:${powerColor}">${totalWatt.toFixed(1)}<sup>W</sup></div>
+      <div class="power-sub">
+        dari <strong>${budget}W</strong> budget ${swName}<br>
+        <strong>${totalDevices}</strong> device di <strong>${portsUsed}</strong> port
+      </div>
+    </div>
+    <div class="power-slots">
+      <div class="power-slot">
+        <div class="slot-label">Headroom</div>
+        <div class="slot-val ${headroom < 0 ? 'red' : headroom < budget * 0.2 ? 'orange' : 'green'}">
+          ${headroom >= 0 ? '+' : ''}${headroom.toFixed(1)}
+        </div>
+        <div class="slot-unit">Watt tersisa</div>
+      </div>
+      <div class="power-slot">
+        <div class="slot-label">Safe Budget</div>
+        <div class="slot-val ${safeStatus === 'ok' ? 'green' : 'orange'}">${safeBudget.toFixed(0)}</div>
+        <div class="slot-unit">Watt (80% rule)</div>
+      </div>
+      <div class="power-slot">
+        <div class="slot-label">Port Terpakai</div>
+        <div class="slot-val ${portsLeft < 0 ? 'red' : 'green'}">${portsUsed}</div>
+        <div class="slot-unit">dari ${ports} port</div>
+      </div>
+      <div class="power-slot">
+        <div class="slot-label">Port Sisa</div>
+        <div class="slot-val ${portsLeft < 0 ? 'red' : portsLeft < 2 ? 'orange' : 'green'}">
+          ${portsLeft < 0 ? 0 : portsLeft}
+        </div>
+        <div class="slot-unit">port kosong</div>
+      </div>
+    </div>
+  `;
+
+  // ── Arc
+  document.getElementById('util-pct-big').textContent = pct.toFixed(0) + '%';
+  document.getElementById('util-pct-big').style.color =
+    status === 'crit' ? 'var(--red)' : status === 'warn' ? 'var(--orange)' : 'var(--green)';
+  setTimeout(() => drawArc(pct), 50);
+
+  // ── Meter bars
+  const fillClass = status === 'crit' ? 'crit' : status === 'warn' ? 'warn' : 'ok';
+  const safeFill  = safeStatus === 'ok' ? 'ok' : safeStatus === 'warn' ? 'warn' : 'crit';
+  document.getElementById('meter-bars').innerHTML = `
+    <div class="meter-row">
+      <div class="meter-row-label">
+        <span>Total Watt vs Budget</span>
+        <strong>${totalWatt.toFixed(1)}W / ${budget}W</strong>
+      </div>
+      <div class="meter-track">
+        <div class="meter-fill ${fillClass}" style="width:${Math.min(pct,100)}%"></div>
+      </div>
+    </div>
+    <div class="meter-row">
+      <div class="meter-row-label">
+        <span>Total Watt vs Safe Budget (80%)</span>
+        <strong>${totalWatt.toFixed(1)}W / ${safeBudget.toFixed(0)}W</strong>
+      </div>
+      <div class="meter-track">
+        <div class="meter-fill ${safeFill}" style="width:${Math.min((totalWatt/safeBudget)*100,100)}%"></div>
+      </div>
+    </div>
+    <div class="meter-row">
+      <div class="meter-row-label">
+        <span>Port PoE Terpakai</span>
+        <strong>${portsUsed} / ${ports} port</strong>
+      </div>
+      <div class="meter-track">
+        <div class="meter-fill ${portsUsed>ports?'crit':portsUsed/ports>0.8?'warn':'ok'}"
+          style="width:${Math.min((portsUsed/ports)*100,100)}%"></div>
+      </div>
+    </div>
+    <div style="margin-top:12px;font-size:11px;color:var(--gray-40);font-family:'Space Mono',monospace;line-height:1.8;">
+      Watt/port rata-rata: ${(totalWatt/Math.max(portsUsed,1)).toFixed(1)}W &nbsp;|&nbsp;
+      Max port tersedia: ${ports > portsUsed ? Math.floor((budget - totalWatt) / (totalWatt/Math.max(portsUsed,1))) : 0} device lagi
+    </div>
+  `;
+
+  // ── Stat row
+  const avgWatt = totalWatt / Math.max(portsUsed, 1);
+  document.getElementById('stat-row').innerHTML = `
+    <div class="stat-box highlight">
+      <div class="stat-label">Total Daya</div>
+      <div class="stat-val">${totalWatt.toFixed(1)}</div>
+      <div class="stat-unit">Watt dari ${totalDevices} device</div>
+    </div>
+    <div class="stat-box ${status === 'crit' ? 'crit-box' : status === 'warn' ? 'warn-box' : ''}">
+      <div class="stat-label">Utilisasi</div>
+      <div class="stat-val">${pct.toFixed(0)}%</div>
+      <div class="stat-unit">${status === 'ok' ? 'Aman' : status === 'warn' ? 'Perhatian' : 'Overload!'}</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Avg per Port</div>
+      <div class="stat-val">${avgWatt.toFixed(1)}</div>
+      <div class="stat-unit">Watt / device</div>
+    </div>
+    <div class="stat-box ${portsLeft < 0 ? 'crit-box' : ''}">
+      <div class="stat-label">Port Sisa</div>
+      <div class="stat-val">${Math.max(portsLeft, 0)}</div>
+      <div class="stat-unit">${portsLeft < 0 ? Math.abs(portsLeft) + ' port kurang!' : 'port kosong'}</div>
+    </div>
+  `;
+
+  // ── Switch recommendations
+  // Cari switch yang cocok berdasarkan total watt + 30% buffer
+  const needed = totalWatt * 1.30;
+  const switches = [
+    { name:'Hikvision DS-3E0310HP-E', ports:8,  budget:96,  price:'~Rp 800rb' },
+    { name:'Hikvision DS-3E0518P-E',  ports:16, budget:150, price:'~Rp 1.2jt' },
+    { name:'Hikvision DS-3E0526P-E',  ports:24, budget:240, price:'~Rp 2.1jt' },
+    { name:'Hikvision DS-3E0528HP-E', ports:24, budget:370, price:'~Rp 3.5jt' },
+    { name:'Ruijie RG-ES108GC-P',     ports:8,  budget:65,  price:'~Rp 650rb' },
+    { name:'Ruijie RG-ES116GC-P',     ports:16, budget:130, price:'~Rp 1.1jt' },
+    { name:'Ruijie RG-ES124GC-P',     ports:24, budget:185, price:'~Rp 1.8jt' },
+    { name:'Generic 250W 16-Port',    ports:16, budget:250, price:'~Rp 900rb' },
+    { name:'Generic 400W 24-Port',    ports:24, budget:400, price:'~Rp 1.5jt' },
+    { name:'Generic 500W 24-Port',    ports:24, budget:500, price:'~Rp 2jt' },
+  ];
+
+  const candidates = switches
+    .filter(s => s.budget >= needed && s.ports >= totalDevices)
+    .sort((a, b) => a.budget - b.budget)
+    .slice(0, 3);
+
+  if (candidates.length === 0) candidates.push({
+    name: 'Switch Enterprise Custom',
+    ports: Math.ceil(totalDevices * 1.5),
+    budget: Math.ceil(needed / 50) * 50,
+    price: 'Cek distributor'
+  });
+
+  document.getElementById('switch-suggest').innerHTML = candidates.map((s, i) => `
+    <div class="switch-card ${i === 0 ? 'recommended' : ''}">
+      <div class="sw-label">${i === 0 ? '★ Rekomendasi Utama' : 'Alternatif ' + i}</div>
+      <div class="sw-name">${s.name}</div>
+      <div class="sw-detail">
+        Budget: <strong>${s.budget}W</strong> &nbsp;|&nbsp; ${s.ports} Port PoE<br>
+        Headroom: <strong>+${(s.budget - totalWatt).toFixed(0)}W</strong> &nbsp;|&nbsp; ${s.price}
+      </div>
+      <div class="sw-badge" style="background:${i===0?'var(--orange)':'var(--gray-20)'};color:${i===0?'white':'var(--gray-60)'};">
+        ${((totalWatt/s.budget)*100).toFixed(0)}% utilisasi
+      </div>
+    </div>
+  `).join('');
+
+  // ── Per-device breakdown
+  let cumWatt = 0;
+  document.getElementById('breakdown-tbody').innerHTML = devices.map((d, i) => {
+    const tot   = d.watt * d.qty;
+    const pctB  = (tot / budget) * 100;
+    cumWatt    += tot;
+    const bst   = pctB >= 40 ? 'crit' : pctB >= 25 ? 'warn' : 'ok';
+    return `<tr>
+      <td style="color:var(--gray-40);font-size:11px;">${i+1}</td>
+      <td class="mono" style="font-size:12px;">${d.name}</td>
+      <td style="font-size:11px;color:var(--gray-60);">${d.type}</td>
+      <td><span class="badge ${BADGE_POE[d.poe]}">${POE_STD[d.poe].label}</span></td>
+      <td class="mono">${d.watt}W</td>
+      <td class="mono" style="font-weight:700;">${d.qty}×</td>
+      <td class="mono" style="font-weight:700;">${tot.toFixed(1)}W</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="pwr-bar-track">
+            <div class="pwr-bar-fill ${bst}" style="width:${Math.min(pctB,100)}%"></div>
+          </div>
+          <span style="font-family:'Space Mono',monospace;font-size:11px;">${pctB.toFixed(0)}%</span>
+        </div>
+      </td>
+      <td><span class="badge ${bst==='ok'?'badge-at':bst==='warn'?'badge-af':'badge-bt90'}">
+        ${bst==='ok'?'OK':bst==='warn'?'WARN':'HIGH'}
+      </span></td>
+    </tr>`;
+  }).join('');
+
+  // ── Recommendation
+  const addCamAf   = safeHeadroom > 0 ? Math.floor(safeHeadroom / 7)  : 0;
+  const addCamAt   = safeHeadroom > 0 ? Math.floor(safeHeadroom / 15) : 0;
+
+  let recHTML = '';
+  if (status === 'ok' && safeStatus === 'ok') {
+    recHTML = `<span>✓ Budget aman — masih ada ${safeHeadroom.toFixed(0)}W headroom di bawah batas 80%.</span><br>
+Dengan sisa budget, masih bisa tambah:<br>
++ ${addCamAf} kamera PoE af (7W/unit, contoh: dome 2MP)<br>
++ ${addCamAt} kamera PoE at (15W/unit, contoh: PTZ entry)<br>
+Tips: selalu sisakan minimal 20% budget untuk startup surge &amp; ekspansi.`;
+  } else if (safeStatus !== 'ok' && status !== 'crit') {
+    recHTML = `<span>⚠ Mendekati batas aman (80% = ${safeBudget.toFixed(0)}W):</span><br>
+→ Jangan tambah device lagi ke switch ini<br>
+→ Pertimbangkan switch dengan budget lebih besar (min ${Math.ceil(totalWatt * 1.4 / 50) * 50}W)<br>
+→ Atau pisah ke 2 switch — bagi device per area/lantai<br>
+→ Cek apakah ada device yang bisa diganti ke non-PoE (pakai adaptor)`;
+  } else {
+    recHTML = `<span>✕ OVERLOAD — tindakan wajib sebelum instalasi:</span><br>
+→ Ganti switch ke budget minimal ${Math.ceil(totalWatt * 1.3 / 50) * 50}W<br>
+→ Atau kurangi ${Math.ceil((totalWatt - safeBudget) / (totalWatt / Math.max(devices.length,1))).toFixed(0)} device dari switch ini<br>
+→ Pisah instalasi ke 2 switch — grouping per area<br>
+→ Ganti kamera ke model dengan konsumsi lebih rendah (cek datasheet)<br>
+→ Wajib test dengan clamp meter saat komisioning — nilai nominal ≠ nilai aktual`;
+  }
+  document.getElementById('rec-box').innerHTML = recHTML;
+
+  document.getElementById('result-card').style.display = 'block';
+  document.getElementById('result-card').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function clearAll() {
+  if (devices.length > 0 && !confirm('Reset semua device?')) return;
+  devices = []; devCounter = 0;
+  renderTable();
+  document.getElementById('result-card').style.display = 'none';
+}
+
+// Init
+updateBudgetPreview();
+</script>
+</body>
+</html>
