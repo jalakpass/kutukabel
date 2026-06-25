@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IP Address Planner | KutuKabel</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+:root{
+  --orange:   #d46316;
+  --orange-dk:#a84d0f;
+  --orange-lt:#fff0e6;
+  --black:    #1a1a1a;
+  --gray-90:  #2d2d2d;
+  --gray-60:  #666;
+  --gray-40:  #999;
+  --gray-20:  #e0e0e0;
+  --gray-10:  #f5f5f5;
+  --white:    #ffffff;
+  --green:    #1d8a4e;
+  --green-lt: #e9f7ef;
+  --red:      #c0392b;
+  --red-lt:   #fdecea;
+  --blue:     #1a6fa8;
+  --blue-lt:  #e8f4fd;
+  --purple:   #6c3483;
+  --purple-lt:#f5eef8;
+  --yellow:   #b7950b;
+  --yellow-lt:#fef9e7;
+}
+
+body{
+  font-family:'Inter',Arial,sans-serif;
+  background:var(--gray-10);
+  min-height:100vh;
+  padding:24px 16px 48px;
+  color:var(--black);
+}
+
+/* ── Header ── */
+.header{
+  max-width:860px;
+  margin:0 auto 20px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.logo-mark{
+  width:40px;height:40px;
+  background:var(--orange);
+  border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Space Mono',monospace;
+  font-size:14px;font-weight:700;
+  color:white;letter-spacing:-1px;
+  flex-shrink:0;
+}
+.header-text h1{
+  font-family:'Space Mono',monospace;
+  font-size:18px;font-weight:700;
+  letter-spacing:-0.5px;
+}
+.header-text p{font-size:12px;color:var(--gray-60);margin-top:2px;}
+
+/* ── Card ── */
+.card{
+  max-width:860px;
+  margin:0 auto 16px;
+  background:var(--white);
+  border-radius:14px;
+  box-shadow:0 2px 16px rgba(0,0,0,.07);
+  overflow:hidden;
+}
+.card-top{
+  background:var(--black);
+  padding:16px 24px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.card-top .dot{width:8px;height:8px;border-radius:50%;background:var(--orange);}
+.card-top span{
+  font-family:'Space Mono',monospace;
+  font-size:11px;color:#888;
+  letter-spacing:1px;text-transform:uppercase;
+}
+.card-top .tag{
+  margin-left:auto;
+  font-family:'Space Mono',monospace;
+  font-size:10px;
+  color:#555;
+  background:#2a2a2a;
+  padding:3px 8px;border-radius:4px;
+  letter-spacing:0.5px;
+}
+
+.form-body{padding:24px;}
+
+/* ── Grid ── */
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.span-2{grid-column:span 2;}
+.span-3{grid-column:1/-1;}
+
+.field{display:flex;flex-direction:column;gap:6px;}
+label{
+  font-size:12px;font-weight:600;
+  color:var(--gray-60);
+  letter-spacing:0.5px;text-transform:uppercase;
+}
+label .req{color:var(--orange);}
+label .hint{
+  font-weight:400;text-transform:none;
+  letter-spacing:0;color:var(--gray-40);
+  font-size:11px;
+}
+
+input,select{
+  width:100%;padding:11px 14px;
+  border:1.5px solid var(--gray-20);
+  border-radius:8px;
+  font-size:14px;
+  font-family:'Inter',Arial,sans-serif;
+  color:var(--black);background:var(--white);
+  transition:border-color .15s;
+  appearance:none;-webkit-appearance:none;
+}
+input:focus,select:focus{outline:none;border-color:var(--orange);}
+input.mono{font-family:'Space Mono',monospace;font-size:13px;}
+input.error{border-color:var(--red);}
+
+select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;
+  padding-right:36px;
+}
+
+/* Device type toggle */
+.type-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+}
+.type-btn{
+  padding:10px 6px;
+  border:1.5px solid var(--gray-20);
+  border-radius:8px;background:var(--white);
+  font-size:11px;font-weight:600;
+  color:var(--gray-60);cursor:pointer;
+  transition:all .15s;text-align:center;
+  line-height:1.4;
+}
+.type-btn .icon{font-size:16px;display:block;margin-bottom:4px;}
+.type-btn.active{border-color:var(--orange);background:var(--orange-lt);color:var(--orange-dk);}
+
+/* Add device row */
+.add-row{
+  display:grid;
+  grid-template-columns:auto 1fr 1fr auto;
+  gap:10px;align-items:end;
+  padding:14px;
+  background:var(--gray-10);
+  border-radius:10px;
+  margin-top:4px;
+}
+
+.btn{
+  padding:11px 16px;border:none;border-radius:8px;
+  font-size:13px;font-weight:700;
+  font-family:'Space Mono',monospace;
+  cursor:pointer;transition:all .15s;
+  white-space:nowrap;
+}
+.btn-primary{background:var(--orange);color:white;}
+.btn-primary:hover{background:var(--orange-dk);}
+.btn-secondary{background:var(--gray-10);color:var(--gray-60);border:1.5px solid var(--gray-20);}
+.btn-secondary:hover{border-color:var(--orange);color:var(--orange);}
+.btn-danger{background:var(--red-lt);color:var(--red);border:1.5px solid transparent;}
+.btn-danger:hover{border-color:var(--red);}
+.btn-full{width:100%;padding:14px;font-size:15px;letter-spacing:0.5px;}
+
+.divider{border:none;border-top:1px solid var(--gray-20);margin:20px 0;}
+
+/* ── Device Table ── */
+.device-table-wrap{overflow-x:auto;margin-top:4px;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead tr{background:var(--black);}
+thead th{
+  padding:10px 12px;
+  font-family:'Space Mono',monospace;
+  font-size:10px;font-weight:700;
+  letter-spacing:0.5px;text-transform:uppercase;
+  color:#888;text-align:left;white-space:nowrap;
+}
+tbody tr{border-bottom:1px solid var(--gray-10);}
+tbody tr:hover{background:var(--gray-10);}
+tbody td{padding:10px 12px;vertical-align:middle;}
+td.mono{font-family:'Space Mono',monospace;font-size:12px;color:var(--black);}
+.badge{
+  display:inline-block;
+  padding:3px 8px;border-radius:4px;
+  font-size:10px;font-weight:700;
+  font-family:'Space Mono',monospace;
+  white-space:nowrap;
+}
+.badge-cctv   {background:#e8f4fd;color:#1a6fa8;}
+.badge-nvr    {background:#f5eef8;color:#6c3483;}
+.badge-switch {background:#e9f7ef;color:#1d8a4e;}
+.badge-ap     {background:#fef9e7;color:#b7950b;}
+.badge-pc     {background:#fdecea;color:#c0392b;}
+.badge-akses  {background:#fff0e6;color:#d46316;}
+.badge-server {background:#2d2d2d;color:#ccc;}
+.badge-other  {background:var(--gray-10);color:var(--gray-60);}
+
+.del-btn{
+  background:none;border:none;
+  color:var(--gray-40);cursor:pointer;
+  font-size:16px;padding:4px 6px;
+  border-radius:4px;transition:all .15s;
+}
+.del-btn:hover{color:var(--red);background:var(--red-lt);}
+
+/* ── Result Panel ── */
+.result-divider{height:4px;background:linear-gradient(90deg,var(--orange),var(--orange-dk));}
+.result-body{padding:24px;background:var(--gray-10);}
+
+.result-headline{
+  font-family:'Space Mono',monospace;
+  font-size:11px;letter-spacing:1px;
+  text-transform:uppercase;color:var(--gray-60);
+  margin-bottom:16px;
+}
+
+/* Summary bar */
+.summary-bar{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;margin-bottom:16px;
+}
+.sum-box{
+  background:var(--white);
+  border-radius:10px;padding:14px;
+  border:1px solid var(--gray-20);
+}
+.sum-box .sum-label{
+  font-size:10px;font-weight:600;
+  letter-spacing:0.5px;text-transform:uppercase;
+  color:var(--gray-60);margin-bottom:6px;
+}
+.sum-box .sum-val{
+  font-family:'Space Mono',monospace;
+  font-size:18px;font-weight:700;color:var(--black);
+}
+.sum-box .sum-sub{font-size:11px;color:var(--gray-60);margin-top:2px;}
+.sum-box.highlight{border-color:var(--orange);background:var(--orange-lt);}
+.sum-box.highlight .sum-val{color:var(--orange-dk);}
+
+/* Subnet info */
+.subnet-panel{
+  background:var(--black);
+  border-radius:12px;padding:20px 24px;
+  margin-bottom:16px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;
+}
+.subnet-item .s-label{
+  font-size:10px;color:#666;
+  font-family:'Space Mono',monospace;
+  letter-spacing:0.5px;text-transform:uppercase;
+  margin-bottom:4px;
+}
+.subnet-item .s-val{
+  font-family:'Space Mono',monospace;
+  font-size:15px;font-weight:700;color:var(--white);
+}
+.subnet-item .s-val.orange{color:var(--orange);}
+.subnet-item .s-val.green{color:#4ade80;}
+.subnet-item .s-val.red{color:#f87171;}
+
+/* IP List table */
+.ip-result-table-wrap{
+  background:var(--white);
+  border-radius:12px;
+  border:1px solid var(--gray-20);
+  overflow:hidden;margin-bottom:16px;
+}
+.ip-result-table-wrap table{font-size:12px;}
+.ip-result-table-wrap thead th{
+  padding:8px 12px;font-size:10px;
+}
+.ip-result-table-wrap tbody td{padding:9px 12px;}
+.row-gateway td{background:#fffae8;}
+.row-broadcast td{background:#fdecea;}
+.row-reserved td{background:#f0f0f0;color:#999;}
+
+/* Conflict warning */
+.conflict-box{
+  background:var(--red-lt);border:1px solid var(--red);
+  border-radius:10px;padding:14px 16px;
+  font-size:12px;color:var(--red);
+  font-family:'Space Mono',monospace;
+  margin-bottom:16px;
+  display:none;
+}
+
+/* Export bar */
+.export-bar{
+  display:flex;gap:10px;flex-wrap:wrap;
+  margin-top:4px;
+}
+
+/* Tooltip */
+.tooltip-wrap{position:relative;display:inline-block;}
+.tooltip-wrap .tip{
+  display:none;
+  position:absolute;
+  bottom:calc(100% + 6px);left:50%;
+  transform:translateX(-50%);
+  background:var(--black);color:white;
+  font-size:11px;padding:6px 10px;
+  border-radius:6px;white-space:nowrap;
+  font-family:'Inter',sans-serif;
+  z-index:10;
+}
+.tooltip-wrap:hover .tip{display:block;}
+
+/* Empty state */
+.empty-state{
+  text-align:center;padding:32px;
+  color:var(--gray-40);font-size:13px;
+}
+.empty-state .big{font-size:32px;margin-bottom:8px;}
+
+/* Validation error */
+.err-msg{font-size:11px;color:var(--red);margin-top:3px;display:none;}
+
+/* Copy feedback */
+.copied{color:var(--green)!important;}
+
+@media(max-width:600px){
+  .grid-3,.grid-2{grid-template-columns:1fr;}
+  .span-2,.span-3{grid-column:1;}
+  .summary-bar{grid-template-columns:1fr 1fr;}
+  .subnet-panel{grid-template-columns:1fr 1fr;}
+  .add-row{grid-template-columns:1fr 1fr;grid-template-rows:auto auto auto;}
+  .type-grid{grid-template-columns:repeat(4,1fr);}
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="logo-mark">KK</div>
+  <div class="header-text">
+    <h1>IP Address Planner</h1>
+    <p>Subnet calculator &amp; alokasi IP per device — standar jaringan RFC 1918</p>
+  </div>
+</div>
+
+<!-- Card 1: Network Setup -->
+<div class="card">
+  <div class="card-top">
+    <div class="dot"></div>
+    <span>Konfigurasi Jaringan</span>
+    <div class="tag">RFC 1918 — Private IP</div>
+  </div>
+  <div class="form-body">
+    <div class="grid-3">
+
+      <div class="field">
+        <label>Network Address <span class="req">*</span></label>
+        <input type="text" id="network-ip" class="mono" placeholder="192.168.1.0" value="192.168.1.0"
+          oninput="validateIP(this)" onchange="updateSubnetInfo()">
+        <div class="err-msg" id="err-ip">Format tidak valid (contoh: 192.168.1.0)</div>
+      </div>
+
+      <div class="field">
+        <label>Subnet Mask / CIDR <span class="req">*</span></label>
+        <select id="cidr" onchange="updateSubnetInfo()">
+          <option value="24" selected>/24 — 255.255.255.0 (254 host)</option>
+          <option value="23">/23 — 255.255.254.0 (510 host)</option>
+          <option value="22">/22 — 255.255.252.0 (1022 host)</option>
+          <option value="25">/25 — 255.255.255.128 (126 host)</option>
+          <option value="26">/26 — 255.255.255.192 (62 host)</option>
+          <option value="27">/27 — 255.255.255.224 (30 host)</option>
+          <option value="28">/28 — 255.255.255.240 (14 host)</option>
+          <option value="16">/16 — 255.255.0.0 (65534 host)</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>IP Gateway <span class="hint">— biasanya .1 atau .254</span></label>
+        <input type="text" id="gateway-ip" class="mono" placeholder="192.168.1.1" value="192.168.1.1"
+          oninput="validateIP(this)">
+      </div>
+
+      <div class="field">
+        <label>Nama Proyek</label>
+        <input type="text" id="project-name" placeholder="Contoh: Gedung Kantor Bekasi Lt.2">
+      </div>
+
+      <div class="field span-2">
+        <label>Reservasi IP Awal <span class="hint">— IP pertama yang boleh dialokasikan ke device</span></label>
+        <select id="start-host">
+          <option value="1">Mulai dari .1 (gateway = .1, device dari .2)</option>
+          <option value="2" selected>Mulai dari .2 (gateway .1 sudah dipesan)</option>
+          <option value="10">Mulai dari .10 (sisakan .2–.9 untuk infrastruktur)</option>
+          <option value="20">Mulai dari .20</option>
+          <option value="100">Mulai dari .100</option>
+        </select>
+      </div>
+
+    </div>
+
+    <!-- Subnet Info Bar -->
+    <div id="subnet-info" style="margin-top:16px;display:none;">
+      <div class="subnet-panel" id="subnet-panel"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Card 2: Tambah Device -->
+<div class="card">
+  <div class="card-top">
+    <div class="dot"></div>
+    <span>Tambah Device</span>
+  </div>
+  <div class="form-body">
+
+    <!-- Type selector -->
+    <label style="margin-bottom:10px;display:block;">Tipe Device</label>
+    <div class="type-grid" id="type-grid">
+      <button class="type-btn active" onclick="selectType('CCTV',this)">
+        <span class="icon">📷</span>CCTV Kamera
+      </button>
+      <button class="type-btn" onclick="selectType('NVR',this)">
+        <span class="icon">🖥️</span>NVR / DVR
+      </button>
+      <button class="type-btn" onclick="selectType('Switch',this)">
+        <span class="icon">🔀</span>Switch PoE
+      </button>
+      <button class="type-btn" onclick="selectType('AP',this)">
+        <span class="icon">📡</span>Access Point
+      </button>
+      <button class="type-btn" onclick="selectType('PC',this)">
+        <span class="icon">💻</span>PC / Client
+      </button>
+      <button class="type-btn" onclick="selectType('Akses',this)">
+        <span class="icon">🔑</span>Access Control
+      </button>
+      <button class="type-btn" onclick="selectType('Server',this)">
+        <span class="icon">🗄️</span>Server
+      </button>
+      <button class="type-btn" onclick="selectType('Other',this)">
+        <span class="icon">⚙️</span>Lainnya
+      </button>
+    </div>
+
+    <div class="add-row" style="margin-top:14px;">
+      <div class="field">
+        <label>Jumlah</label>
+        <input type="number" id="dev-qty" value="1" min="1" max="200" style="width:80px;">
+      </div>
+      <div class="field">
+        <label>Label / Nama Device</label>
+        <input type="text" id="dev-name" placeholder="Contoh: Kamera Lobby Lt.1" class="mono"
+          onkeydown="if(event.key==='Enter')addDevice()">
+      </div>
+      <div class="field">
+        <label>Lokasi / Keterangan</label>
+        <input type="text" id="dev-location" placeholder="Contoh: Pintu Masuk Utama"
+          onkeydown="if(event.key==='Enter')addDevice()">
+      </div>
+      <div class="field">
+        <label>&nbsp;</label>
+        <button class="btn btn-primary" onclick="addDevice()">+ Tambah</button>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Device list table -->
+    <div class="device-table-wrap">
+      <table id="device-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Tipe</th>
+            <th>Label / Nama</th>
+            <th>Lokasi</th>
+            <th>Qty</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="device-tbody">
+          <tr>
+            <td colspan="6">
+              <div class="empty-state">
+                <div class="big">📋</div>
+                Belum ada device. Tambahkan device di atas.
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="divider">
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn btn-primary btn-full" onclick="generate()" style="flex:2;">
+        ▶ GENERATE IP PLAN
+      </button>
+      <button class="btn btn-secondary" onclick="clearAll()" style="flex:1;">
+        Reset
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Result Card -->
+<div class="card" id="result-card" style="display:none;">
+  <div class="result-divider"></div>
+  <div class="result-body">
+    <div class="result-headline">// IP Allocation Plan</div>
+
+    <!-- Conflict warning -->
+    <div class="conflict-box" id="conflict-box"></div>
+
+    <!-- Summary -->
+    <div class="summary-bar" id="summary-bar"></div>
+
+    <!-- IP Table -->
+    <div class="ip-result-table-wrap">
+      <table id="ip-result-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>IP Address</th>
+            <th>Tipe</th>
+            <th>Label / Nama</th>
+            <th>Lokasi</th>
+            <th>Keterangan</th>
+          </tr>
+        </thead>
+        <tbody id="ip-result-tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- Export -->
+    <div class="export-bar">
+      <button class="btn btn-secondary" onclick="copyCSV()">📋 Salin sebagai CSV</button>
+      <button class="btn btn-secondary" onclick="copyTable()">📋 Salin sebagai Tabel</button>
+      <button class="btn btn-secondary" onclick="exportHTML()">💾 Simpan HTML</button>
+    </div>
+  </div>
+</div>
+
+<div class="footer" style="max-width:860px;margin:20px auto 0;font-size:11px;color:var(--gray-60);text-align:center;line-height:1.6;">
+  KutuKabel Tools — IP Planning berbasis RFC 1918 Private Address Space &nbsp;|&nbsp;
+  Network: 10.0.0.0/8 · 172.16.0.0/12 · 192.168.0.0/16
+</div>
+
+<script>
+// ── State
+let devices = [];
+let currentType = 'CCTV';
+let devCounter = 0;
+
+// ── IP Utilities (pure math, no external deps)
+
+function ipToInt(ip) {
+  const parts = ip.trim().split('.');
+  if (parts.length !== 4) return null;
+  let n = 0;
+  for (let i = 0; i < 4; i++) {
+    const b = parseInt(parts[i]);
+    if (isNaN(b) || b < 0 || b > 255) return null;
+    n = (n << 8) | b;
+  }
+  return n >>> 0;
+}
+
+function intToIp(n) {
+  return [
+    (n >>> 24) & 0xff,
+    (n >>> 16) & 0xff,
+    (n >>> 8)  & 0xff,
+     n         & 0xff
+  ].join('.');
+}
+
+function cidrToMask(cidr) {
+  const c = parseInt(cidr);
+  return c === 0 ? 0 : (0xffffffff << (32 - c)) >>> 0;
+}
+
+function getSubnetInfo(networkIpStr, cidr) {
+  const mask      = cidrToMask(cidr);
+  const netInt    = ipToInt(networkIpStr);
+  if (netInt === null) return null;
+
+  const network   = (netInt & mask) >>> 0;
+  const broadcast = (network | (~mask >>> 0)) >>> 0;
+  const firstHost = network + 1;
+  const lastHost  = broadcast - 1;
+  const totalHost = Math.pow(2, 32 - cidr) - 2;
+
+  return {
+    network:   intToIp(network),
+    broadcast: intToIp(broadcast),
+    firstHost: intToIp(firstHost),
+    lastHost:  intToIp(lastHost),
+    mask:      intToIp(mask),
+    cidr,
+    totalHost,
+    netInt: network,
+    broadcastInt: broadcast,
+  };
+}
+
+function isIPInSubnet(ipStr, info) {
+  const n = ipToInt(ipStr);
+  if (!n) return false;
+  return n > info.netInt && n < info.broadcastInt;
+}
+
+// ── UI: IP validation
+function validateIP(el) {
+  const v = el.value.trim();
+  const ok = /^(\d{1,3}\.){3}\d{1,3}$/.test(v) && ipToInt(v) !== null;
+  el.classList.toggle('error', v.length > 0 && !ok);
+  return ok;
+}
+
+// ── UI: Subnet info display
+function updateSubnetInfo() {
+  const netIP = document.getElementById('network-ip').value.trim();
+  const cidr  = parseInt(document.getElementById('cidr').value);
+  const info  = getSubnetInfo(netIP, cidr);
+  if (!info) { document.getElementById('subnet-info').style.display = 'none'; return; }
+
+  document.getElementById('subnet-info').style.display = 'block';
+  document.getElementById('subnet-panel').innerHTML = `
+    <div class="subnet-item">
+      <div class="s-label">Network Address</div>
+      <div class="s-val orange">${info.network}/${cidr}</div>
+    </div>
+    <div class="subnet-item">
+      <div class="s-label">Subnet Mask</div>
+      <div class="s-val">${info.mask}</div>
+    </div>
+    <div class="subnet-item">
+      <div class="s-label">Broadcast</div>
+      <div class="s-val red">${info.broadcast}</div>
+    </div>
+    <div class="subnet-item">
+      <div class="s-label">Host Pertama</div>
+      <div class="s-val green">${info.firstHost}</div>
+    </div>
+    <div class="subnet-item">
+      <div class="s-label">Host Terakhir</div>
+      <div class="s-val green">${info.lastHost}</div>
+    </div>
+    <div class="subnet-item">
+      <div class="s-label">Total Usable Host</div>
+      <div class="s-val">${info.totalHost.toLocaleString()}</div>
+    </div>
+  `;
+
+  // Auto-suggest gateway
+  const gwField = document.getElementById('gateway-ip');
+  if (!gwField.value || gwField.value === '192.168.1.1') {
+    gwField.value = info.firstHost;
+  }
+}
+
+// ── UI: Device type
+function selectType(type, btn) {
+  currentType = type;
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // Auto-suggest label prefix
+  const prefixes = {
+    CCTV:'IP Cam', NVR:'NVR', Switch:'Switch PoE',
+    AP:'Access Point', PC:'PC', Akses:'Controller',
+    Server:'Server', Other:'Device'
+  };
+  const nameEl = document.getElementById('dev-name');
+  if (!nameEl.value || Object.values(prefixes).some(p => nameEl.value.startsWith(p))) {
+    nameEl.value = prefixes[type] + ' ';
+    nameEl.focus();
+    nameEl.setSelectionRange(nameEl.value.length, nameEl.value.length);
+  }
+}
+
+// ── Add device
+function addDevice() {
+  const qty  = parseInt(document.getElementById('dev-qty').value) || 1;
+  const name = document.getElementById('dev-name').value.trim();
+  const loc  = document.getElementById('dev-location').value.trim();
+  if (!name) { document.getElementById('dev-name').focus(); return; }
+
+  devCounter++;
+  devices.push({ id: devCounter, type: currentType, name, location: loc, qty });
+  renderDeviceTable();
+
+  document.getElementById('dev-name').value = '';
+  document.getElementById('dev-location').value = '';
+  document.getElementById('dev-qty').value = 1;
+  document.getElementById('dev-name').focus();
+}
+
+function removeDevice(id) {
+  devices = devices.filter(d => d.id !== id);
+  renderDeviceTable();
+}
+
+const BADGE_CLASS = {
+  CCTV:'badge-cctv', NVR:'badge-nvr', Switch:'badge-switch',
+  AP:'badge-ap', PC:'badge-pc', Akses:'badge-akses',
+  Server:'badge-server', Other:'badge-other'
+};
+
+function renderDeviceTable() {
+  const tbody = document.getElementById('device-tbody');
+  if (devices.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="big">📋</div>Belum ada device.</div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = devices.map((d, i) => `
+    <tr>
+      <td style="color:var(--gray-40);font-size:12px;">${i + 1}</td>
+      <td><span class="badge ${BADGE_CLASS[d.type]||'badge-other'}">${d.type}</span></td>
+      <td class="mono">${d.name}</td>
+      <td style="color:var(--gray-60);font-size:12px;">${d.location||'—'}</td>
+      <td style="font-family:'Space Mono',monospace;font-weight:700;">${d.qty}</td>
+      <td><button class="del-btn" onclick="removeDevice(${d.id})" title="Hapus">✕</button></td>
+    </tr>
+  `).join('');
+}
+
+// ── Generate IP Plan
+function generate() {
+  if (devices.length === 0) { alert('Tambahkan minimal 1 device terlebih dahulu.'); return; }
+
+  const netIPstr  = document.getElementById('network-ip').value.trim();
+  const cidr      = parseInt(document.getElementById('cidr').value);
+  const gwStr     = document.getElementById('gateway-ip').value.trim();
+  const startHost = parseInt(document.getElementById('start-host').value);
+
+  const info = getSubnetInfo(netIPstr, cidr);
+  if (!info) { alert('Network address tidak valid.'); return; }
+
+  const gwInt = ipToInt(gwStr);
+
+  // Build IP pool — semua usable host dalam subnet
+  // Alokasi mulai dari startHost (offset dari network)
+  let cursor = info.netInt + startHost;
+
+  // Total device yang dibutuhkan
+  const totalNeeded = devices.reduce((s, d) => s + d.qty, 0);
+
+  const conflicts = [];
+  const rows = [];
+
+  // Baris gateway
+  rows.push({
+    ip: gwStr,
+    type: 'Gateway',
+    name: 'Default Gateway / Router',
+    location: '—',
+    note: 'Reserved — jangan gunakan untuk device',
+    rowClass: 'row-gateway',
+    badge: '<span class="badge" style="background:#fef9e7;color:#b7950b;">GATEWAY</span>'
+  });
+
+  // Alokasi device
+  for (const dev of devices) {
+    for (let i = 0; i < dev.qty; i++) {
+      // Skip jika cursor = gateway
+      while (cursor === gwInt || cursor <= info.netInt || cursor >= info.broadcastInt) {
+        if (cursor >= info.broadcastInt) break;
+        cursor++;
+      }
+      if (cursor >= info.broadcastInt) {
+        conflicts.push(`⚠️ IP habis! ${dev.name} (unit ${i + 1}) tidak dapat dialokasikan — subnet penuh.`);
+        break;
+      }
+
+      const ipStr = intToIp(cursor);
+      const label = dev.qty > 1
+        ? `${dev.name} ${String(i + 1).padStart(2, '0')}`
+        : dev.name;
+
+      rows.push({
+        ip: ipStr,
+        type: dev.type,
+        name: label,
+        location: dev.location || '—',
+        note: '',
+        rowClass: '',
+        badge: `<span class="badge ${BADGE_CLASS[dev.type]||'badge-other'}">${dev.type}</span>`
+      });
+      cursor++;
+    }
+  }
+
+  // Broadcast row
+  rows.push({
+    ip: info.broadcast,
+    type: 'Broadcast',
+    name: 'Broadcast Address',
+    location: '—',
+    note: 'Reserved — tidak dapat digunakan',
+    rowClass: 'row-broadcast',
+    badge: '<span class="badge" style="background:#fdecea;color:#c0392b;">BCAST</span>'
+  });
+
+  // Sisa IP (reserved/available)
+  const usedCount = rows.length - 2; // -gateway -broadcast
+  const remaining = info.totalHost - usedCount;
+
+  // Render conflict
+  const conflictBox = document.getElementById('conflict-box');
+  if (conflicts.length > 0) {
+    conflictBox.style.display = 'block';
+    conflictBox.innerHTML = conflicts.join('<br>');
+  } else {
+    conflictBox.style.display = 'none';
+  }
+
+  // Render summary
+  const countByType = {};
+  devices.forEach(d => { countByType[d.type] = (countByType[d.type] || 0) + d.qty; });
+  const topTypes = Object.entries(countByType).sort((a,b) => b[1]-a[1]).slice(0,2).map(([t,n]) => `${t}: ${n}`).join(' · ');
+
+  document.getElementById('summary-bar').innerHTML = `
+    <div class="sum-box highlight">
+      <div class="sum-label">Total Device</div>
+      <div class="sum-val">${totalNeeded}</div>
+      <div class="sum-sub">${topTypes}</div>
+    </div>
+    <div class="sum-box">
+      <div class="sum-label">IP Terpakai</div>
+      <div class="sum-val">${usedCount}</div>
+      <div class="sum-sub">dari ${info.totalHost} usable host</div>
+    </div>
+    <div class="sum-box">
+      <div class="sum-label">IP Tersisa</div>
+      <div class="sum-val">${remaining}</div>
+      <div class="sum-sub">untuk ekspansi</div>
+    </div>
+    <div class="sum-box">
+      <div class="sum-label">Subnet</div>
+      <div class="sum-val">/${cidr}</div>
+      <div class="sum-sub">${info.network} — ${info.broadcast}</div>
+    </div>
+  `;
+
+  // Render IP table
+  const tbody = document.getElementById('ip-result-tbody');
+  tbody.innerHTML = rows.map((r, i) => `
+    <tr class="${r.rowClass}">
+      <td style="color:var(--gray-40);font-size:11px;">${r.rowClass ? '' : i}</td>
+      <td class="mono" style="font-weight:700;letter-spacing:0.3px;">
+        <span class="tooltip-wrap">
+          ${r.ip}
+          <span class="tip" onclick="copyIP('${r.ip}',this)">Klik untuk salin</span>
+        </span>
+      </td>
+      <td>${r.badge}</td>
+      <td class="mono" style="font-size:12px;">${r.name}</td>
+      <td style="color:var(--gray-60);font-size:12px;">${r.location}</td>
+      <td style="color:var(--gray-60);font-size:11px;">${r.note}</td>
+    </tr>
+  `).join('');
+
+  // Make IP cells clickable
+  tbody.querySelectorAll('td.mono').forEach((td, i) => {
+    if (rows[i] && rows[i].ip) {
+      td.style.cursor = 'pointer';
+      td.title = 'Klik untuk salin';
+      td.onclick = () => {
+        navigator.clipboard.writeText(rows[i].ip).then(() => {
+          td.style.color = 'var(--green)';
+          setTimeout(() => td.style.color = '', 1000);
+        });
+      };
+    }
+  });
+
+  // Store for export
+  window._exportRows = rows;
+  window._exportInfo = info;
+  window._exportCidr = cidr;
+
+  document.getElementById('result-card').style.display = 'block';
+  document.getElementById('result-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ── Export
+function copyCSV() {
+  if (!window._exportRows) return;
+  const proj = document.getElementById('project-name').value || 'IP Plan';
+  const header = `Proyek: ${proj}\nNetwork: ${window._exportInfo.network}/${window._exportCidr}\n\n`;
+  const csv = 'No,IP Address,Tipe,Label,Lokasi,Keterangan\n' +
+    window._exportRows.map((r, i) =>
+      `${r.rowClass ? '' : i},"${r.ip}","${r.type}","${r.name}","${r.location}","${r.note}"`
+    ).join('\n');
+  navigator.clipboard.writeText(header + csv).then(() => showToast('CSV disalin ke clipboard!'));
+}
+
+function copyTable() {
+  if (!window._exportRows) return;
+  const col = [5, 20, 10, 32, 22, 30];
+  const pad = (s, n) => String(s).substring(0, n).padEnd(n);
+  const line = '+' + col.map(c => '-'.repeat(c + 2)).join('+') + '+';
+  const row  = (cells) => '| ' + cells.map((c,i) => pad(c, col[i])).join(' | ') + ' |';
+  const proj = document.getElementById('project-name').value || 'IP Plan';
+
+  let out = `${proj} — Network: ${window._exportInfo.network}/${window._exportCidr}\n\n`;
+  out += line + '\n';
+  out += row(['#','IP Address','Tipe','Label','Lokasi','Ket']) + '\n';
+  out += line + '\n';
+  window._exportRows.forEach((r, i) => {
+    out += row([r.rowClass ? '—' : i, r.ip, r.type, r.name, r.location, r.note]) + '\n';
+  });
+  out += line;
+  navigator.clipboard.writeText(out).then(() => showToast('Tabel disalin ke clipboard!'));
+}
+
+function exportHTML() {
+  if (!window._exportRows) return;
+  const proj = document.getElementById('project-name').value || 'IP Plan';
+  const now  = new Date().toLocaleString('id-ID');
+  const rows = window._exportRows.map((r, i) => `
+    <tr style="${r.rowClass === 'row-gateway' ? 'background:#fffae8' : r.rowClass === 'row-broadcast' ? 'background:#fdecea' : ''}">
+      <td>${r.rowClass ? '—' : i}</td>
+      <td><b>${r.ip}</b></td>
+      <td>${r.type}</td>
+      <td>${r.name}</td>
+      <td>${r.location}</td>
+      <td style="color:#999;font-size:11px">${r.note}</td>
+    </tr>`).join('');
+
+  const html = `<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8">
+<title>IP Plan — ${proj}</title>
+<style>
+body{font-family:Arial,sans-serif;padding:24px;color:#1a1a1a;}
+h2{font-size:18px;margin-bottom:4px;}
+p{color:#666;font-size:12px;margin-bottom:16px;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{background:#1a1a1a;color:#ccc;padding:8px 12px;text-align:left;font-size:11px;}
+td{padding:8px 12px;border-bottom:1px solid #eee;}
+td:nth-child(2){font-family:monospace;font-weight:bold;}
+</style></head><body>
+<h2>📋 IP Address Plan — ${proj}</h2>
+<p>Network: ${window._exportInfo.network}/${window._exportCidr} &nbsp;|&nbsp; Dibuat: ${now} &nbsp;|&nbsp; KutuKabel Tools</p>
+<table><thead><tr><th>#</th><th>IP Address</th><th>Tipe</th><th>Label</th><th>Lokasi</th><th>Keterangan</th></tr></thead>
+<tbody>${rows}</tbody></table>
+</body></html>`;
+
+  const blob = new Blob([html], { type: 'text/html' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `ip-plan-${proj.replace(/\s+/g,'-').toLowerCase()}.html`;
+  a.click();
+}
+
+function copyIP(ip, el) {
+  navigator.clipboard.writeText(ip).then(() => {
+    el.textContent = '✓ Disalin!';
+    setTimeout(() => el.textContent = 'Klik untuk salin', 1200);
+  });
+}
+
+function showToast(msg) {
+  let t = document.getElementById('toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast';
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:white;padding:10px 20px;border-radius:8px;font-size:13px;z-index:999;font-family:Space Mono,monospace;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 2200);
+}
+
+function clearAll() {
+  if (devices.length > 0 && !confirm('Reset semua device?')) return;
+  devices = [];
+  devCounter = 0;
+  renderDeviceTable();
+  document.getElementById('result-card').style.display = 'none';
+}
+
+// Init
+updateSubnetInfo();
+</script>
+</body>
+</html>
