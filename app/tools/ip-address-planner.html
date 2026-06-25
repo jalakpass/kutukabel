@@ -382,14 +382,26 @@ td.mono{font-family:'Space Mono',monospace;font-size:12px;color:var(--black);}
       <div class="field">
         <label>Subnet Mask / CIDR <span class="req">*</span></label>
         <select id="cidr" onchange="updateSubnetInfo()">
-          <option value="24" selected>/24 — 255.255.255.0 (254 host)</option>
-          <option value="23">/23 — 255.255.254.0 (510 host)</option>
-          <option value="22">/22 — 255.255.252.0 (1022 host)</option>
-          <option value="25">/25 — 255.255.255.128 (126 host)</option>
-          <option value="26">/26 — 255.255.255.192 (62 host)</option>
-          <option value="27">/27 — 255.255.255.224 (30 host)</option>
-          <option value="28">/28 — 255.255.255.240 (14 host)</option>
-          <option value="16">/16 — 255.255.0.0 (65534 host)</option>
+          <optgroup label="── Jaringan Besar (Enterprise / Gedung)">
+            <option value="16">/16 — 255.255.0.0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(65.534 host)</option>
+            <option value="17">/17 — 255.255.128.0 &nbsp;&nbsp;&nbsp;(32.766 host)</option>
+            <option value="18">/18 — 255.255.192.0 &nbsp;&nbsp;&nbsp;(16.382 host)</option>
+            <option value="19">/19 — 255.255.224.0 &nbsp;&nbsp;&nbsp;( 8.190 host)</option>
+            <option value="20">/20 — 255.255.240.0 &nbsp;&nbsp;&nbsp;( 4.094 host)</option>
+            <option value="21">/21 — 255.255.248.0 &nbsp;&nbsp;&nbsp;( 2.046 host)</option>
+            <option value="22">/22 — 255.255.252.0 &nbsp;&nbsp;&nbsp;( 1.022 host)</option>
+          </optgroup>
+          <optgroup label="── Jaringan Menengah (Gedung / Lantai)">
+            <option value="23">/23 — 255.255.254.0 &nbsp;&nbsp;&nbsp;(   510 host)</option>
+            <option value="24" selected>/24 — 255.255.255.0 &nbsp;&nbsp;&nbsp;(   254 host) ← paling umum</option>
+          </optgroup>
+          <optgroup label="── Jaringan Kecil (Ruangan / VLAN)">
+            <option value="25">/25 — 255.255.255.128 (   126 host)</option>
+            <option value="26">/26 — 255.255.255.192 (    62 host)</option>
+            <option value="27">/27 — 255.255.255.224 (    30 host)</option>
+            <option value="28">/28 — 255.255.255.240 (    14 host)</option>
+            <option value="29">/29 — 255.255.255.248 (     6 host)</option>
+          </optgroup>
         </select>
       </div>
 
