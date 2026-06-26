@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cable Length Estimator | KutuKabel</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+:root{
+  --orange:   #d46316;
+  --orange-dk:#a84d0f;
+  --orange-lt:#fff0e6;
+  --black:    #1a1a1a;
+  --gray-90:  #2d2d2d;
+  --gray-60:  #666;
+  --gray-40:  #999;
+  --gray-20:  #e0e0e0;
+  --gray-10:  #f5f5f5;
+  --white:    #ffffff;
+  --green:    #1d8a4e;
+  --green-lt: #e9f7ef;
+  --red:      #c0392b;
+  --red-lt:   #fdecea;
+  --yellow:   #b7950b;
+  --yellow-lt:#fef9e7;
+  --blue:     #1a6fa8;
+  --blue-lt:  #e8f4fd;
+  --purple:   #6c3483;
+  --purple-lt:#f5eef8;
+
+  /* Cable type colors */
+  --utp:   #1a6fa8;
+  --coax:  #d46316;
+  --fo:    #1d8a4e;
+  --power: #c0392b;
+}
+
+body{
+  font-family:'Inter',Arial,sans-serif;
+  background:var(--gray-10);
+  min-height:100vh;
+  padding:24px 16px 48px;
+  color:var(--black);
+}
+
+.header{
+  max-width:960px;margin:0 auto 20px;
+  display:flex;align-items:center;gap:12px;
+}
+.logo-mark{
+  width:40px;height:40px;background:var(--orange);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Space Mono',monospace;font-size:14px;font-weight:700;
+  color:white;letter-spacing:-1px;flex-shrink:0;
+}
+.header-text h1{font-family:'Space Mono',monospace;font-size:18px;font-weight:700;letter-spacing:-0.5px;}
+.header-text p{font-size:12px;color:var(--gray-60);margin-top:2px;}
+
+.card{
+  max-width:960px;margin:0 auto 16px;background:var(--white);
+  border-radius:14px;box-shadow:0 2px 16px rgba(0,0,0,.07);overflow:hidden;
+}
+.card-top{
+  background:var(--black);padding:16px 24px;
+  display:flex;align-items:center;gap:10px;
+}
+.card-top .dot{width:8px;height:8px;border-radius:50%;background:var(--orange);}
+.card-top span{font-family:'Space Mono',monospace;font-size:11px;color:#888;letter-spacing:1px;text-transform:uppercase;}
+.card-top .tag{margin-left:auto;font-family:'Space Mono',monospace;font-size:10px;color:#555;background:#2a2a2a;padding:3px 8px;border-radius:4px;}
+
+.form-body{padding:24px;}
+
+.grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+
+.field{display:flex;flex-direction:column;gap:6px;}
+label{font-size:12px;font-weight:600;color:var(--gray-60);letter-spacing:0.5px;text-transform:uppercase;}
+label .hint{font-weight:400;text-transform:none;letter-spacing:0;color:var(--gray-40);font-size:11px;}
+
+input,select{
+  width:100%;padding:11px 14px;border:1.5px solid var(--gray-20);border-radius:8px;
+  font-size:14px;font-family:'Inter',Arial,sans-serif;color:var(--black);background:var(--white);
+  transition:border-color .15s;appearance:none;-webkit-appearance:none;
+}
+input:focus,select:focus{outline:none;border-color:var(--orange);}
+input.mono{font-family:'Space Mono',monospace;font-size:13px;}
+select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;
+}
+
+/* Cable type selector */
+.cable-type-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.ctype-btn{
+  padding:12px 6px;border:1.5px solid var(--gray-20);border-radius:8px;
+  background:var(--white);font-size:11px;font-weight:700;
+  font-family:'Space Mono',monospace;color:var(--gray-60);cursor:pointer;
+  transition:all .15s;text-align:center;line-height:1.4;
+}
+.ctype-btn .ct-icon{font-size:18px;display:block;margin-bottom:4px;}
+.ctype-btn .ct-sub{font-size:9px;font-weight:400;font-family:'Inter',sans-serif;color:var(--gray-40);}
+.ctype-btn.active{border-width:2px;}
+
+/* Add row */
+.add-row{
+  display:grid;
+  grid-template-columns:2fr 1fr 1fr 1fr 1fr auto;
+  gap:10px;align-items:end;
+  padding:16px;background:var(--gray-10);border-radius:10px;margin-top:4px;
+}
+
+.btn{
+  padding:11px 16px;border:none;border-radius:8px;
+  font-size:13px;font-weight:700;font-family:'Space Mono',monospace;
+  cursor:pointer;transition:all .15s;white-space:nowrap;
+}
+.btn-primary{background:var(--orange);color:white;}
+.btn-primary:hover{background:var(--orange-dk);}
+.btn-secondary{background:var(--gray-10);color:var(--gray-60);border:1.5px solid var(--gray-20);}
+.btn-secondary:hover{border-color:var(--orange);color:var(--orange);}
+.btn-full{width:100%;padding:14px;font-size:15px;}
+.btn-sm{padding:7px 12px;font-size:11px;}
+
+.divider{border:none;border-top:1px solid var(--gray-20);margin:20px 0;}
+
+/* Run table */
+.run-table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead tr{background:var(--black);}
+thead th{padding:10px 12px;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#888;text-align:left;white-space:nowrap;}
+tbody tr{border-bottom:1px solid var(--gray-10);}
+tbody tr:hover{background:var(--gray-10);}
+tbody td{padding:9px 12px;vertical-align:middle;}
+td.mono{font-family:'Space Mono',monospace;font-size:12px;}
+tfoot tr{background:var(--gray-10);}
+tfoot td{padding:10px 12px;font-weight:700;border-top:2px solid var(--gray-20);}
+
+.badge{display:inline-block;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:700;font-family:'Space Mono',monospace;white-space:nowrap;}
+.del-btn{background:none;border:none;color:var(--gray-40);cursor:pointer;font-size:16px;padding:4px 6px;border-radius:4px;transition:all .15s;}
+.del-btn:hover{color:var(--red);background:var(--red-lt);}
+
+/* Preset chips */
+.preset-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px;}
+.preset-chip{padding:5px 11px;border:1.5px solid var(--gray-20);border-radius:16px;font-size:11px;font-weight:600;color:var(--gray-60);cursor:pointer;transition:all .15s;background:var(--white);white-space:nowrap;}
+.preset-chip:hover{border-color:var(--orange);color:var(--orange);background:var(--orange-lt);}
+
+/* ── Result ── */
+.result-divider{height:4px;background:linear-gradient(90deg,var(--orange),var(--orange-dk));}
+.result-body{padding:24px;background:var(--gray-10);}
+.result-headline{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gray-60);margin-bottom:16px;}
+
+/* Big number panel */
+.total-panel{
+  background:var(--black);border-radius:12px;padding:20px 24px;
+  margin-bottom:16px;
+  display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:center;
+}
+.total-num{
+  font-family:'Space Mono',monospace;font-size:56px;font-weight:700;
+  color:var(--orange);line-height:1;letter-spacing:-2px;
+}
+.total-num sup{font-size:22px;letter-spacing:0;}
+.total-slots{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.ts-item{display:flex;flex-direction:column;gap:2px;}
+.ts-label{font-size:10px;color:#666;font-family:'Space Mono',monospace;letter-spacing:0.5px;text-transform:uppercase;}
+.ts-val{font-family:'Space Mono',monospace;font-size:16px;font-weight:700;color:var(--white);}
+.ts-unit{font-size:11px;color:#555;}
+
+/* Stat row */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+.stat-box{background:var(--white);border-radius:10px;padding:14px;border:1px solid var(--gray-20);}
+.stat-box.highlight{border-color:var(--orange);background:var(--orange-lt);}
+.stat-box.warn{border-color:var(--yellow);background:var(--yellow-lt);}
+.stat-label{font-size:10px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;color:var(--gray-60);margin-bottom:6px;}
+.stat-val{font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--black);line-height:1;}
+.stat-unit{font-size:11px;color:var(--gray-60);margin-top:3px;}
+
+/* Cable type breakdown */
+.cable-breakdown{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;
+}
+.cable-card{
+  background:var(--white);border-radius:10px;border:1.5px solid var(--gray-20);
+  overflow:hidden;
+}
+.cable-card-header{
+  display:flex;align-items:center;gap:10px;padding:12px 14px;
+  border-bottom:1px solid var(--gray-10);
+}
+.cable-color-bar{width:4px;height:36px;border-radius:2px;flex-shrink:0;}
+.cable-card-title{font-size:13px;font-weight:700;color:var(--black);}
+.cable-card-sub{font-size:11px;color:var(--gray-60);margin-top:1px;}
+.cable-card-body{padding:12px 14px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.cb-stat{display:flex;flex-direction:column;gap:2px;}
+.cb-label{font-size:10px;color:var(--gray-40);font-family:'Space Mono',monospace;text-transform:uppercase;letter-spacing:0.3px;}
+.cb-val{font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:var(--black);}
+
+/* Meter bar */
+.meter-row-sm{margin-bottom:6px;}
+.meter-label-sm{display:flex;justify-content:space-between;font-size:11px;color:var(--gray-60);margin-bottom:3px;}
+.meter-track-sm{height:6px;background:var(--gray-10);border-radius:3px;overflow:hidden;}
+.meter-fill-sm{height:100%;border-radius:3px;transition:width .6s;}
+
+/* Spool calculator */
+.spool-section{
+  background:var(--white);border-radius:12px;border:1px solid var(--gray-20);
+  overflow:hidden;margin-bottom:16px;
+}
+.spool-header{background:var(--black);padding:12px 18px;}
+.spool-header span{font-family:'Space Mono',monospace;font-size:10px;color:#888;letter-spacing:1px;text-transform:uppercase;}
+.spool-body{padding:16px;}
+.spool-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.spool-card{
+  background:var(--gray-10);border-radius:8px;padding:14px;
+  border:1.5px solid var(--gray-20);
+  display:flex;flex-direction:column;gap:4px;
+}
+.spool-card.recommended{border-color:var(--orange);background:var(--orange-lt);}
+.spool-name{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--black);}
+.spool-detail{font-size:11px;color:var(--gray-60);line-height:1.5;}
+.spool-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px;font-family:'Space Mono',monospace;display:inline-block;margin-top:4px;}
+
+/* Detail run table */
+.detail-table-wrap{
+  background:var(--white);border-radius:12px;border:1px solid var(--gray-20);
+  overflow:hidden;margin-bottom:16px;
+}
+.detail-table-wrap table{font-size:12px;}
+.detail-table-wrap thead th{padding:8px 12px;font-size:10px;}
+.detail-table-wrap tbody td{padding:8px 12px;}
+
+/* Alert */
+.alert-box{border-radius:10px;padding:14px 16px;font-size:12px;font-family:'Space Mono',monospace;margin-bottom:16px;line-height:1.8;display:none;}
+.alert-warn{background:var(--yellow-lt);border:1px solid var(--yellow);color:var(--yellow);}
+
+/* Rec box */
+.rec-box{background:var(--green-lt);border-left:3px solid var(--green);border-radius:0 8px 8px 0;padding:14px 16px;font-size:12px;color:var(--green);font-family:'Space Mono',monospace;line-height:1.8;margin-bottom:16px;}
+.rec-box span{color:var(--gray-60);font-family:'Inter',sans-serif;}
+
+/* Empty */
+.empty-state{text-align:center;padding:32px;color:var(--gray-40);font-size:13px;}
+.empty-state .big{font-size:32px;margin-bottom:8px;}
+
+.tip-icon{display:inline-block;width:15px;height:15px;background:var(--gray-20);border-radius:50%;font-size:9px;text-align:center;line-height:15px;color:var(--gray-60);cursor:help;font-family:'Space Mono',monospace;font-weight:700;margin-left:4px;vertical-align:middle;}
+
+.export-bar{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;}
+
+@media(max-width:680px){
+  .grid-4,.grid-3,.grid-2{grid-template-columns:1fr;}
+  .cable-type-grid{grid-template-columns:repeat(2,1fr);}
+  .add-row{grid-template-columns:1fr 1fr;}
+  .stat-row{grid-template-columns:1fr 1fr;}
+  .cable-breakdown{grid-template-columns:1fr;}
+  .spool-grid{grid-template-columns:1fr;}
+  .total-panel{grid-template-columns:1fr;}
+  .total-slots{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo-mark">KK</div>
+  <div class="header-text">
+    <h1>Cable Length Estimator</h1>
+    <p>Estimasi kebutuhan kabel UTP, Coax, FO, dan Power per titik kamera — siap cetak untuk belanja material</p>
+  </div>
+</div>
+
+<!-- Card 1: Global Setup -->
+<div class="card">
+  <div class="card-top">
+    <div class="dot"></div>
+    <span>Parameter Global</span>
+    <div class="tag">Buffer + Waste Factor</div>
+  </div>
+  <div class="form-body">
+    <div class="grid-4">
+      <div class="field">
+        <label>Nama Proyek</label>
+        <input type="text" id="project-name" placeholder="Gedung Kantor Bekasi">
+      </div>
+      <div class="field">
+        <label>Buffer Overhead <span class="tip-icon" title="Tambahan untuk routing, terminasi, dan waste. Industri standar 15–25%. Untuk jalur conduit berliku tambah sampai 30%.">?</span></label>
+        <select id="overhead">
+          <option value="10">10% — Jalur lurus / shaft vertikal</option>
+          <option value="15" selected>15% — Standar (rekomendasi)</option>
+          <option value="20">20% — Banyak belokan / plafon</option>
+          <option value="25">25% — Jalur kompleks</option>
+          <option value="30">30% — Renovasi / jalur tidak pasti</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Ketinggian Lantai <span class="hint">— default</span></label>
+        <input type="number" id="default-height" value="3.5" min="1" max="30" step="0.1" class="mono">
+      </div>
+      <div class="field">
+        <label>Panjang Ekor Kabel <span class="tip-icon" title="Sisa kabel di ujung kamera dan panel untuk terminasi. Standar: 0.5m di kamera, 1m di panel.">?</span></label>
+        <select id="tail-length">
+          <option value="0.5">0.5m (minimal)</option>
+          <option value="1" selected>1m (standar)</option>
+          <option value="1.5">1.5m</option>
+          <option value="2">2m (instalasi rapi)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Card 2: Tambah Titik Kabel -->
+<div class="card">
+  <div class="card-top">
+    <div class="dot"></div>
+    <span>Tambah Titik Instalasi</span>
+  </div>
+  <div class="form-body">
+
+    <!-- Cable type -->
+    <label style="margin-bottom:10px;display:block;">Tipe Kabel</label>
+    <div class="cable-type-grid" style="margin-bottom:16px;">
+      <button class="ctype-btn active" id="btn-utp" onclick="setCableType('UTP',this)" style="border-color:var(--utp);color:var(--utp);background:#e8f4fd22;">
+        <span class="ct-icon">🔵</span>UTP / CAT5e/6
+        <span class="ct-sub">IP Cam, PoE, Data</span>
+      </button>
+      <button class="ctype-btn" id="btn-coax" onclick="setCableType('COAX',this)">
+        <span class="ct-icon">🟠</span>Coaxial RG59/6U
+        <span class="ct-sub">Analog CCTV, HD-TVI</span>
+      </button>
+      <button class="ctype-btn" id="btn-fo" onclick="setCableType('FO',this)">
+        <span class="ct-icon">🟢</span>Fiber Optic
+        <span class="ct-sub">Backbone, jarak jauh</span>
+      </button>
+      <button class="ctype-btn" id="btn-power" onclick="setCableType('POWER',this)">
+        <span class="ct-icon">🔴</span>Kabel Power
+        <span class="ct-sub">220V, 12V adaptor</span>
+      </button>
+    </div>
+
+    <!-- UTP sub-type -->
+    <div id="utp-options" style="margin-bottom:12px;">
+      <div class="grid-2">
+        <div class="field">
+          <label>Kategori UTP</label>
+          <select id="utp-cat">
+            <option value="CAT5e">CAT5e — Max 100m (standar CCTV)</option>
+            <option value="CAT6" selected>CAT6 — Max 100m (rekomendasi)</option>
+            <option value="CAT6A">CAT6A — Max 100m (10GbE)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Batas Maksimum IEEE 802.3 <span class="tip-icon" title="Max 100m per segmen UTP termasuk patch cable. Lebih dari ini butuh switch/repeater.">?</span></label>
+          <div style="padding:11px 14px;background:var(--gray-10);border-radius:8px;font-family:'Space Mono',monospace;font-size:13px;color:var(--gray-60);">100m per segmen</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COAX sub-type -->
+    <div id="coax-options" style="display:none;margin-bottom:12px;">
+      <div class="grid-2">
+        <div class="field">
+          <label>Tipe Coaxial</label>
+          <select id="coax-type">
+            <option value="RG59">RG59 — Max 300m analog, 200m HD-TVI</option>
+            <option value="RG6U" selected>RG6U — Max 500m analog, 300m HD-TVI</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Sistem</label>
+          <select id="coax-system">
+            <option value="analog">Analog CVBS</option>
+            <option value="hdtvi" selected>HD-TVI / HD-CVI / AHD</option>
+            <option value="hdsdi">HD-SDI</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- FO sub-type -->
+    <div id="fo-options" style="display:none;margin-bottom:12px;">
+      <div class="grid-2">
+        <div class="field">
+          <label>Tipe Fiber</label>
+          <select id="fo-type">
+            <option value="SM-9/125">Single Mode 9/125 — jarak sangat jauh</option>
+            <option value="MM-50/125" selected>Multi Mode 50/125 — gedung, max ~2km</option>
+            <option value="MM-62.5/125">Multi Mode 62.5/125 — legacy</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Armored / Indoor</label>
+          <select id="fo-armor">
+            <option value="indoor">Indoor (GJPFJV)</option>
+            <option value="armored">Armored outdoor (GYTA)</option>
+            <option value="micro">Micro tube / duct</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- POWER sub-type -->
+    <div id="power-options" style="display:none;margin-bottom:12px;">
+      <div class="grid-2">
+        <div class="field">
+          <label>Tipe Kabel Power</label>
+          <select id="power-type">
+            <option value="NYM-2x1.5">NYM 2×1.5mm² — 220V</option>
+            <option value="NYM-2x2.5">NYM 2×2.5mm² — 220V beban besar</option>
+            <option value="NYMHY-2x0.75">NYMHYO 2×0.75mm² — 12V adaptor</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Catatan</label>
+          <div style="padding:11px 14px;background:var(--gray-10);border-radius:8px;font-size:12px;color:var(--gray-60);">
+            Untuk kamera PoE, tidak perlu kabel power terpisah
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick preset runs -->
+    <label style="margin-bottom:8px;display:block;">Preset Cepat <span class="hint">— skenario umum</span></label>
+    <div class="preset-row" style="margin-bottom:16px;">
+      <div class="preset-chip" onclick="loadPreset('lobby')">📷 Kamera Lobby (15m)</div>
+      <div class="preset-chip" onclick="loadPreset('corridor')">📷 Kamera Koridor (25m)</div>
+      <div class="preset-chip" onclick="loadPreset('parking')">📷 Parkir Outdoor (50m)</div>
+      <div class="preset-chip" onclick="loadPreset('rooftop')">📷 Atap / Rooftop (80m)</div>
+      <div class="preset-chip" onclick="loadPreset('ptz')">🔭 PTZ Outdoor (60m)</div>
+      <div class="preset-chip" onclick="loadPreset('nvr')">🖥️ NVR ke Switch (3m)</div>
+    </div>
+
+    <div class="add-row">
+      <div class="field">
+        <label>Label / Lokasi Titik</label>
+        <input type="text" id="run-label" placeholder="Contoh: Kamera Lobby Lt.1" class="mono"
+          onkeydown="if(event.key==='Enter')addRun()">
+      </div>
+      <div class="field">
+        <label>Jarak Horizontal (m)</label>
+        <input type="number" id="run-h" value="20" min="0" max="1000" step="0.5" class="mono">
+      </div>
+      <div class="field">
+        <label>Jarak Vertikal (m) <span class="hint">— naik/turun</span></label>
+        <input type="number" id="run-v" value="3.5" min="0" max="100" step="0.5" class="mono">
+      </div>
+      <div class="field">
+        <label>Jalur Tambahan (m) <span class="hint">— conduit, belokan</span></label>
+        <input type="number" id="run-extra" value="0" min="0" max="100" step="0.5" class="mono">
+      </div>
+      <div class="field">
+        <label>Qty</label>
+        <input type="number" id="run-qty" value="1" min="1" max="200" class="mono">
+      </div>
+      <div class="field">
+        <label>&nbsp;</label>
+        <button class="btn btn-primary" onclick="addRun()">+ Tambah</button>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Run table -->
+    <div class="run-table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Label</th><th>Tipe</th><th>Spec</th>
+            <th>H (m)</th><th>V (m)</th><th>Extra (m)</th><th>Tail (m)</th>
+            <th>Raw (m)</th><th>Qty</th><th>+Buffer</th><th>Total</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="run-tbody">
+          <tr><td colspan="13">
+            <div class="empty-state"><div class="big">🔌</div>Belum ada titik kabel. Tambahkan di atas atau klik preset.</div>
+          </td></tr>
+        </tbody>
+        <tfoot id="run-tfoot" style="display:none;">
+          <tr>
+            <td colspan="10" style="color:var(--gray-60);font-size:12px;">TOTAL KEBUTUHAN</td>
+            <td class="mono" id="tfoot-buffer">—</td>
+            <td class="mono" id="tfoot-total" style="font-size:15px;color:var(--orange);">—</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <hr class="divider">
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-primary btn-full" onclick="calculate()" style="flex:2;">▶ HITUNG KEBUTUHAN KABEL</button>
+      <button class="btn btn-secondary" onclick="clearAll()" style="flex:1;">Reset</button>
+    </div>
+  </div>
+</div>
+
+<!-- Result -->
+<div class="card" id="result-card" style="display:none;">
+  <div class="result-divider"></div>
+  <div class="result-body">
+    <div class="result-headline">// Cable Material Report</div>
+
+    <div class="alert-box alert-warn" id="alert-warn"></div>
+
+    <!-- Big total -->
+    <div class="total-panel" id="total-panel"></div>
+
+    <!-- Stat row -->
+    <div class="stat-row" id="stat-row"></div>
+
+    <!-- Per cable type breakdown -->
+    <div style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gray-60);margin-bottom:12px;">// Breakdown per Tipe Kabel</div>
+    <div class="cable-breakdown" id="cable-breakdown"></div>
+
+    <!-- Spool / roll calculator -->
+    <div class="spool-section">
+      <div class="spool-header"><span>Kebutuhan Roll / Spool Kabel</span></div>
+      <div class="spool-body">
+        <div class="spool-grid" id="spool-grid"></div>
+      </div>
+    </div>
+
+    <!-- Detail per titik -->
+    <div class="detail-table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Label</th><th>Tipe</th><th>Spec</th>
+            <th>Raw (m)</th><th>Qty</th><th>Sub Total</th><th>+Buffer</th><th>Final (m)</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="detail-tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- Rec box -->
+    <div class="rec-box" id="rec-box"></div>
+
+    <!-- Export -->
+    <div class="export-bar">
+      <button class="btn btn-secondary" onclick="copyBOM()">📋 Salin Bill of Materials</button>
+      <button class="btn btn-secondary" onclick="copyCSV()">📋 Salin CSV</button>
+      <button class="btn btn-secondary" onclick="exportHTML()">💾 Simpan HTML</button>
+    </div>
+  </div>
+</div>
+
+<div style="max-width:960px;margin:20px auto 0;font-size:11px;color:var(--gray-60);text-align:center;line-height:1.6;">
+  KutuKabel Tools — Cable Estimator &nbsp;|&nbsp; UTP max 100m (IEEE 802.3) · RG59 max 300m · RG6U max 500m · Buffer 15% industri standar
+</div>
+
+<script>
+// ── State
+let runs = [];
+let runCounter = 0;
+let currentCableType = 'UTP';
+
+// ── Cable type config
+const CTYPE = {
+  UTP:   { color:'#1a6fa8', icon:'🔵', label:'UTP',   maxLen:100 },
+  COAX:  { color:'#d46316', icon:'🟠', label:'Coax',  maxLen:500 },
+  FO:    { color:'#1d8a4e', icon:'🟢', label:'FO',    maxLen:2000 },
+  POWER: { color:'#c0392b', icon:'🔴', label:'Power', maxLen:999  },
+};
+
+// ── Spool sizes (meter per roll)
+const SPOOLS = {
+  UTP:   [50, 100, 305, 500],
+  COAX:  [50, 100, 200, 305, 500],
+  FO:    [100, 200, 500, 1000, 2000],
+  POWER: [50, 100, 200, 300],
+};
+
+function setCableType(type, btn) {
+  currentCableType = type;
+  document.querySelectorAll('.ctype-btn').forEach(b => {
+    b.classList.remove('active');
+    b.style.borderColor=''; b.style.color=''; b.style.background='';
+  });
+  btn.classList.add('active');
+  btn.style.borderColor = CTYPE[type].color;
+  btn.style.color       = CTYPE[type].color;
+  btn.style.background  = CTYPE[type].color + '12';
+
+  ['utp-options','coax-options','fo-options','power-options'].forEach(id =>
+    document.getElementById(id).style.display = 'none');
+  const map = {UTP:'utp-options', COAX:'coax-options', FO:'fo-options', POWER:'power-options'};
+  document.getElementById(map[type]).style.display = 'block';
+}
+
+function getSpec() {
+  if (currentCableType === 'UTP')   return document.getElementById('utp-cat').value;
+  if (currentCableType === 'COAX')  return document.getElementById('coax-type').value + ' ' + document.getElementById('coax-system').value.toUpperCase();
+  if (currentCableType === 'FO')    return document.getElementById('fo-type').value + ' ' + document.getElementById('fo-armor').value;
+  if (currentCableType === 'POWER') return document.getElementById('power-type').value;
+  return '';
+}
+
+// ── Presets
+const PRESETS = {
+  lobby:    { label:'Kamera Lobby', h:15, v:3,  extra:2,  qty:1 },
+  corridor: { label:'Kamera Koridor', h:25, v:3.5, extra:3, qty:1 },
+  parking:  { label:'Kamera Parkir Outdoor', h:50, v:5,  extra:5,  qty:1 },
+  rooftop:  { label:'Kamera Atap/Rooftop', h:80, v:10, extra:5,  qty:1 },
+  ptz:      { label:'PTZ Outdoor', h:60, v:6,  extra:8,  qty:1 },
+  nvr:      { label:'NVR ke Switch', h:3,  v:0,  extra:0,  qty:1 },
+};
+
+function loadPreset(key) {
+  const p = PRESETS[key];
+  document.getElementById('run-label').value = p.label;
+  document.getElementById('run-h').value     = p.h;
+  document.getElementById('run-v').value     = p.v;
+  document.getElementById('run-extra').value = p.extra;
+  document.getElementById('run-qty').value   = p.qty;
+  document.getElementById('run-label').focus();
+}
+
+// ── Add run
+function addRun() {
+  const label  = document.getElementById('run-label').value.trim();
+  if (!label) { document.getElementById('run-label').focus(); return; }
+  const h      = parseFloat(document.getElementById('run-h').value)     || 0;
+  const v      = parseFloat(document.getElementById('run-v').value)     || 0;
+  const extra  = parseFloat(document.getElementById('run-extra').value) || 0;
+  const qty    = parseInt(document.getElementById('run-qty').value)     || 1;
+  const tail   = parseFloat(document.getElementById('tail-length').value) * 2; // both ends
+  const spec   = getSpec();
+
+  const rawPerUnit = h + v + extra + tail;
+
+  runCounter++;
+  runs.push({ id:runCounter, label, ctype:currentCableType, spec, h, v, extra, tail, rawPerUnit, qty });
+  renderRunTable();
+
+  document.getElementById('run-label').value = '';
+  document.getElementById('run-extra').value = 0;
+  document.getElementById('run-qty').value   = 1;
+  document.getElementById('run-label').focus();
+}
+
+function removeRun(id) {
+  runs = runs.filter(r => r.id !== id);
+  renderRunTable();
+}
+
+function renderRunTable() {
+  const tbody  = document.getElementById('run-tbody');
+  const tfoot  = document.getElementById('run-tfoot');
+  const ovhPct = parseInt(document.getElementById('overhead').value) / 100;
+
+  if (runs.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="13"><div class="empty-state"><div class="big">🔌</div>Belum ada titik.</div></td></tr>`;
+    tfoot.style.display = 'none';
+    return;
+  }
+
+  let totalBuffer = 0, totalFinal = 0;
+  tbody.innerHTML = runs.map((r, i) => {
+    const subtotal = r.rawPerUnit * r.qty;
+    const buffer   = subtotal * ovhPct;
+    const final    = subtotal + buffer;
+    totalBuffer   += buffer;
+    totalFinal    += final;
+    const warn     = r.rawPerUnit > CTYPE[r.ctype].maxLen;
+    return `<tr ${warn ? 'style="background:var(--yellow-lt);"' : ''}>
+      <td style="color:var(--gray-40);font-size:11px;">${i+1}</td>
+      <td class="mono" style="font-size:12px;">${r.label}${warn ? ' ⚠' : ''}</td>
+      <td><span class="badge" style="background:${CTYPE[r.ctype].color}22;color:${CTYPE[r.ctype].color};">${r.ctype}</span></td>
+      <td style="font-size:11px;color:var(--gray-60);">${r.spec}</td>
+      <td class="mono">${r.h}</td>
+      <td class="mono">${r.v}</td>
+      <td class="mono">${r.extra}</td>
+      <td class="mono">${r.tail.toFixed(1)}</td>
+      <td class="mono" style="font-weight:700;">${r.rawPerUnit.toFixed(1)}</td>
+      <td class="mono">${r.qty}×</td>
+      <td class="mono">+${buffer.toFixed(1)}</td>
+      <td class="mono" style="font-weight:700;color:${CTYPE[r.ctype].color};">${final.toFixed(1)}</td>
+      <td><button class="del-btn" onclick="removeRun(${r.id})">✕</button></td>
+    </tr>`;
+  }).join('');
+
+  tfoot.style.display = '';
+  document.getElementById('tfoot-buffer').textContent = '+' + totalBuffer.toFixed(1) + 'm';
+  document.getElementById('tfoot-total').textContent  = totalFinal.toFixed(1) + 'm';
+}
+
+// ── Main calculate
+function calculate() {
+  if (runs.length === 0) { alert('Tambahkan minimal 1 titik kabel.'); return; }
+
+  const ovhPct = parseInt(document.getElementById('overhead').value) / 100;
+  const proj   = document.getElementById('project-name').value || 'Proyek';
+
+  // Group by cable type
+  const groups = {};
+  runs.forEach(r => {
+    if (!groups[r.ctype]) groups[r.ctype] = { runs:[], totalRaw:0, totalFinal:0, specs:{} };
+    const raw   = r.rawPerUnit * r.qty;
+    const final = raw * (1 + ovhPct);
+    groups[r.ctype].runs.push({ ...r, raw, final });
+    groups[r.ctype].totalRaw   += raw;
+    groups[r.ctype].totalFinal += final;
+    if (!groups[r.ctype].specs[r.spec]) groups[r.ctype].specs[r.spec] = 0;
+    groups[r.ctype].specs[r.spec] += final;
+  });
+
+  const grandTotal = Object.values(groups).reduce((s,g) => s + g.totalFinal, 0);
+  const totalRuns  = runs.reduce((s,r) => s + r.qty, 0);
+  const totalPoints = runs.length;
+
+  // Warnings
+  const warns = [];
+  runs.forEach(r => {
+    if (r.rawPerUnit > CTYPE[r.ctype].maxLen) {
+      warns.push(`⚠ "${r.label}": ${r.rawPerUnit.toFixed(0)}m melebihi batas max ${r.ctype} (${CTYPE[r.ctype].maxLen}m). Butuh switch/extender/FO converter.`);
+    }
+  });
+  const alertEl = document.getElementById('alert-warn');
+  if (warns.length) { alertEl.style.display='block'; alertEl.innerHTML = warns.join('<br>'); }
+  else alertEl.style.display = 'none';
+
+  // ── Big total
+  document.getElementById('total-panel').innerHTML = `
+    <div>
+      <div style="font-family:'Space Mono',monospace;font-size:10px;color:#666;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Total Kabel Dibutuhkan</div>
+      <div class="total-num">${grandTotal.toFixed(0)}<sup> m</sup></div>
+      <div style="color:#666;font-size:12px;margin-top:6px;">termasuk ${document.getElementById('overhead').value}% buffer overhead</div>
+    </div>
+    <div class="total-slots">
+      <div class="ts-item">
+        <div class="ts-label">Titik Instalasi</div>
+        <div class="ts-val">${totalPoints}</div>
+        <div class="ts-unit">lokasi berbeda</div>
+      </div>
+      <div class="ts-item">
+        <div class="ts-label">Total Runs</div>
+        <div class="ts-val">${totalRuns}</div>
+        <div class="ts-unit">kamera / device</div>
+      </div>
+      <div class="ts-item">
+        <div class="ts-label">Tipe Kabel</div>
+        <div class="ts-val">${Object.keys(groups).length}</div>
+        <div class="ts-unit">jenis berbeda</div>
+      </div>
+      <div class="ts-item">
+        <div class="ts-label">Rata-rata</div>
+        <div class="ts-val">${(grandTotal / Math.max(totalRuns,1)).toFixed(0)}m</div>
+        <div class="ts-unit">per titik</div>
+      </div>
+      <div class="ts-item">
+        <div class="ts-label">Buffer Total</div>
+        <div class="ts-val">+${(grandTotal - Object.values(groups).reduce((s,g)=>s+g.totalRaw,0)).toFixed(0)}m</div>
+        <div class="ts-unit">${document.getElementById('overhead').value}% overhead</div>
+      </div>
+      <div class="ts-item">
+        <div class="ts-label">Proyek</div>
+        <div class="ts-val" style="font-size:12px;">${proj.substring(0,16)}</div>
+        <div class="ts-unit">${new Date().toLocaleDateString('id-ID')}</div>
+      </div>
+    </div>
+  `;
+
+  // Stat row
+  const longestRun = runs.reduce((mx, r) => r.rawPerUnit > mx ? r.rawPerUnit : mx, 0);
+  const utpRuns    = runs.filter(r=>r.ctype==='UTP' && r.rawPerUnit > 80);
+  document.getElementById('stat-row').innerHTML = `
+    <div class="stat-box highlight">
+      <div class="stat-label">Grand Total</div>
+      <div class="stat-val">${grandTotal.toFixed(0)}</div>
+      <div class="stat-unit">meter kabel</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Run Terpanjang</div>
+      <div class="stat-val">${longestRun.toFixed(0)}</div>
+      <div class="stat-unit">meter per titik</div>
+    </div>
+    <div class="stat-box ${utpRuns.length > 0 ? 'warn' : ''}">
+      <div class="stat-label">UTP Near Limit</div>
+      <div class="stat-val">${utpRuns.length}</div>
+      <div class="stat-unit">titik mendekati 100m</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Avg per Titik</div>
+      <div class="stat-val">${(grandTotal/Math.max(totalRuns,1)).toFixed(0)}</div>
+      <div class="stat-unit">meter</div>
+    </div>
+  `;
+
+  // Cable breakdown cards
+  const breakdownEl = document.getElementById('cable-breakdown');
+  breakdownEl.innerHTML = Object.entries(groups).map(([ctype, g]) => {
+    const color  = CTYPE[ctype].color;
+    const pctOfTotal = (g.totalFinal / grandTotal * 100).toFixed(0);
+    const specBreakdown = Object.entries(g.specs).map(([spec, len]) =>
+      `<div class="meter-row-sm">
+        <div class="meter-label-sm"><span>${spec}</span><span>${len.toFixed(0)}m</span></div>
+        <div class="meter-track-sm"><div class="meter-fill-sm" style="width:${(len/g.totalFinal*100).toFixed(0)}%;background:${color};"></div></div>
+      </div>`
+    ).join('');
+    return `
+    <div class="cable-card">
+      <div class="cable-card-header">
+        <div class="cable-color-bar" style="background:${color}"></div>
+        <div>
+          <div class="cable-card-title">${CTYPE[ctype].icon} Kabel ${ctype}</div>
+          <div class="cable-card-sub">${g.runs.length} titik · ${pctOfTotal}% dari total</div>
+        </div>
+        <div style="margin-left:auto;font-family:'Space Mono',monospace;font-size:22px;font-weight:700;color:${color};">${g.totalFinal.toFixed(0)}<span style="font-size:12px;">m</span></div>
+      </div>
+      <div class="cable-card-body">
+        <div class="cb-stat"><div class="cb-label">Raw</div><div class="cb-val">${g.totalRaw.toFixed(0)}m</div></div>
+        <div class="cb-stat"><div class="cb-label">Buffer</div><div class="cb-val">+${(g.totalFinal-g.totalRaw).toFixed(0)}m</div></div>
+        <div class="cb-stat"><div class="cb-label">Total</div><div class="cb-val">${g.totalFinal.toFixed(0)}m</div></div>
+        <div class="cb-stat"><div class="cb-label">Titik</div><div class="cb-val">${g.runs.reduce((s,r)=>s+r.qty,0)}</div></div>
+      </div>
+      <div style="padding:0 14px 12px;">${specBreakdown}</div>
+    </div>`;
+  }).join('');
+
+  // Spool calculator
+  const spoolEl = document.getElementById('spool-grid');
+  spoolEl.innerHTML = Object.entries(groups).map(([ctype, g]) => {
+    const color  = CTYPE[ctype].color;
+    const needed = Math.ceil(g.totalFinal);
+    const spools = SPOOLS[ctype] || [100, 305];
+
+    // Find optimal spool combinations
+    const options = spools.map(spool => {
+      const count  = Math.ceil(needed / spool);
+      const total  = count * spool;
+      const waste  = total - needed;
+      return { spool, count, total, waste };
+    }).sort((a,b) => a.waste - b.waste);
+
+    const best = options[0];
+    return `
+    <div class="spool-card recommended">
+      <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--orange-dk);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:4px;">✓ ${ctype} — Rekomendasi</div>
+      <div class="spool-name">${best.count} × Roll ${best.spool}m</div>
+      <div class="spool-detail">
+        Dibutuhkan: <strong>${needed}m</strong><br>
+        Total beli: <strong>${best.total}m</strong><br>
+        Sisa (waste): ${best.waste}m (${(best.waste/best.total*100).toFixed(0)}%)
+      </div>
+      <div class="spool-badge" style="background:var(--orange);color:white;">BELI ${best.count} ROLL @ ${best.spool}m</div>
+    </div>
+    ${options.slice(1,3).map(o => `
+    <div class="spool-card">
+      <div style="font-size:10px;color:var(--gray-40);font-family:'Space Mono',monospace;text-transform:uppercase;margin-bottom:4px;">Alternatif</div>
+      <div class="spool-name">${o.count} × Roll ${o.spool}m</div>
+      <div class="spool-detail">
+        Total: ${o.total}m · Sisa: ${o.waste}m
+      </div>
+      <div class="spool-badge" style="background:var(--gray-20);color:var(--gray-60);">@ ${o.spool}m/roll</div>
+    </div>`).join('')}
+    `;
+  }).join('');
+
+  // Detail table
+  const detailEl = document.getElementById('detail-tbody');
+  detailEl.innerHTML = Object.values(groups).flatMap(g => g.runs).map((r, i) => {
+    const warn   = r.rawPerUnit > CTYPE[r.ctype].maxLen;
+    const color  = CTYPE[r.ctype].color;
+    return `<tr ${warn ? 'style="background:var(--yellow-lt);"' : ''}>
+      <td style="color:var(--gray-40);font-size:11px;">${i+1}</td>
+      <td class="mono" style="font-size:12px;">${r.label}</td>
+      <td><span class="badge" style="background:${color}22;color:${color};">${r.ctype}</span></td>
+      <td style="font-size:11px;color:var(--gray-60);">${r.spec}</td>
+      <td class="mono">${r.rawPerUnit.toFixed(1)}</td>
+      <td class="mono">${r.qty}×</td>
+      <td class="mono">${r.raw.toFixed(1)}</td>
+      <td class="mono">+${(r.final-r.raw).toFixed(1)}</td>
+      <td class="mono" style="font-weight:700;color:${color};">${r.final.toFixed(1)}</td>
+      <td>${warn
+        ? '<span class="badge" style="background:var(--yellow-lt);color:var(--yellow);">⚠ OVERLIMIT</span>'
+        : '<span class="badge" style="background:var(--green-lt);color:var(--green);">OK</span>'
+      }</td>
+    </tr>`;
+  }).join('');
+
+  // Rec box
+  const warnings = runs.filter(r => r.rawPerUnit > CTYPE[r.ctype].maxLen);
+  let rec = `<span>Summary material untuk ${proj}:</span><br>`;
+  rec += `→ Total ${grandTotal.toFixed(0)}m kabel dari ${totalRuns} titik instalasi<br>`;
+  if (warnings.length) {
+    rec += `→ ⚠ ${warnings.length} titik melebihi batas maksimum — pertimbangkan PoE Extender, Media Converter FO, atau switch tambahan di titik tersebut<br>`;
+  }
+  rec += `→ Selalu beli 1 roll ekstra untuk cadangan cutting dan kerusakan<br>`;
+  rec += `→ UTP: gunakan CAT6 untuk semua instalasi baru — kompatibel 10/100/1000Mbps dan PoE<br>`;
+  rec += `→ Label setiap kabel di kedua ujung sebelum ditarik (gunakan ID titik yang sama)`;
+  document.getElementById('rec-box').innerHTML = rec;
+
+  // Store for export
+  window._exportGroups = groups;
+  window._exportTotal  = grandTotal;
+  window._exportProj   = proj;
+  window._exportOvh    = document.getElementById('overhead').value;
+
+  document.getElementById('result-card').style.display = 'block';
+  document.getElementById('result-card').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+// ── Export
+function copyBOM() {
+  if (!window._exportGroups) return;
+  const proj = window._exportProj;
+  const now  = new Date().toLocaleString('id-ID');
+  let bom    = `BILL OF MATERIALS — ${proj}\nGenerated: ${now}\nKutuKabel Tools\n`;
+  bom += '='.repeat(50) + '\n\n';
+  bom += `TOTAL KABEL: ${window._exportTotal.toFixed(0)} m\n`;
+  bom += `Buffer overhead: ${window._exportOvh}%\n\n`;
+  Object.entries(window._exportGroups).forEach(([ctype, g]) => {
+    bom += `\n── ${ctype} (${g.totalFinal.toFixed(0)} m) ──\n`;
+    Object.entries(g.specs).forEach(([spec, len]) => {
+      const spool = (SPOOLS[ctype]||[100]).sort((a,b)=>a-b).find(s=>s>=len)||SPOOLS[ctype][SPOOLS[ctype].length-1];
+      const count = Math.ceil(len/spool);
+      bom += `  ${spec}: ${len.toFixed(0)} m → ${count} × roll ${spool}m\n`;
+    });
+  });
+  bom += '\n' + '='.repeat(50) + '\n';
+  bom += 'Detail per titik:\n';
+  runs.forEach((r,i) => {
+    const ovh   = parseInt(document.getElementById('overhead').value)/100;
+    const final = r.rawPerUnit * r.qty * (1+ovh);
+    bom += `${i+1}. ${r.label} [${r.ctype} ${r.spec}] — ${final.toFixed(0)}m\n`;
+  });
+  navigator.clipboard.writeText(bom).then(() => showToast('BOM disalin!'));
+}
+
+function copyCSV() {
+  if (!window._exportGroups) return;
+  let csv = `Proyek,${window._exportProj}\nGenerated,${new Date().toLocaleString('id-ID')}\n\n`;
+  csv += 'No,Label,Tipe,Spec,H(m),V(m),Extra(m),Tail(m),Raw/unit,Qty,Sub Raw,Buffer,Total Final\n';
+  const ovh = parseInt(document.getElementById('overhead').value)/100;
+  runs.forEach((r,i) => {
+    const raw   = r.rawPerUnit * r.qty;
+    const final = raw * (1+ovh);
+    csv += `${i+1},"${r.label}","${r.ctype}","${r.spec}",${r.h},${r.v},${r.extra},${r.tail.toFixed(1)},${r.rawPerUnit.toFixed(1)},${r.qty},${raw.toFixed(1)},${(final-raw).toFixed(1)},${final.toFixed(1)}\n`;
+  });
+  navigator.clipboard.writeText(csv).then(() => showToast('CSV disalin!'));
+}
+
+function exportHTML() {
+  if (!window._exportGroups) return;
+  const proj = window._exportProj;
+  const now  = new Date().toLocaleString('id-ID');
+  const ovh  = parseInt(document.getElementById('overhead').value)/100;
+  const rows = runs.map((r,i) => {
+    const raw=r.rawPerUnit*r.qty, final=raw*(1+ovh);
+    return `<tr><td>${i+1}</td><td>${r.label}</td><td>${r.ctype}</td><td>${r.spec}</td>
+    <td>${r.rawPerUnit.toFixed(1)}</td><td>${r.qty}</td><td>${raw.toFixed(1)}</td>
+    <td>+${(final-raw).toFixed(1)}</td><td><strong>${final.toFixed(1)}</strong></td></tr>`;
+  }).join('');
+  const html=`<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><title>Cable BOM — ${proj}</title>
+  <style>body{font-family:Arial,sans-serif;padding:24px;}h2{margin-bottom:4px;}p{color:#666;font-size:12px;margin-bottom:16px;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}th{background:#1a1a1a;color:#ccc;padding:8px 12px;text-align:left;font-size:11px;}
+  td{padding:8px 12px;border-bottom:1px solid #eee;font-family:monospace;}
+  .tot{background:#fff0e6;font-weight:bold;}</style></head><body>
+  <h2>🔌 Cable Length Estimator — ${proj}</h2>
+  <p>Generated: ${now} | Buffer: ${window._exportOvh}% | Total: ${window._exportTotal.toFixed(0)}m | KutuKabel Tools</p>
+  <table><thead><tr><th>#</th><th>Label</th><th>Tipe</th><th>Spec</th><th>Raw/unit</th><th>Qty</th><th>Sub Raw</th><th>Buffer</th><th>Total Final</th></tr></thead>
+  <tbody>${rows}</tbody>
+  <tfoot><tr class="tot"><td colspan="8">GRAND TOTAL</td><td>${window._exportTotal.toFixed(0)} m</td></tr></tfoot>
+  </table></body></html>`;
+  const blob=new Blob([html],{type:'text/html'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`cable-bom-${proj.replace(/\s+/g,'-').toLowerCase()}.html`;
+  a.click();
+}
+
+function clearAll() {
+  if (runs.length>0 && !confirm('Reset semua data?')) return;
+  runs=[]; runCounter=0;
+  document.getElementById('run-tbody').innerHTML=`<tr><td colspan="13"><div class="empty-state"><div class="big">🔌</div>Belum ada titik.</div></td></tr>`;
+  document.getElementById('run-tfoot').style.display='none';
+  document.getElementById('result-card').style.display='none';
+}
+
+function showToast(msg) {
+  let t=document.getElementById('toast');
+  if(!t){t=document.createElement('div');t.id='toast';t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:white;padding:10px 20px;border-radius:8px;font-size:13px;z-index:999;font-family:Space Mono,monospace;';document.body.appendChild(t);}
+  t.textContent=msg;t.style.display='block';setTimeout(()=>t.style.display='none',2200);
+}
+</script>
+</body>
+</html>
